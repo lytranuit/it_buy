@@ -23,15 +23,22 @@ namespace Vue.Models
         public string? pdf { get; set; }
         public int? esign_id { get; set; }
         public int? muahang_chonmua_id { get; set; }
+        public bool? is_dathang { get; set; }
+        public bool? is_thanhtoan { get; set; }
 
+        public string? dondathang { get; set; }
+        public string? loaithanhtoan { get; set; } // Trả trước or trả sau
         //[ForeignKey("muahang_chonmua_id")]
-        //public MuahangNccModel? muahang_chonmua { get; set; }
+        [NotMapped]
+        public MuahangNccModel? muahang_chonmua { get; set; }
+        public List<MuahangDinhkemModel>? list_thanhtoan { get; set; }
         public List<MuahangChitietModel>? chitiet { get; set; }
         public List<MuahangNccModel>? nccs { get; set; }
 
+        public DateTime? date_finish { get; set; }     ///Ngày hoàn thành
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         [DataType(DataType.Date)]
-        public DateTime? date { get; set; }
+        public DateTime? date { get; set; }     ///Ngày giao hàng dự kiến
         public DateTime? deleted_at { get; set; }
         public DateTime? updated_at { get; set; }
         public DateTime? created_at { get; set; }

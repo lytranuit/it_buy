@@ -1,4 +1,3 @@
-
 <template>
   <TreeSelect :options="supliers" :multiple="multiple" :normalizer="normalizer" :modelValue="modelValue" :name="name"
     :required="required" :append-to-body="appendToBody" @update:modelValue="emit('update:modelValue', $event)"
@@ -40,7 +39,7 @@ const emit = defineEmits(["update:modelValue"]);
 const normalizer = (node) => {
   // console.log(node);
   return {
-    id: node.mancc,
+    id: node.id,
     label: node.mancc + " - " + node.tenncc,
   }
 }

@@ -3,9 +3,12 @@ import { defineStore } from "pinia";
 
 export const useMuahang = defineStore("muahang", () => {
   const model = ref({});
+  const tabviewActive = ref(0);
   const datatable = ref([]);
   const nccs = ref([]);
   const nccs_chitiet = ref([]);
+  const files = ref([]);
+  const waiting = ref();
   const list_add = computed(() => {
     return datatable.value.filter((item) => {
       return item.ids;
@@ -30,6 +33,9 @@ export const useMuahang = defineStore("muahang", () => {
     list_add,
     list_update,
     list_delete,
+    files,
+    waiting,
+    tabviewActive,
     reset,
   };
 });

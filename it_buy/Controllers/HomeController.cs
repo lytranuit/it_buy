@@ -123,13 +123,14 @@ namespace Vue.Controllers
                     if (model != null)
                     {
                         model.status_id = (int)Status.EsignSuccess;
+                        model.pdf = dutru_tmp.pdf;
                         _context.Update(model);
-                        var chitiet = model.chitiet;
-                        foreach (var item in chitiet)
-                        {
-                            item.status_id = 2;
-                        }
-                        _context.UpdateRange(chitiet);
+                        //var chitiet = model.chitiet;
+                        //foreach (var item in chitiet)
+                        //{
+                        //    item.status_id = 2;
+                        //}
+                        //_context.UpdateRange(chitiet);
                         queue.status_id = 2;
                         _context.Update(queue);
                         await _context.SaveChangesAsync();
@@ -171,6 +172,7 @@ namespace Vue.Controllers
                     if (model != null)
                     {
                         model.status_id = (int)Status.MuahangEsignSuccess;
+                        model.pdf = muahang_tmp.pdf;
                         _context.Update(model);
                         queue.status_id = 2;
                         _context.Update(queue);

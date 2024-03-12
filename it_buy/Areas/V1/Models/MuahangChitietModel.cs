@@ -15,7 +15,10 @@ namespace Vue.Models
         public decimal? soluong { get; set; }
         public int? status_id { get; set; }
         public string? note { get; set; }
-        public int? dutru_chitiet_id { get; set; }
+        public int dutru_chitiet_id { get; set; }
+        public string? note_nhanhang { get; set; }
+        public int? status_nhanhang { get; set; }
+        public DateTime? date_nhanhang { get; set; }
 
         [ForeignKey("muahang_id")]
         public MuahangModel? muahang { get; set; }

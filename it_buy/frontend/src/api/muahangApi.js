@@ -24,6 +24,24 @@ export default {
       })
       .then((res) => res.data);
   },
+  xoadondathang(params) {
+    return repository
+      .post(`/v1/${resoure}/xoadondathang`, params, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => res.data);
+  },
+  xoathanhtoan(params) {
+    return repository
+      .post(`/v1/${resoure}/xoathanhtoan`, params, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => res.data);
+  },
   save(params) {
     return repository
       .post(`/v1/${resoure}/Save`, params, {
@@ -33,9 +51,22 @@ export default {
       })
       .then((res) => res.data);
   },
-  saveLinkChitiet(params) {
+  xuatdondathang(id) {
     return repository
-      .post(`/v1/${resoure}/saveLinkChitiet`, params, {
+      .post(
+        `/v1/${resoure}/xuatdondathang`,
+        { id: id },
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      )
+      .then((res) => res.data);
+  },
+  savethanhtoan(params) {
+    return repository
+      .post(`/v1/${resoure}/savethanhtoan`, params, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -99,6 +130,27 @@ export default {
   get(id) {
     return repository
       .get(`/v1/${resoure}/Get`, { params: { id: id } })
+      .then((res) => res.data);
+  },
+  addcomment(params) {
+    return repository
+      .post(`/v1/${resoure}/addcomment`, params, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => res.data);
+  },
+  morecomment(model_id, from_id) {
+    return repository
+      .get(`/v1/${resoure}/morecomment`, {
+        params: { id: model_id, from_id: from_id },
+      })
+      .then((res) => res.data);
+  },
+  getFiles(id) {
+    return repository
+      .get(`/v1/${resoure}/getFiles`, { params: { id: id } })
       .then((res) => res.data);
   },
 };

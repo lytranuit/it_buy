@@ -12,6 +12,7 @@ namespace Vue.Models
         public int id { get; set; }
         public string? code { get; set; }
         public string? name { get; set; }
+        public string? bophan { get; set; }
         public string? created_by { get; set; }
 
         [ForeignKey("created_by")]
@@ -24,6 +25,7 @@ namespace Vue.Models
         public int? esign_id { get; set; }
         public List<DutruChitietModel>? chitiet { get; set; }
 
+        public DateTime? date_finish { get; set; }     ///Ngày hoàn thành
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         [DataType(DataType.Date)]
         public DateTime? date { get; set; }
@@ -56,5 +58,9 @@ namespace Vue.Models
         MuahangEsignSuccess = 10,
         [Display(Name = "Ký lỗi Mua hàng")]
         MuahangEsignError = 11,
+        [Display(Name = "Đã đặt hàng")]
+        DatHang = 12,
+        [Display(Name = "Chấp nhận thanh toán")]
+        ThanhtoanSuccess = 13,
     }
 }

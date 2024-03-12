@@ -10,15 +10,15 @@
       <section class="card card-fluid">
         <div class="card-body" style="overflow: auto; position: relative">
           <DataTable class="p-datatable-customers" showGridlines :value="datatable" :lazy="true" ref="dt"
-            scrollHeight="70vh" v-model:selection="selectedProducts" :paginator="true" :rowsPerPageOptions="[10, 50, 100]"
-            :rows="rows" :totalRecords="totalRecords" @page="onPage($event)" :rowHover="true" :loading="loading"
-            responsiveLayout="scroll" :resizableColumns="true" columnResizeMode="expand" v-model:filters="filters"
-            filterDisplay="menu">
+            scrollHeight="70vh" v-model:selection="selectedProducts" :paginator="true"
+            :rowsPerPageOptions="[10, 50, 100]" :rows="rows" :totalRecords="totalRecords" @page="onPage($event)"
+            :rowHover="true" :loading="loading" responsiveLayout="scroll" :resizableColumns="true"
+            columnResizeMode="expand" v-model:filters="filters" filterDisplay="menu">
             <template #header>
               <div style="width: 200px">
-                <treeselect :options="columns" v-model="showing" multiple :limit="0"
+                <TreeSelect :options="columns" v-model="showing" multiple :limit="0"
                   :limitText="(count) => 'Hiển thị: ' + count + ' cột'">
-                </treeselect>
+                </TreeSelect>
               </div>
             </template>
 
@@ -26,9 +26,11 @@
             <Column selectionMode="multiple" style="width: 3rem" :exportable="false"></Column>
             <Column v-for="col of selectedColumns" :field="col.data" :header="col.label" :key="col.data"
               :showFilterMatchModes="false">
+
               <template #body="slotProps">
                 <div v-html="slotProps.data[col.data]"></div>
               </template>
+
               <template #filter="{ filterModel, filterCallback }" v-if="col.filter == true">
                 <InputText type="text" v-model="filterModel.value" @keydown.enter="filterCallback()"
                   class="p-column-filter" />
@@ -36,6 +38,7 @@
             </Column>
 
             <Column style="width: 1rem">
+
               <template #body="slotProps">
                 <a class="p-link text-warning mr-2 font-16" @click="editProduct(slotProps.data)"><i
                     class="pi pi-pencil"></i></a>
@@ -48,31 +51,14 @@
       </section>
     </div>
 
-    <Dialog v-model:visible="productDialog" :header="headerForm" :modal="true" class="p-fluid">
-      <div class="row mb-2">
-        <div class="field col">
-          <label for="name">Mã NCC <span class="text-danger">*</span></label>
-          <InputText id="name" class="p-inputtext-sm" v-model.trim="model.mancc" required="true"
-            :class="{ 'p-invalid': submitted && !model.mancc }" />
-          <small class="p-error" v-if="submitted && !model.mancc">Required.</small>
-        </div>
-        <div class="field col">
-          <label for="name">Tên NCC</label>
-          <InputText id="name" class="p-inputtext-sm" v-model.trim="model.tenncc" />
-        </div>
-      </div>
-
-      <template #footer>
-        <Button label="Cancel" icon="pi pi-times" class="p-button-text" @click="hideDialog"></Button>
-        <Button label="Save" icon="pi pi-check" class="p-button-text" @click="saveProduct"></Button>
-      </template>
-    </Dialog>
+    <PopupAdd @save="loadLazyData"></PopupAdd>
 
     <Dialog v-model:visible="deleteProductDialog" header="Xác nhận" :modal="true">
       <div class="confirmation-content">
         <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
         <span v-if="model">Bạn có muốn xóa <b>{{ model.mancc }}</b> này không?</span>
       </div>
+
       <template #footer>
         <Button label="Không" icon="pi pi-times" class="p-button-text" @click="deleteProductDialog = false"></Button>
         <Button label="Đồng ý" icon="pi pi-check" class="p-button-text" @click="deleteProduct"></Button>
@@ -84,6 +70,7 @@
         <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
         <span>Bạn có muốn xóa tất cả những mục đã chọn không?</span>
       </div>
+
       <template #footer>
         <Button label="Không" icon="pi pi-times" class="p-button-text" @click="deleteProductsDialog = false"></Button>
         <Button label="Đồng ý" icon="pi pi-check" class="p-button-text" @click="deleteSelectedProducts"></Button>
@@ -109,6 +96,9 @@ import Toast from "primevue/toast";
 import { useToast } from "primevue/usetoast";
 import supplierApi from "../../api/supplierApi";
 import { useAuth } from "../../stores/auth";
+import { useSupplier } from "../../stores/supplier";
+import PopupAdd from "../../components/supplier/PopupAdd.vue";
+import { storeToRefs } from "pinia";
 const toast = useToast();
 
 const store = useAuth();
@@ -160,10 +150,9 @@ const lazyParams = computed(() => {
 const dt = ref(null);
 
 ////Form
-const model = ref();
+const store_supplier = useSupplier();
 const old_key = ref();
-const submitted = ref();
-const headerForm = ref("");
+const { model, headerForm, visibleDialog } = storeToRefs(store_supplier);
 ///Control
 const productDialog = ref();
 const deleteProductsDialog = ref();
@@ -189,62 +178,16 @@ const onPage = (event) => {
 };
 
 ///Form
-const valid = () => {
-  if (!model.value.mancc.trim()) return false;
-  return true;
-};
-const saveProduct = () => {
-  submitted.value = true;
-  if (!valid()) return;
-  waiting.value = true;
-  model.value.old_key = old_key.value;
-  // for (let key in model.value) {
-  //     if (model.value[key] == null) model.value[key] = '';
-  // }
-  supplierApi.save(model.value).then((res) => {
-    waiting.value = false;
-    if (res.success) {
-      if (model.value.old_key != null) {
-        //edit
-        toast.add({
-          severity: "success",
-          summary: "Thành công",
-          detail: "Cập nhật " + model.value.mancc + " thành công",
-          life: 3000,
-        });
-      } else {
-        toast.add({
-          severity: "success",
-          summary: "Thành công",
-          detail: "Tạo mới thành công",
-          life: 3000,
-        });
-      }
-    } else {
-      toast.add({
-        severity: "error",
-        summary: "Lỗi",
-        detail: res.message,
-        life: 3000,
-      });
-    }
-    loadLazyData();
-    model.value = {};
-    productDialog.value = false;
-  });
-};
-const editProduct = (m) => {
-  old_key.value = m.mancc;
-  headerForm.value = m.mancc;
-  model.value = { ...m };
-  productDialog.value = true;
-};
 const openNew = () => {
   model.value = {};
-  old_key.value = null;
   headerForm.value = "Tạo mới";
-  submitted.value = false;
-  productDialog.value = true;
+  visibleDialog.value = true;
+};
+
+const editProduct = (m) => {
+  headerForm.value = m.mahh;
+  model.value = { ...m };
+  visibleDialog.value = true;
 };
 const confirmDeleteSelected = () => {
   deleteProductsDialog.value = true;

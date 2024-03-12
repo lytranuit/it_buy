@@ -13,40 +13,52 @@
                 <div class="d-inline-flex float-right">
                 </div>
             </template>
+
             <template #empty>
                 <div class='text-center'>Không có dữ liệu.</div>
             </template>
             <Column selectionMode="multiple" v-if="model.status_id == 1"></Column>
             <Column v-for="(col, index) in selectedColumns" :field="col.data" :header="col.label" :key="col.data"
                 :showFilterMatchModes="false" :class="col.data">
+
                 <template #body="slotProps">
 
                     <template v-if="col.data == 'hh_id' && model.status_id == 1">
-                        <Materials v-model="slotProps.data[col.data]"
-                            @update:modelValue="changeMaterial($event, slotProps.data)" :required="true">
-                        </Materials>
+                        <div class="d-flex align-items-center">
+                            <Materials v-model="slotProps.data[col.data]"
+                                @update:modelValue="changeMaterial($event, slotProps.data)" :required="true">
+                            </Materials>
+                            <span class="fas fa-plus ml-3 text-success" style="cursor: pointer;"
+                                @click="openNew(slotProps.index)"></span>
+                        </div>
                     </template>
 
                     <template v-else-if="col.data == 'dvt' && model.status_id == 1">
                         <input v-model="slotProps.data[col.data]" class="p-inputtext p-inputtext-sm" required />
                     </template>
+
                     <template v-else-if="col.data == 'soluong' && model.status_id == 1">
                         <InputNumber v-model="slotProps.data[col.data]" class="p-inputtext-sm" />
                     </template>
+
                     <template v-else-if="col.data == 'note' && model.status_id == 1">
                         <textarea v-model="slotProps.data[col.data]" class="form-control" />
                     </template>
+
                     <template v-else-if="col.data == 'hh_id' && model.status_id != 1">
                         {{ slotProps.data["mahh"] }}
                     </template>
+
                     <template v-else>
                         {{ slotProps.data[col.data] }}
                     </template>
                 </template>
             </Column>
         </DataTable>
+        <PopupAdd @save="changeNewMaterial"></PopupAdd>
     </div>
 </template>
+
 <script setup>
 
 import { onMounted, ref, watch, computed } from 'vue';
@@ -63,61 +75,132 @@ import { rand } from '../../utilities/rand'
 import { formatPrice } from '../../utilities/util'
 import { useDutru } from '../../stores/dutru';
 import { useGeneral } from '../../stores/general';
+import PopupAdd from '../materials/PopupAdd.vue';
+import { useMaterials } from '../../stores/materials';
 
 const store_dutru = useDutru();
 const store_general = useGeneral();
+const store_materials = useMaterials();
+const RefMaterials = storeToRefs(store_materials);
+const modelMaterial = RefMaterials.model;
+const { headerForm, visibleDialog } = RefMaterials;
+
 const { datatable, model, list_delete } = storeToRefs(store_dutru);
-const { materials } = storeToRefs(store_general);
 const changeMaterial = store_general.changeMaterial;
 const confirm = useConfirm();
-const solohandung = ref();
-const editingRow = ref();
 
 const loading = ref(false);
 const selected = ref();
-const columns = ref([
-    {
-        label: "STT(*)",
-        data: "stt",
-        className: "text-center",
-    },
-    {
-        label: "Mã(*)",
-        "data": "hh_id",
-        "className": "text-center",
-    },
-    {
-        label: "Tên(*)",
-        "data": "tenhh",
-        "className": "text-center"
-    },
-    {
-        label: "ĐVT(*)",
-        "data": "dvt",
-        "className": "text-center",
-    },
-    {
-        label: "Số lượng(*)",
-        "data": "soluong",
-        "className": "text-center"
-    },
-    {
-        label: "Mô tả",
-        "data": "note",
-        "className": "text-center"
+const columns = computed(() => {
+    if (model.value.type_id == 1) {
+        return [
+            {
+                label: "STT(*)",
+                data: "stt",
+                className: "text-center",
+            },
+            {
+                label: "Mã(*)",
+                "data": "hh_id",
+                "className": "text-center",
+            },
+            {
+                label: "Tên(*)",
+                "data": "tenhh",
+                "className": "text-center"
+            },
+            {
+                label: "Grade",
+                "data": "grade",
+                "className": "text-center"
+            }, {
+                label: "Mã Artwork",
+                "data": "masothietke",
+                "className": "text-center"
+            }, {
+                label: "Tên SP",
+                "data": "tensp",
+                "className": "text-center"
+            }, {
+                label: "Nhà sản xuất",
+                "data": "nhasx",
+                "className": "text-center"
+            },
+            {
+                label: "ĐVT(*)",
+                "data": "dvt",
+                "className": "text-center",
+            },
+            {
+                label: "Số lượng(*)",
+                "data": "soluong",
+                "className": "text-center"
+            },
+            {
+                label: "Mô tả",
+                "data": "note",
+                "className": "text-center",
+            }
+        ]
+    } else {
+        return [
+            {
+                label: "STT(*)",
+                data: "stt",
+                className: "text-center",
+            },
+            {
+                label: "Mã(*)",
+                "data": "hh_id",
+                "className": "text-center",
+            },
+            {
+                label: "Tên(*)",
+                "data": "tenhh",
+                "className": "text-center"
+            },
+            {
+                label: "ĐVT(*)",
+                "data": "dvt",
+                "className": "text-center",
+            },
+            {
+                label: "Số lượng(*)",
+                "data": "soluong",
+                "className": "text-center"
+            },
+            {
+                label: "Mô tả",
+                "data": "note",
+                "className": "text-center",
+            }
+        ]
     }
-])
-
+});
+const indexActive = ref();
 const selectedColumns = computed(() => {
     return columns.value.filter(col => col.hide != true);
 });
+const changeNewMaterial = (data) => {
+    store_general.fetchMaterials(false).then((res) => {
+        var row = datatable.value[indexActive.value];
+        row.hh_id = "m-" + data.id;
+        changeMaterial("m-" + data.id, row)
+    });
+}
+const openNew = (index) => {
+    indexActive.value = index;
+    modelMaterial.value = {};
+    headerForm.value = "Tạo mới";
+    visibleDialog.value = true;
+}
 const addRow = () => {
     let stt = 0;
     if (datatable.value.length) {
         stt = datatable.value[datatable.value.length - 1].stt;
     }
     stt++;
-    datatable.value.push({ ids: rand(), stt: stt })
+    datatable.value.push({ ids: rand(), stt: stt, soluong: 1 })
 }
 const confirmDeleteSelected = () => {
     confirm.require({
@@ -147,9 +230,9 @@ const confirmDeleteSelected = () => {
 onMounted(() => {
 })
 </script>
+
 <style>
 .hh_id {
     max-width: 300px;
-
 }
 </style>

@@ -1,9 +1,8 @@
-﻿using Newtonsoft.Json;
-using NuGet.Configuration;
-using System;
-using System.Collections.Generic;
+﻿
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace Vue.Models
 {
@@ -23,14 +22,13 @@ namespace Vue.Models
             get
             {
                 //Console.WriteLine(settings);
-                return Newtonsoft.Json.JsonConvert.DeserializeObject<QueueValue>(string.IsNullOrEmpty(json) ? "{}" : json);
+                return JsonSerializer.Deserialize<QueueValue>(string.IsNullOrEmpty(json) ? "{}" : json);
             }
             set
             {
-                json = Newtonsoft.Json.JsonConvert.SerializeObject(value, Formatting.None,
-                new JsonSerializerSettings
+                json = JsonSerializer.Serialize(value, new JsonSerializerOptions()
                 {
-                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                    ReferenceHandler = ReferenceHandler.IgnoreCycles
                 });
             }
         }

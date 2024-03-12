@@ -22,24 +22,26 @@ namespace it_template.Areas.V1.Controllers
             UserManager = UserMgr;
         }
         [HttpPost]
-        public async Task<JsonResult> Save(MaterialModel HangHoaModel, string old_key)
+        public async Task<JsonResult> Save(MaterialModel HangHoaModel)
         {
             var jsonData = new { success = true, message = "" };
             try
             {
                 HangHoaModel.tenhh = HangHoaModel.tenhh.Trim();
-                HangHoaModel.dvt = HangHoaModel.dvt.Trim();
-                if (old_key == null)
+                //HangHoaModel.dvt = HangHoaModel.dvt.Trim();
+                if (HangHoaModel.id > 0)
                 {
-                    _context.Add(HangHoaModel);
-                    _context.SaveChanges();
-                }
-                else
-                {
-                    var HangHoaModel_old = _context.MaterialModel.Where(d => d.mahh == old_key).FirstOrDefault();
+                    var HangHoaModel_old = _context.MaterialModel.Where(d => d.id == HangHoaModel.id).FirstOrDefault();
                     CopyValues<MaterialModel>(HangHoaModel_old, HangHoaModel);
                     _context.Update(HangHoaModel_old);
                     _context.SaveChanges();
+
+                }
+                else
+                {
+                    _context.Add(HangHoaModel);
+                    _context.SaveChanges();
+                    return Json(new { success = true, data = HangHoaModel });
                 }
             }
             catch (Exception ex)
@@ -52,13 +54,17 @@ namespace it_template.Areas.V1.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> Remove(List<string> item)
+        public async Task<JsonResult> Remove(List<int> item)
         {
             var jsonData = new { success = true, message = "" };
             try
             {
-                var list = _context.MaterialModel.Where(d => item.Contains(d.mahh)).ToList();
-                _context.RemoveRange(list);
+                var list = _context.MaterialModel.Where(d => item.Contains(d.id)).ToList();
+                foreach (var i in list)
+                {
+                    i.deleted_at = DateTime.Now;
+                }
+                _context.UpdateRange(list);
                 _context.SaveChanges();
             }
             catch (Exception ex)
@@ -79,7 +85,7 @@ namespace it_template.Areas.V1.Controllers
             var mahh = Request.Form["filters[mahh]"].FirstOrDefault();
             var tenhh = Request.Form["filters[tenhh]"].FirstOrDefault();
             int skip = start != null ? Convert.ToInt32(start) : 0;
-            var customerData = _context.MaterialModel.Where(d => 1 == 1);
+            var customerData = _context.MaterialModel.Where(d => d.deleted_at == null);
             int recordsTotal = customerData.Count();
             if (mahh != null && mahh != "")
             {

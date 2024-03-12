@@ -54,7 +54,7 @@
 
         <ul class="nav-second-level" aria-expanded="false">
           <li class="nav-item">
-            <router-link class="nav-link" to="/nvl"><i class="ti-control-record"></i>Nguyên vật liệu</router-link>
+            <router-link class="nav-link" to="/materials"><i class="ti-control-record"></i>Danh mục hàng hóa</router-link>
           </li>
           <li class="nav-item">
             <router-link class="nav-link" to="/supplier"><i class="ti-control-record"></i>Nhà cung cấp</router-link>

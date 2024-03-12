@@ -40,16 +40,38 @@ namespace it_template.Areas.V1.Controllers
                 var stt = 1;
                 foreach (var item in data.chitiet)
                 {
-                    var material = _context.MaterialModel.Where(d => item.hh_id == "m-" + d.id).FirstOrDefault();
-                    if (material != null)
-                    {
-                        item.tenhh = material.tenhh;
-                        item.mahh = material.mahh;
-                        item.stt = stt++;
-                    }
+                    item.stt = stt++;
                 }
             }
             return Json(data);
+        }
+
+        public JsonResult GetNhanhang(int id)
+        {
+            var list_items = _context.DutruChitietModel.Where(d => d.dutru_id == id).Select(d => d.id).ToList();
+            var data = _context.MuahangChitietModel.Include(d => d.muahang).Where(d => list_items.Contains(d.dutru_chitiet_id) && d.muahang.is_dathang == true).ToList();
+            if (data != null)
+            {
+                //var stt = 1;
+                foreach (var item in data)
+                {
+                    //var material = _context.MaterialModel.Where(d => item.hh_id == "m-" + d.id).FirstOrDefault();
+                    //if (material != null)
+                    //{
+                    //    item.tenhh = material.tenhh;
+                    //    item.mahh = material.mahh;
+                    //}
+                    var chonmua = _context.MuahangNccModel.Where(d => d.id == item.muahang.muahang_chonmua_id).Include(d => d.ncc).FirstOrDefault();
+                    item.muahang.muahang_chonmua = chonmua;
+                }
+            }
+            var list = data.GroupBy(d => new { d.muahang }).Select(d => new
+            {
+                muahang = d.Key.muahang,
+                items = d.ToList()
+            });
+
+            return Json(list);
         }
 
         [HttpPost]
@@ -60,6 +82,60 @@ namespace it_template.Areas.V1.Controllers
             _context.Update(Model);
             _context.SaveChanges();
             return Json(Model);
+        }
+        [HttpPost]
+        public async Task<JsonResult> SaveNhanhang(int dutru_id, List<MuahangChitietModel> list)
+        {
+            var list_check_muahang = new List<int>();
+
+            if (list != null)
+            {
+                foreach (var item in list)
+                {
+                    if (item.status_nhanhang == 1)
+                    {
+                        list_check_muahang.Add(item.muahang_id);
+                    }
+                    _context.Update(item);
+                }
+            }
+            _context.SaveChanges();
+
+            ///check du tru
+            var dutru = _context.DutruModel.Where(d => d.id == dutru_id).Include(d => d.chitiet).FirstOrDefault();
+            var soluong_ht = 0;
+            foreach (var item in dutru.chitiet)
+            {
+                var soluong_dutru = item.soluong;
+                var muahang_chitiet = _context.MuahangChitietModel.Where(d => d.dutru_chitiet_id == item.id && d.status_nhanhang == 1).ToList();
+                var soluong_mua = muahang_chitiet.Sum(d => d.soluong);
+                if (soluong_dutru == soluong_mua)
+                {
+                    soluong_ht++;
+                }
+            }
+            if (soluong_ht == dutru.chitiet.Count())
+            {
+                dutru.date_finish = DateTime.Now;
+                _context.Update(dutru);
+                _context.SaveChanges();
+            }
+            /////Update Finish
+            list_check_muahang = list_check_muahang.Distinct().ToList();
+            foreach (var item in list_check_muahang)
+            {
+                var muahang = _context.MuahangModel.Where(d => d.id == item).Include(d => d.chitiet).FirstOrDefault();
+                var list_nhanhang = muahang.chitiet.Where(d => d.status_nhanhang == 1).Count();
+
+                if (list_nhanhang == muahang.chitiet.Count() && muahang.is_thanhtoan == true)
+                {
+                    muahang.date_finish = DateTime.Now;
+                    _context.Update(muahang);
+                }
+            }
+            _context.SaveChanges();
+
+            return Json(new { success = true });
         }
         [HttpPost]
         public async Task<JsonResult> Save(DutruModel DutruModel, List<DutruChitietModel> list_add, List<DutruChitietModel>? list_update, List<DutruChitietModel>? list_delete)
@@ -123,7 +199,7 @@ namespace it_template.Areas.V1.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = ex.Message });
+                return Json(new { success = false, message = ex.InnerException.Message });
             }
 
         }
@@ -138,30 +214,32 @@ namespace it_template.Areas.V1.Controllers
                 var stt = 1;
                 foreach (var item in data.chitiet)
                 {
-                    var material = _context.MaterialModel.Where(d => item.hh_id == "m-" + d.id).FirstOrDefault();
-                    if (material != null)
-                    {
-                        //stt { get; set; }
 
-                        //public string tennvl { get; set; }
-                        //public string manvl { get; set; }
-                        //public string artwork { get; set; }
-                        //public string dvt { get; set; }
-                        //public string soluong { get; set; }
-                        //public string date { get; set; }
-                        //public string note { get; set; }
-                        RawDetails.Add(new RawDetails
-                        {
-                            stt = stt++,
-                            tennvl = material.tenhh,
-                            manvl = material.mahh,
-                            dvt = item.dvt,
-                            soluong = item.soluong.Value.ToString("#,##0.00"),
-                            note = item.note,
-                            artwork = material.masothietke,
-                            date = data.date.Value.ToString("yyyy-MM-dd")
-                        });
-                    }
+                    //stt { get; set; }
+
+                    //public string tennvl { get; set; }
+                    //public string manvl { get; set; }
+                    //public string artwork { get; set; }
+                    //public string dvt { get; set; }
+                    //public string soluong { get; set; }
+                    //public string date { get; set; }
+                    //public string note { get; set; }
+                    RawDetails.Add(new RawDetails
+                    {
+                        stt = stt++,
+                        tennvl = item.tenhh,
+                        manvl = item.mahh,
+                        dvt = item.dvt,
+                        soluong = item.soluong.Value.ToString("#,##0.00"),
+                        note = item.note,
+                        artwork = item.masothietke,
+                        date = data.date.Value.ToString("yyyy-MM-dd"),
+                        grade = item.grade,
+                        nhasx = item.nhasx,
+                        dangbaoche = item.dangbaoche,
+                        tensp = item.tensp,
+                    });
+
                 }
             }
             else
@@ -190,7 +268,15 @@ namespace it_template.Areas.V1.Controllers
             //Creates Document instance
             Spire.Doc.Document document = new Spire.Doc.Document();
             //Loads the word document
-            document.LoadFromFile(_configuration["Source:Path_Private"] + "/buy/templates/dutru_nvl.docx", Spire.Doc.FileFormat.Docx);
+            if (data.type_id == 1)
+            {
+
+                document.LoadFromFile(_configuration["Source:Path_Private"] + "/buy/templates/dutru_nvl.docx", Spire.Doc.FileFormat.Docx);
+            }
+            else
+            {
+                document.LoadFromFile(_configuration["Source:Path_Private"] + "/buy/templates/dutru_giantiep.docx", Spire.Doc.FileFormat.Docx);
+            }
 
 
             var now = DateTime.Now;
@@ -199,6 +285,8 @@ namespace it_template.Areas.V1.Controllers
                 {"ngay",now.ToString("dd") },
                 {"thang",now.ToString("MM") },
                 {"nam",now.ToString("yyyy") },
+                {"bophan",data.bophan },
+                {"note",data.note },
             };
 
 
@@ -352,19 +440,20 @@ namespace it_template.Areas.V1.Controllers
             foreach (var record in datapost)
             {
                 var dutru = record.dutru;
-                var tenhh1 = "";
-                var mahh1 = "";
-                if (dutru.type_id == 1)
-                {
-                    var material = _context.MaterialModel.Where(d => record.hh_id == "m-" + d.id).FirstOrDefault();
-                    if (material != null)
-                    {
-                        tenhh1 = material.tenhh;
-                        mahh1 = material.mahh;
-                    }
-                }
+                var tenhh1 = record.tenhh;
+                var mahh1 = record.mahh;
+                //if (dutru.type_id == 1)
+                //{
+                //var material = _context.MaterialModel.Where(d => record.hh_id == "m-" + d.id).FirstOrDefault();
+                //if (material != null)
+                //{
+                //    tenhh1 = material.tenhh;
+                //    mahh1 = material.mahh;
+                //}
+                //}
+                var muahang_chitiet = record.muahang_chitiet.Where(d => d.muahang.status_id != 11).ToList();
                 var soluong_dutru = record.soluong;
-                var soluong_mua = record.muahang_chitiet.Sum(d => d.soluong);
+                var soluong_mua = muahang_chitiet.Sum(d => d.soluong);
 
                 var soluong = soluong_mua < soluong_dutru ? soluong_dutru - soluong_mua : 0;
                 data.Add(new
@@ -378,12 +467,158 @@ namespace it_template.Areas.V1.Controllers
                     soluong = soluong,
                     dutru_chitiet_id = record.id,
                     list_dutru = new List<DutruModel>() { dutru },
-                    list_muahang = record.muahang_chitiet.Select(d => d.muahang).ToList(),
+                    list_muahang = muahang_chitiet.Select(d => d.muahang).ToList(),
                 });
             }
 
             var jsonData = new { draw = draw, recordsFiltered = recordsFiltered, recordsTotal = recordsTotal, data = data };
             return Json(jsonData);
+        }
+        [HttpPost]
+        public async Task<IActionResult> AddComment(DutruCommentModel CommentModel)
+        {
+            System.Security.Claims.ClaimsPrincipal currentUser = User;
+            string user_id = UserManager.GetUserId(currentUser); // Get user id:
+            var user = await UserManager.GetUserAsync(currentUser); // Get user id:
+            CommentModel.user_id = user_id;
+            CommentModel.created_at = DateTime.Now;
+            _context.Add(CommentModel);
+            _context.SaveChanges();
+            var files = Request.Form.Files;
+
+            var items_comment = new List<DutruCommentFileModel>();
+            if (files != null && files.Count > 0)
+            {
+                var pathroot = _configuration["Source:Path_Private"] + "\\buy\\dutru\\" + CommentModel.dutru_id + "\\";
+                bool exists = Directory.Exists(pathroot);
+
+                if (!exists)
+                    Directory.CreateDirectory(pathroot);
+
+                foreach (var file in files)
+                {
+                    var timeStamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
+                    string name = file.FileName;
+                    string ext = Path.GetExtension(name);
+                    string mimeType = file.ContentType;
+
+                    //var fileName = Path.GetFileName(name);
+                    var newName = timeStamp + " - " + name;
+
+                    newName = newName.Replace("+", "_");
+                    newName = newName.Replace("%", "_");
+                    newName = newName.Replace(",", "_");
+                    var filePath = _configuration["Source:Path_Private"] + "\\buy\\dutru\\" + CommentModel.dutru_id + "\\" + newName;
+                    string url = "/private/buy/dutru/" + CommentModel.dutru_id + "/" + newName;
+                    items_comment.Add(new DutruCommentFileModel
+                    {
+                        ext = ext,
+                        url = url,
+                        name = name,
+                        mimeType = mimeType,
+                        comment_id = CommentModel.id,
+                        created_at = DateTime.Now
+                    });
+
+                    using (var fileSrteam = new FileStream(filePath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(fileSrteam);
+                    }
+                }
+                _context.AddRange(items_comment);
+                _context.SaveChanges();
+            }
+
+            ///create unread
+            //var ExecutionModel = _context.ExecutionModel.Where(d => d.id == CommentModel.execution_id).FirstOrDefault();
+            //var Activities = _context.ActivityModel
+            //            .Where(d => d.execution_id == CommentModel.execution_id)
+            //            .ToList();
+            //var users_related = new List<string>();
+            //foreach (var activity in Activities)
+            //{
+            //    if (activity.blocking == true)
+            //    {
+            //        var list_reciever = _workflow.getListReciever(activity).Select(d => d.Id).ToList();
+            //        users_related.AddRange(list_reciever);
+            //    }
+            //    else
+            //    {
+            //        users_related.Add(activity.created_by);
+            //    }
+            //}
+            //users_related = users_related.Distinct().ToList();
+            //var itemToRemove = users_related.SingleOrDefault(r => r == user_id);
+            //users_related.Remove(itemToRemove);
+            ////SEND MAIL
+            //if (users_related != null)
+            //{
+            //    var users_related_obj = _context.UserModel.Where(d => users_related.Contains(d.Id)).Select(d => d.Email).ToList();
+            //    var mail_string = string.Join(",", users_related_obj.ToArray());
+            //    string Domain = (HttpContext.Request.IsHttps ? "https://" : "http://") + HttpContext.Request.Host.Value;
+            //    var attach = items_comment.Select(d => d.url).ToList();
+            //    var text = CommentModel.comment;
+            //    if (attach.Count() > 0 && CommentModel.comment == null)
+            //    {
+            //        text = $"{user.FullName} gửi đính kèm";
+            //    }
+            //    var body = _view.Render("Emails/NewComment",
+            //        new
+            //        {
+            //            link_logo = Domain + "/images/clientlogo_astahealthcare.com_f1800.png",
+            //            link = Domain + "/execution/details/" + ExecutionModel.process_version_id + "?execution_id=" + ExecutionModel.id,
+            //            text = text,
+            //            name = user.FullName
+            //        });
+
+            //    var email = new EmailModel
+            //    {
+            //        email_to = mail_string,
+            //        subject = "[Tin nhắn mới] " + ExecutionModel.title,
+            //        body = body,
+            //        email_type = "new_comment_document",
+            //        status = 1,
+            //        data_attachments = attach
+            //    };
+            //    _context.Add(email);
+            //}
+            ////await _context.SaveChangesAsync();
+
+            /// Audittrail
+            var audit = new AuditTrailsModel();
+            audit.UserId = user.Id;
+            audit.Type = AuditType.Update.ToString();
+            audit.DateTime = DateTime.Now;
+            audit.description = $"Tài khoản {user.FullName} đã thêm bình luận.";
+            _context.Add(audit);
+            await _context.SaveChangesAsync();
+
+            CommentModel.user = user;
+            CommentModel.is_read = true;
+
+            return Json(new
+            {
+                success = 1,
+                comment = CommentModel
+            });
+        }
+
+        public async Task<IActionResult> MoreComment(int id, int? from_id)
+        {
+            int limit = 10;
+            var comments_ctx = _context.DutruCommentModel
+                .Where(d => d.dutru_id == id);
+            if (from_id != null)
+            {
+                comments_ctx = comments_ctx.Where(d => d.id < from_id);
+            }
+            List<DutruCommentModel> comments = comments_ctx.OrderByDescending(d => d.id)
+                .Take(limit).Include(d => d.files).Include(d => d.user).ToList();
+            //System.Security.Claims.ClaimsPrincipal currentUser = User;
+            //string current_user_id = UserManager.GetUserId(currentUser); // Get user id:
+
+
+            return Json(new { success = 1, comments });
         }
         private void CopyValues<T>(T target, T source)
         {
@@ -431,6 +666,10 @@ namespace it_template.Areas.V1.Controllers
         public string? ngaysx { get; set; }
         public string? date { get; set; }
         public string? note { get; set; }
+        public string? grade { get; set; }
+        public string? nhasx { get; set; }
+        public string? tensp { get; set; }
+        public string? dangbaoche { get; set; }
     }
 
 }

@@ -9,17 +9,21 @@
             </template>
             <Column v-for="(col, index) in selectedColumns" :field="col.data" :header="col.label" :key="col.data"
                 :showFilterMatchModes="false">
+
                 <template #body="slotProps">
                     <template v-if="col.data == 'hh_id'">
                         {{ slotProps.data["mahh"] }}
                     </template>
+
                     <template v-else-if="col.data == 'dongia'">
                         <InputNumber v-model="slotProps.data[col.data]" class="p-inputtext-sm" suffix=" VND"
-                            @update:modelValue="changeDongia()" />
+                            @update:modelValue="changeDongia()" :readonly="readonly"/>
                     </template>
+
                     <template v-else-if="col.data == 'thanhtien'">
                         {{ formatPrice(slotProps.data[col.data], 0) }} VND
                     </template>
+
                     <template v-else>
                         {{ slotProps.data[col.data] }}
                     </template>
@@ -28,6 +32,7 @@
         </DataTable>
     </div>
 </template>
+
 <script setup>
 
 import { onMounted, ref, watch, computed } from 'vue';
@@ -42,9 +47,10 @@ import { formatPrice } from '../../utilities/util'
 import { useMuahang } from '../../stores/muahang';
 import { useGeneral } from '../../stores/general';
 
+const readonly = ref(false);
 const store_muahang = useMuahang();
 const store_general = useGeneral();
-const { nccs, nccs_chitiet } = storeToRefs(store_muahang);
+const { nccs, nccs_chitiet, model } = storeToRefs(store_muahang);
 const confirm = useConfirm();
 
 const loading = ref(false);
@@ -106,6 +112,10 @@ const props = defineProps({
     index: Number,
 })
 onMounted(() => {
+
+    if ([9, 10, 11].indexOf(model.value.status_id) != -1) {
+        readonly.value = true;
+    }
     // console.log(props.index)
     // console.log(modelncc.value)
 })

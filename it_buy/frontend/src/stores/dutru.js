@@ -4,6 +4,7 @@ import { defineStore } from "pinia";
 export const useDutru = defineStore("dutru", () => {
   const model = ref({});
   const datatable = ref([]);
+  const list_nhanhang = ref([]);
 
   const list_add = computed(() => {
     return datatable.value.filter((item) => {
@@ -27,6 +28,7 @@ export const useDutru = defineStore("dutru", () => {
     list_add,
     list_update,
     list_delete,
+    list_nhanhang,
     reset,
   };
 });

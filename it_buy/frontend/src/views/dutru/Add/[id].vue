@@ -12,10 +12,7 @@
           </div>
           <div class="card-body">
             <div class="row">
-              <div class="col-12">
-                <Steps :model="items" />
-              </div>
-              <div class="col-md-9">
+              <div class="col-md-6">
                 <div class="form-group row">
                   <b class="col-12 col-lg-12 col-form-label">Tiêu đề:<i class="text-danger">*</i></b>
                   <div class="col-12 col-lg-12 pt-1">
@@ -25,24 +22,32 @@
               </div>
               <div class="col-md-3">
                 <div class="form-group row">
+                  <b class="col-12 col-lg-12 col-form-label">Bộ phận dự trù:<i class="text-danger">*</i></b>
+                  <div class="col-12 col-lg-12 pt-1">
+                    <input class="form-control" v-model="model.bophan" required>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="form-group row">
                   <b class="col-12 col-lg-12 col-form-label">Hạn giao hàng:<i class="text-danger">*</i></b>
                   <div class="col-12 col-lg-12 pt-1">
-                    <Calendar v-model="model.date" dateFormat="yy-mm-dd" class="date-custom" :manualInput="false" showIcon
-                      :minDate="minDate" />
+                    <Calendar v-model="model.date" dateFormat="yy-mm-dd" class="date-custom" :manualInput="false"
+                      showIcon :minDate="minDate" />
                   </div>
                 </div>
               </div>
               <div class="col-md-12">
                 <div class="form-group row">
-                  <b class="col-12 col-lg-12 col-form-label">Hàng hóa:<i class="text-danger">*</i></b>
+                  <b class="col-12 col-lg-12 col-form-label">Lý do mua hàng:<i class="text-danger">*</i></b>
                   <div class="col-12 col-lg-12 pt-1">
-                    <FormDutruChitiet></FormDutruChitiet>
+                    <textarea class="form-control form-control-sm" v-model="model.note" required></textarea>
                   </div>
                 </div>
                 <div class="form-group row">
-                  <b class="col-12 col-lg-12 col-form-label">Ghi chú:</b>
+                  <b class="col-12 col-lg-12 col-form-label">Hàng hóa:<i class="text-danger">*</i></b>
                   <div class="col-12 col-lg-12 pt-1">
-                    <textarea class="form-control form-control-sm" v-model="model.note"></textarea>
+                    <FormDutruChitiet></FormDutruChitiet>
                   </div>
                 </div>
               </div>
@@ -69,6 +74,7 @@ import dutruApi from "../../../api/dutruApi";
 import { useDutru } from '../../../stores/dutru';
 import { storeToRefs } from "pinia";
 import { useToast } from "primevue/usetoast";
+import { rand } from "../../../utilities/rand";
 const toast = useToast();
 const minDate = new Date();
 const route = useRoute();
@@ -77,37 +83,30 @@ const router = useRouter();
 const messageError = ref();
 const store = useAuth();
 const { model, datatable, list_add } = storeToRefs(storeDutru);
-const items = ref([
-  {
-    label: 'Dự trù'
-  },
-  {
-    label: 'Trình ký'
-  },
-  {
-    label: 'Đề nghị mua hàng'
-  },
-  {
-    label: 'Trình ký'
-  },
-  {
-    label: 'Đơn mua hàng'
-  },
-  {
-    label: 'Nhận hàng'
-  },
-  {
-    label: 'Hoàn thành'
-  }
-]);
 onMounted(() => {
   storeDutru.reset();
   model.value.type_id = route.params.id;
   model.value.status_id = 1;
+  if (model.value.type_id == 1) {
+    model.value.bophan = "Phòng Kế hoạch sản xuất";
+  }
+  addRow();
 });
+const addRow = () => {
+  let stt = 0;
+  if (datatable.value.length) {
+    stt = datatable.value[datatable.value.length - 1].stt;
+  }
+  stt++;
+  datatable.value.push({ ids: rand(), stt: stt, soluong: 1 })
+}
 const submit = () => {
   if (!model.value.name) {
     alert("Chưa nhập tiêu đề!");
+    return false;
+  }
+  if (!model.value.note) {
+    alert("Chưa nhập lý do mua hàng!");
     return false;
   }
   if (!model.value.date) {

@@ -12,9 +12,6 @@
           </div>
           <div class="card-body">
             <div class="row">
-              <div class="col-12">
-                <Steps :model="items" v-model:activeStep="model.activeStep" />
-              </div>
               <div class="col-md-9">
                 <div class="form-group row">
                   <b class="col-12 col-lg-12 col-form-label">Tiêu đề:<i class="text-danger">*</i></b>
@@ -33,7 +30,7 @@
               </div>
               <div class="col-md-12">
                 <div class="form-group row">
-                  <b class="col-12 col-lg-12 col-form-label">Nguyên vật liệu:<i class="text-danger">*</i></b>
+                  <b class="col-12 col-lg-12 col-form-label">Hàng hóa:<i class="text-danger">*</i></b>
                   <div class="col-12 col-lg-12 pt-1">
                     <FormMuahangChitiet></FormMuahangChitiet>
                   </div>
@@ -93,7 +90,7 @@ const items = ref([
   }
 ]);
 onMounted(() => {
-  // console.log(route.query)
+  console.log(datatable.value)
   model.value = {};
   if (!datatable.value.length) {
     router.push("/muahang");

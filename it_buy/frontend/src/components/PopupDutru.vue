@@ -31,7 +31,7 @@ const groups = ref([
   },
   {
     id: 2,
-    name: "Nguyên liệu RD"
+    name: "Mua hàng gián tiếp"
   }
 ]);
 const execute = (id) => {

@@ -39,10 +39,16 @@ namespace Vue.Data
         public DbSet<NhacungcapModel> NhacungcapModel { get; set; }
         public DbSet<DutruModel> DutruModel { get; set; }
         public DbSet<DutruChitietModel> DutruChitietModel { get; set; }
+        public DbSet<DutruCommentModel> DutruCommentModel { get; set; }
+        public DbSet<DutruCommentFileModel> DutruCommentFileModel { get; set; }
         public DbSet<MuahangModel> MuahangModel { get; set; }
         public DbSet<MuahangChitietModel> MuahangChitietModel { get; set; }
+        public DbSet<MuahangCommentModel> MuahangCommentModel { get; set; }
+        public DbSet<MuahangCommentFileModel> MuahangCommentFileModel { get; set; }
         public DbSet<MuahangNccModel> MuahangNccModel { get; set; }
         public DbSet<MuahangNccDinhkemModel> MuahangNccDinhkemModel { get; set; }
+        public DbSet<MuahangDondathangModel> MuahangDondathangModel { get; set; }
+        public DbSet<MuahangDinhkemModel> MuahangThanhtoanModel { get; set; }
         public DbSet<MuahangNccChitietModel> MuahangNccChitietModel { get; set; }
         public DbSet<QueueModel> QueueModel { get; set; }
 

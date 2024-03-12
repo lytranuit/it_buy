@@ -6,8 +6,8 @@
       <section class="card card-fluid">
         <div class="card-body" style="overflow: auto; position: relative">
           <DataTable class="p-datatable-customers" showGridlines :value="datatable" :lazy="true" ref="dt"
-            scrollHeight="70vh" :paginator="true" :rowsPerPageOptions="[10, 50, 100]"
-            :rows="rows" :totalRecords="totalRecords" @page="onPage($event)" :rowHover="true" :loading="loading"
+            scrollHeight="70vh" :paginator="true" :rowsPerPageOptions="[10, 50, 100]" :rows="rows"
+            :totalRecords="totalRecords" @page="onPage($event)" :rowHover="true" :loading="loading"
             responsiveLayout="scroll" :resizableColumns="true" columnResizeMode="expand" v-model:filters="filters"
             filterDisplay="menu">
             <template #header>
@@ -22,6 +22,7 @@
 
             <Column v-for="col of selectedColumns" :field="col.data" :header="col.label" :key="col.data"
               :showFilterMatchModes="false">
+
               <template #body="slotProps">
                 <template v-if="col.data == 'id'">
                   <RouterLink :to="'/muahang/edit/' + slotProps.data[col.data]">
@@ -29,13 +30,19 @@
                     {{ slotProps.data[col.data] }}
                   </RouterLink>
                 </template>
+
                 <template v-else-if="col.data == 'name'">
                   {{ slotProps.data[col.data] }}
                 </template>
+
                 <template v-else-if="col.data == 'status_id'">
                   <div class="text-center">
+                    <Button label="Hoàn thành" class="p-button-success" size="small"
+                      v-if="slotProps.data['date_finish']"></Button>
+                    <Button label="Chờ nhận hàng & thanh toán" class="p-button-warning" size="small"
+                      v-else-if="slotProps.data['is_dathang']"></Button>
                     <Button label="Đang thực hiện" class="p-button-secondary" size="small"
-                      v-if="slotProps.data[col.data] == 1"></Button>
+                      v-else-if="slotProps.data[col.data] == 1"></Button>
                     <Button label="Đang gửi và nhận báo giá" class="p-button-warning" size="small"
                       v-else-if="slotProps.data[col.data] == 6"></Button>
                     <Button label="So sánh giá" class="p-button-warning" size="small"
@@ -48,25 +55,32 @@
                       v-else-if="slotProps.data[col.data] == 10"></Button>
                     <Button label="Không duyệt" class="p-button-danger" size="small"
                       v-else-if="slotProps.data[col.data] == 11"></Button>
+
+                  </div>
+                  <div class="text-center mt-2">
+                   
                   </div>
                 </template>
+
                 <template v-else-if="col.data == 'created_by'">
                   <div v-if="slotProps.data['user_created_by']" class="d-flex">
                     <Avatar :image="slotProps.data.user_created_by.image_url"
                       :title="slotProps.data.user_created_by.fullName" size="small" shape="circle" /> <span
                       class="align-self-center ml-2">{{
-                        slotProps.data.user_created_by.fullName }}</span>
+            slotProps.data.user_created_by.fullName }}</span>
                   </div>
                 </template>
 
                 <div v-else v-html="slotProps.data[col.data]"></div>
               </template>
+
               <template #filter="{ filterModel, filterCallback }" v-if="col.filter == true">
                 <InputText type="text" v-model="filterModel.value" @keydown.enter="filterCallback()"
                   class="p-column-filter" />
               </template>
             </Column>
             <Column style="width: 1rem">
+
               <template #body="slotProps">
                 <a class="p-link text-danger font-16" @click="confirmDelete(slotProps.data['id'])"><i
                     class="pi pi-trash"></i></a>

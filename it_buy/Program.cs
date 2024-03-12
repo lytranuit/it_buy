@@ -16,6 +16,7 @@ using System.Text;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.AspNetCore.Authentication;
+using Vue.Middleware;
 //using Vue.Middleware;
 
 namespace Vue
@@ -113,7 +114,7 @@ namespace Vue
             var builder = CreateDefaultBuilder(args);
             var app = builder.Build();
 
-            //app.UseMiddleware<CheckTokenMiddleware>();
+            app.UseMiddleware<CheckTokenMiddleware>();
             app.UseDeveloperExceptionPage();
             // Configure the HTTP request pipeline.
             app.UseStaticFiles();
@@ -197,6 +198,7 @@ namespace Vue
                 }
                 else if (!context.User.Identity.IsAuthenticated)
                 {
+                    //var token_query = context.Request.Cookies["Auth-Token"].ToString();
                     context.Response.Redirect("/Identity/Account/Login");
                 }
                 else

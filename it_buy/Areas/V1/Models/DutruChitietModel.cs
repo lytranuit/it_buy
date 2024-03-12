@@ -26,6 +26,11 @@ namespace Vue.Models
         public string? tenhh { get; set; }
         //[NotMapped]
         public string? dvt { get; set; }
+        public string? masothietke { get; set; }
+        public string? grade { get; set; }
+        public string? nhasx { get; set; }
+        public string? tensp { get; set; }
+        public string? dangbaoche { get; set; }
         [NotMapped]
 
         public int? stt { get; set; }
