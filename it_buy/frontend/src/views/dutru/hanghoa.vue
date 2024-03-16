@@ -35,6 +35,17 @@
             <div v-for="item of slotProps.data[col.data]" :key="item.id">
               <RouterLink :to="'/muahang/edit/' + item.id" class="text-primary">{{ item.id }} - {{ item.code }}
               </RouterLink>
+              <Badge value="Hoàn thành" size="small" severity="success" v-if="item['date_finish']"></Badge>
+              <Badge value="Chờ nhận hàng & thanh toán" size="small" severity="warning" v-else-if="item['is_dathang']">
+              </Badge>
+              <Badge value="Đang thực hiện" size="small" severity="warning" v-else-if="item['status_id'] == 1"></Badge>
+              <Badge value="Đang gửi và nhận báo giá" size="small" severity="warning"
+                v-else-if="item['status_id'] == 6"></Badge>
+              <Badge value="So sánh giá" size="small" severity="warning" v-else-if="item['status_id'] == 7"></Badge>
+              <Badge value="Đang trình ký" size="small" v-else-if="item['status_id'] == 8"></Badge>
+              <Badge value="Chờ ký duyệt" size="small" severity="warning" v-else-if="item['status_id'] == 9"></Badge>
+              <Badge value="Đã duyệt" size="small" severity="success" v-else-if="item['status_id'] == 10"></Badge>
+              <Badge value="Không duyệt" size="small" severity="danger" v-else-if="item['status_id'] == 11"></Badge>
             </div>
           </template>
 
@@ -44,6 +55,21 @@
             </div>
           </template>
 
+          <template v-else-if="col.data == 'thanhtien'">
+            {{ formatPrice(slotProps.data[col.data], 0) }} VNĐ
+          </template>
+
+          <template v-else-if="col.data == 'soluong_dutru'">
+            {{ slotProps.data[col.data] }} {{ slotProps.data["dvt"] }}
+          </template>
+
+          <template v-else-if="col.data == 'soluong_mua'">
+            {{ slotProps.data[col.data] }} {{ slotProps.data["dvt"] }}
+          </template>
+
+          <template v-else-if="col.data == 'soluong'">
+            {{ slotProps.data[col.data] }} {{ slotProps.data["dvt"] }}
+          </template>
           <template v-else>
             {{ slotProps.data[col.data] }}
           </template>
@@ -62,7 +88,7 @@
 import { onMounted, ref, computed, watch } from "vue";
 import dutruApi from "../../api/dutruApi";
 import Avatar from "primevue/avatar";
-import Button from "primevue/button";
+import Badge from "primevue/badge";
 import DataTable from "primevue/datatable";
 import { FilterMatchMode } from "primevue/api";
 import Column from "primevue/column"; ////Datatable
@@ -70,7 +96,7 @@ import InputText from "primevue/inputtext";
 import ConfirmDialog from "primevue/confirmdialog";
 import { useConfirm } from "primevue/useconfirm";
 import Loading from "../../components/Loading.vue";
-import { formatDate } from "../../utilities/util";
+import { formatDate, formatPrice } from "../../utilities/util";
 import { useMuahang } from "../../stores/muahang";
 import { storeToRefs } from "pinia";
 import { useRoute, useRouter } from "vue-router";
@@ -136,6 +162,12 @@ const columns = ref([
     id: 8,
     label: "Còn lại",
     data: "soluong",
+    className: "text-center",
+  },
+  {
+    id: 9,
+    label: "Thành tiền",
+    data: "thanhtien",
     className: "text-center",
   },
 ]);

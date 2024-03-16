@@ -1,5 +1,5 @@
 <template>
-    <div id="TableMuahangFiles">
+    <div id="TableDutruFiles">
         <DataTable showGridlines :value="files" ref="dt" class="p-datatable-ct" :rowHover="true" :loading="loading"
             responsiveLayout="scroll" :resizableColumns="true" columnResizeMode="expand" v-model:selection="selected">
             <template #header>
@@ -80,8 +80,8 @@ import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
 import { storeToRefs } from 'pinia'
 
-import { useMuahang } from '../../stores/muahang';
-import muahangApi from '../../api/muahangApi';
+import { useDutru } from '../../stores/dutru';
+import dutruApi from '../../api/dutruApi';
 import { useRoute } from 'vue-router';
 import { formatDate } from '../../utilities/util';
 import { useConfirm } from 'primevue/useconfirm';
@@ -89,11 +89,11 @@ import { useToast } from 'primevue/usetoast';
 
 const toast = useToast();
 const confirm = useConfirm();
-const store_muahang = useMuahang();
+const store_dutru = useDutru();
 const submitted = ref(false);
 const modelfile = ref({});
 const visibleDialog = ref();
-const { files, waiting, model } = storeToRefs(store_muahang);
+const { files, model, waiting } = storeToRefs(store_dutru);
 const route = useRoute();
 const loading = ref(false);
 const selected = ref();
@@ -132,7 +132,7 @@ const confirmDeleteDinhkem = (item) => {
             var list_id = item.list_file.map((x) => {
                 return x.id;
             });
-            muahangApi.xoadinhkem({ list_id: list_id }).then((response) => {
+            dutruApi.xoadinhkem({ list_id: list_id }).then((response) => {
                 waiting.value = false;
                 if (response.success) {
                     load();
@@ -153,7 +153,7 @@ const save = () => {
         return false;
     }
     var params = modelfile.value;
-    params.muahang_id = model.value.id;
+    params.dutru_id = model.value.id;
     var files = $(".file-input")[0].files;
     for (var stt in files) {
         var file = files[stt];
@@ -161,7 +161,7 @@ const save = () => {
     }
     waiting.value = true;
     hideDialog();
-    muahangApi.saveDinhkem(params).then((response) => {
+    dutruApi.saveDinhkem(params).then((response) => {
         waiting.value = false;
         if (response.success) {
             toast.add({ severity: 'success', summary: 'Thành công!', detail: 'Thay đổi thành công', life: 3000 });
@@ -188,7 +188,7 @@ const selectedColumns = computed(() => {
     return columns.value.filter(col => col.hide != true);
 });
 const load = async () => {
-    var res = await muahangApi.getFiles(route.params.id);
+    var res = await dutruApi.getFiles(route.params.id);
     files.value = res;
 }
 onMounted(() => {

@@ -18,6 +18,7 @@ namespace Vue.Models
         public string? nhasx { get; set; }
         public string? tensp { get; set; }
         public string? dangbaoche { get; set; }
+        public string? tieuchuan { get; set; }
         public string? note { get; set; }
         public DateTime? deleted_at { get; set; }
         public DateTime? updated_at { get; set; }

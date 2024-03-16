@@ -7,6 +7,7 @@ namespace Vue.Models
     [Table("dutru_comment_file")]
     public class DutruCommentFileModel
     {
+        [Key]
         public int id { get; set; }
 
         [StringLength(255)]

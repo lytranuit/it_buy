@@ -20,6 +20,7 @@ using Spire.Xls;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using System.Diagnostics;
 using System.Text.Json.Serialization;
+using workflow.Models;
 
 namespace it_template.Areas.V1.Controllers
 {
@@ -111,7 +112,7 @@ namespace it_template.Areas.V1.Controllers
 
         // POST: UserController/Edit/5
         [HttpPost]
-        public async Task<JsonResult> Edit(UserModel User, List<string> roles, List<string> list_users)
+        public async Task<JsonResult> Edit(UserModel User, List<string> roles, List<int> departments)
         {
             UserModel User_old = await UserManager.FindByIdAsync(User.Id);
             var OldValues = JsonConvert.SerializeObject(User_old);
@@ -152,16 +153,16 @@ namespace it_template.Areas.V1.Controllers
                 await _context.SaveChangesAsync();
             }
             ///
-            var users_old = _context.UserManagerModel.Where(d => d.userId == User_old.Id).ToList();
-            _context.RemoveRange(users_old);
-            foreach (string u in list_users)
+            var departments_old = _context.UserDepartmentModel.Where(d => d.user_id == User_old.Id).ToList();
+            _context.RemoveRange(departments_old);
+            foreach (int department in departments)
             {
-                var UserManagerModel = new UserManagerModel()
+                var UserDepartmentModel = new UserDepartmentModel()
                 {
-                    userId = User_old.Id,
-                    userManagerId = u,
+                    user_id = User_old.Id,
+                    department_id = department,
                 };
-                _context.Add(UserManagerModel);
+                _context.Add(UserDepartmentModel);
             }
             _context.SaveChanges();
             return Json(new { success = true, message = "Thành công" });
@@ -198,11 +199,11 @@ namespace it_template.Areas.V1.Controllers
         }
         public async Task<JsonResult> Get(string id)
         {
-            UserModel User = await _context.UserModel.Where(d => d.Id == id).Include(d => d.list_users).FirstOrDefaultAsync();
+            UserModel User = await _context.UserModel.Where(d => d.Id == id).Include(d => d.departments).FirstOrDefaultAsync();
             var role_avaliable = _configuration.GetSection("Roles").Get<string[]>().ToList();
             var roles_old = RoleManager.Roles.Where(d => role_avaliable.Contains(d.Name)).Select(a => a.Id).ToList();
             var roles = _context.UserRoleModel.Where(d => d.UserId == id && roles_old.Contains(d.RoleId)).Select(d => d.RoleId).ToList();
-            return Json(new { success = true, id = User.Id, roles = roles, list_users = User.list_users.Select(d => d.userManagerId.ToString()).ToList(), email = User.Email, FullName = User.FullName, image_url = User.image_url, image_sign = User.image_sign });
+            return Json(new { success = true, id = User.Id, roles = roles, departments = User.departments.Select(d => d.department_id.ToString()).ToList(), email = User.Email, FullName = User.FullName, image_url = User.image_url, image_sign = User.image_sign, PhoneNumber = User.PhoneNumber });
         }
 
         public async Task<JsonResult> active()

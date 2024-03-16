@@ -24,18 +24,36 @@ export default {
       })
       .then((res) => res.data);
   },
-  xoadondathang(params) {
+  xoadinhkemncc(params) {
     return repository
-      .post(`/v1/${resoure}/xoadondathang`, params, {
+      .post(`/v1/${resoure}/xoadinhkemncc`, params, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       })
       .then((res) => res.data);
   },
-  xoathanhtoan(params) {
+  saveDinhkem(params) {
     return repository
-      .post(`/v1/${resoure}/xoathanhtoan`, params, {
+      .post(`/v1/${resoure}/saveDinhkem`, params, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => res.data);
+  },
+  saveUynhiemchi(params) {
+    return repository
+      .post(`/v1/${resoure}/saveUynhiemchi`, params, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => res.data);
+  },
+  savenhanhang(params) {
+    return repository
+      .post(`/v1/${resoure}/savenhanhang`, params, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -45,6 +63,15 @@ export default {
   save(params) {
     return repository
       .post(`/v1/${resoure}/Save`, params, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => res.data);
+  },
+  thongbao(params) {
+    return repository
+      .post(`/v1/${resoure}/thongbao`, params, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -130,6 +157,16 @@ export default {
   get(id) {
     return repository
       .get(`/v1/${resoure}/Get`, { params: { id: id } })
+      .then((res) => res.data);
+  },
+  getUserNhanhang(id) {
+    return repository
+      .get(`/v1/${resoure}/getUserNhanhang`, { params: { muahang_id: id } })
+      .then((res) => res.data);
+  },
+  QrNhanhang(id) {
+    return repository
+      .get(`/v1/${resoure}/QrNhanhang`, { params: { muahang_id: id } })
       .then((res) => res.data);
   },
   addcomment(params) {

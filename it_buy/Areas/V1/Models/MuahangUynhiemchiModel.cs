@@ -5,8 +5,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Vue.Models
 {
-    [Table("muahang_dondathang")]
-    public class MuahangDondathangModel
+    [Table("muahang_uynhiemchi")]
+    public class MuahangUynhiemchiModel
     {
         [Key]
         public int id { get; set; }
@@ -16,7 +16,7 @@ namespace Vue.Models
         public string? ext { get; set; }
         public string? mimeType { get; set; }
 
-
+        public string? created_by { get; set; }
         [ForeignKey("muahang_id")]
         public MuahangModel? muahang { get; set; }
 

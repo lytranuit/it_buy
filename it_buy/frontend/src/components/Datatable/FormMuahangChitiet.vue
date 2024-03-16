@@ -21,7 +21,7 @@
                 <template #body="slotProps">
 
                     <template v-if="col.data == 'soluong' && model.status_id == 1">
-                        <InputNumber v-model="slotProps.data[col.data]" class="p-inputtext-sm" />
+                        <InputNumber v-model="slotProps.data[col.data]" class="p-inputtext-sm" :maxFractionDigits="2"/>
                     </template>
                     <template v-else-if="col.data == 'note' && model.status_id == 1">
                         <textarea v-model="slotProps.data[col.data]" class="form-control" />

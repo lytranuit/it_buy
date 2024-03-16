@@ -62,10 +62,18 @@
                     <Thanhtoan @next="nextCallback"></Thanhtoan>
                   </template>
                 </StepperPanel>
-                <StepperPanel header="Hoàn thành" v-if="model.status_id == 10">
+                <StepperPanel header="Hoàn thành" v-if="model.date_finish">
 
                   <template #content="{ prevCallback }">
+                    <div class="row text-center">
 
+                      <div class="col-md-12">
+                        <img src="/src/assets/images/Purchase_Success.png" />
+                      </div>
+                      <div class="col-md-12 ">
+                        <b class="text-success">Hoàn thành</b>
+                      </div>
+                    </div>
                   </template>
 
                 </StepperPanel>
@@ -117,44 +125,37 @@ import Trinhky from "../../../components/muahang/Trinhky.vue";
 import Dondathang from "../../../components/muahang/Dondathang.vue";
 import Nhanhang from "../../../components/muahang/Nhanhang.vue";
 import Thanhtoan from "../../../components/muahang/Thanhtoan.vue";
-const activeStep = ref(0);
+const activeStep = computed(() => {
+  var value = 0;
+  if (model.value.status_id == 6) {
+    value = 1;
+  } else if (model.value.status_id == 7) {
+    value = 2;
+  } else if ([8, 9, 11].indexOf(model.value.status_id) != -1) {
+    value = 3;
+  } else if ([10].indexOf(model.value.status_id) != -1) {
+    value = 4;
+  }
+  if (model.value.is_dathang) {
+    value++;
+  }
+  if (model.value.is_thanhtoan) {
+    value++;
+  }
+  if (model.value.date_finish) {
+    value = 7;
+  }
+  return value;
+});
 const route = useRoute();
 const storeMuahang = useMuahang();
-const { model, datatable, nccs, waiting, tabviewActive } = storeToRefs(storeMuahang);
+const { model, waiting, tabviewActive } = storeToRefs(storeMuahang);
 
 
 
 
 
 onMounted(() => {
-  muahangApi.get(route.params.id).then((res) => {
-    var chitiet = res.chitiet;
-    var list_ncc = res.nccs;
-    res.date = res.date ? moment(res.date).format("YYYY-MM-DD") : null;
-    delete res.chitiet;
-    delete res.nccs;
-    delete res.user_created_by;
-    model.value = res;
-    datatable.value = chitiet;
-    nccs.value = list_ncc;
-    if (model.value.status_id == 6) {
-      activeStep.value = 1;
-    } else if (model.value.status_id == 7) {
-      activeStep.value = 2;
-    } else if ([8, 9, 11].indexOf(model.value.status_id) != -1) {
-      activeStep.value = 3;
-    } else if ([10].indexOf(model.value.status_id) != -1) {
-      activeStep.value = 4;
-    }
-    if (model.value.is_dathang) {
-      activeStep.value++
-    }
-    if (model.value.is_thanhtoan) {
-      activeStep.value++
-    }
-    if (model.value.date_finish) {
-      activeStep.value = 7;
-    }
-  });
+  storeMuahang.load_data(route.params.id);
 });
 </script>

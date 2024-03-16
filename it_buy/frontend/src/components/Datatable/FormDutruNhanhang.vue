@@ -31,6 +31,10 @@
                             :manualInput="false" showIcon :minDate="minDate" :readonly="model.date_finish"/>
                     </template>
 
+                    <template v-else-if="col.data == 'soluong_nhanhang'">
+                        <InputNumber v-model="slotProps.data[col.data]" class="p-inputtext-sm" :readonly="model.date_finish" :maxFractionDigits="2"/>
+                    </template>
+
                     <template v-else-if="col.data == 'note_nhanhang'">
                         <textarea v-model="slotProps.data[col.data]" class="form-control form-control-sm" :readonly="model.date_finish"></textarea>
                     </template>
@@ -95,6 +99,11 @@ const columns = ref([
     {
         label: "Số lượng",
         "data": "soluong",
+        "className": "text-center"
+    },
+    {
+        label: "Số lượng nhận hàng (*)",
+        "data": "soluong_nhanhang",
         "className": "text-center"
     },
     {

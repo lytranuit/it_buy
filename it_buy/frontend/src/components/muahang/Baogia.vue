@@ -96,7 +96,7 @@
               <div class="text-center">
                 <i class="far fa-file-pdf text-danger"></i>
                 <h6 class="text-truncate" :title="item1.name">{{ item1.name }}</h6>
-                <div style="cursor: pointer;" @click="xoadinhkem(key1, item)" v-if="readonly == false">
+                <div style="cursor: pointer;" @click="xoadinhkemncc(key1, item)" v-if="readonly == false">
                   <i class="fas fa-times-circle text-danger font-16"></i>
                 </div>
               </div>
@@ -190,7 +190,7 @@ const removeNCC = (ncc) => {
   });
 }
 
-const xoadinhkem = (key1, item) => {
+const xoadinhkemncc = (key1, item) => {
   // console.log(item.dinhkem[key1]);
   confirm.require({
     message: 'Bạn có chắc muốn xóa?',
@@ -199,7 +199,7 @@ const xoadinhkem = (key1, item) => {
     accept: () => {
 
       waiting.value = true;
-      muahangApi.xoadinhkem({ id: item.dinhkem[key1].id }).then((response) => {
+      muahangApi.xoadinhkemncc({ id: item.dinhkem[key1].id }).then((response) => {
         waiting.value = false;
         if (response.success) {
           $(".list_attachment .file-box[data-key='" + item.dinhkem[key1].id + "']").remove();
@@ -242,7 +242,8 @@ const submit1 = () => {
     waiting.value = false;
     if (response.success) {
       toast.add({ severity: 'success', summary: 'Thành công!', detail: 'Thay đổi thành công', life: 3000 });
-      location.reload();
+      // location.reload();
+      store_muahang.load_data(model.value.id);
     }
     // console.log(response)
   });

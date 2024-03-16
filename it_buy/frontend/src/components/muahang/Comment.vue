@@ -9,7 +9,9 @@
 
         <InputGroup>
           <input type="file" class="d-none" name='file[]' multiple @change="changeFile" />
-          <Textarea placeholder="Thêm bình luận ở đây" rows="1" required name="comment" />
+          <DxHtmlEditor v-model:value="text" ref="editor_filecontent" :mentions="mentions_employee"
+            style="width: 100%;">
+          </DxHtmlEditor>
           <Button label="" icon="pi pi-file" size="small" severity="success" @click="AddCommentFile"></Button>
 
           <Button label="Gửi" icon="pi pi-send" size="small" @click="add_comment"></Button>
@@ -27,9 +29,7 @@
                 -
                 {{ formatDate(comment.created_at, "HH:mm DD/MM/YYYY") }}</small>
             </h5>
-            <div class="mb-2" style="white-space: pre-wrap">
-              {{ comment.comment }}
-            </div>
+            <div class="mb-2" style="white-space: pre-wrap" v-html="comment.comment"></div>
             <div class="mb-2 attach_file file-box-content">
               <div class="file-box" v-for="(file, index1) in comment.files">
                 <a :href="file.url" :download="file.name" class="download-icon-link">
@@ -54,7 +54,7 @@
   </div>
 </template>
 <script setup>
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import Api from "../../api/Api";
 import { formatDate } from "../../utilities/util";
 import { useMuahang } from "../../stores/muahang";
@@ -63,10 +63,29 @@ import muahangApi from "../../api/muahangApi";
 import InputGroup from 'primevue/inputgroup';
 import Textarea from 'primevue/textarea';
 import Button from 'primevue/button';
+
+import {
+  DxHtmlEditor,
+} from 'devextreme-vue/html-editor';
+import { useAuth } from "../../stores/auth";
+const store = useAuth();
+const { users } = storeToRefs(store);
 const store_muahang = useMuahang();
 const { model } = storeToRefs(store_muahang);
 const comments = ref([]);
+const text = ref();
 const uploadText = ref("");
+const mentions_employee = computed(() => {
+  return [
+    {
+      dataSource: users.value,
+      searchExpr: "name",
+      displayExpr: "name",
+      valueExpr: "id",
+      marker: "@",
+    },
+  ]
+})
 const getComments = async () => {
   /// Lấy comments
   var model_id = model.value.id;
@@ -91,18 +110,30 @@ const changeFile = () => {
 }
 const add_comment = async (e) => {
   e.preventDefault();
-  var comment = $("[name=comment]").val();
+  var comment = text.value;
   var files = $("[name='file[]']")[0].files;
-  //console.log(files);
-  //return false;
+  // console.log(comment);
+  // return false;
   if (comment == "" && !files.length) {
     alert("Mời nhập bình luận!");
     return false;
   }
   var form = $("#binhluan")[0];
   var formData = new FormData(form);
-
+  formData.append("comment", comment);
+  var users_related = [];
+  $(".dx-mention", comment).each(function () {
+    // console.log(this)
+    var user_id = $(this).data("id");
+    users_related.push(users_related);
+    formData.append("users_related[]", user_id);
+  });
+  // if (users_related.length > 0) {
+  //   formData.append("users_related", users_related);
+  // }
+  // console.log(formData)
   $("#binhluan").trigger("reset");
+  text.value = "";
   uploadText.value = null;
   var result = await muahangApi.addcomment(formData);
   if (result.success) {
@@ -112,6 +143,7 @@ const add_comment = async (e) => {
 }
 onMounted(() => {
   getComments();
+  store.fetchUsers();
 })
 </script>
 

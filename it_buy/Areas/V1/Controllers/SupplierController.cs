@@ -20,22 +20,23 @@ namespace it_template.Areas.V1.Controllers
             UserManager = UserMgr;
         }
         [HttpPost]
-        public async Task<JsonResult> Save(NhacungcapModel NhacungcapModel, string old_key)
+        public async Task<JsonResult> Save(NhacungcapModel NhacungcapModel)
         {
             var jsonData = new { success = true, message = "" };
             try
             {
-                if (old_key == null)
+                if (NhacungcapModel.id > 0)
                 {
-                    _context.Add(NhacungcapModel);
+                    var NhacungcapModel_old = _context.NhacungcapModel.Where(d => d.id == NhacungcapModel.id).FirstOrDefault();
+                    CopyValues<NhacungcapModel>(NhacungcapModel_old, NhacungcapModel);
+                    _context.Update(NhacungcapModel_old);
                     _context.SaveChanges();
                 }
                 else
                 {
-                    var NhacungcapModel_old = _context.NhacungcapModel.Where(d => d.mancc == old_key).FirstOrDefault();
-                    CopyValues<NhacungcapModel>(NhacungcapModel_old, NhacungcapModel);
-                    _context.Update(NhacungcapModel_old);
+                    _context.Add(NhacungcapModel);
                     _context.SaveChanges();
+
                 }
             }
             catch (Exception ex)
@@ -48,12 +49,12 @@ namespace it_template.Areas.V1.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> Remove(List<string> item)
+        public async Task<JsonResult> Remove(List<int> item)
         {
             var jsonData = new { success = true, message = "" };
             try
             {
-                var list = _context.NhacungcapModel.Where(d => item.Contains(d.mancc)).ToList();
+                var list = _context.NhacungcapModel.Where(d => item.Contains(d.id)).ToList();
                 _context.RemoveRange(list);
                 _context.SaveChanges();
             }

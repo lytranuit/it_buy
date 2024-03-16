@@ -16,6 +16,7 @@ namespace Vue.Models
         public string? ext { get; set; }
         public string? mimeType { get; set; }
 
+        public string? created_by { get; set; }
 
         [ForeignKey("muahang_ncc_id")]
         public MuahangNccModel? muahang_ncc { get; set; }

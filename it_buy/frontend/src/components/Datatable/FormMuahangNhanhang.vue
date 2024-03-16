@@ -25,13 +25,37 @@
                     <template v-if="col.data == 'hh_id'">
                         {{ slotProps.data["mahh"] }}
                     </template>
+                    <template v-else-if="editable == true && col.data == 'date_nhanhang'">
+                        <Calendar v-model="slotProps.data[col.data]" dateFormat="yy-mm-dd" class="date-custom"
+                            :manualInput="false" showIcon :minDate="minDate" :readonly="model.date_finish" />
+                    </template>
+
+                    <template v-else-if="editable == true && col.data == 'soluong_nhanhang'">
+                        <InputNumber v-model="slotProps.data[col.data]" class="p-inputtext-sm"
+                            :readonly="model.date_finish" :maxFractionDigits="2" />
+                    </template>
+
+                    <template v-else-if="editable == true && col.data == 'note_nhanhang'">
+                        <textarea v-model="slotProps.data[col.data]" class="form-control form-control-sm"
+                            :readonly="model.date_finish"></textarea>
+                    </template>
+
+                    <template v-else-if="editable == true && col.data == 'status_nhanhang'">
+                        <select class="form-control form-control-sm" v-model="slotProps.data[col.data]"
+                            :readonly="model.date_finish">
+                            <option value="0">Chưa nhận hàng</option>
+                            <option value="1">Đã nhận hàng</option>
+                            <option value="2">Khiếu nại</option>
+                        </select>
+                    </template>
+
 
                     <template v-else-if="col.data == 'status_nhanhang' && slotProps.data[col.data] == 1">
-                        <Chip label="Đã nhận hàng" icon="pi pi-check" class="bg-success text-white"/>
+                        <Chip label="Đã nhận hàng" icon="pi pi-check" class="bg-success text-white" />
                     </template>
 
                     <template v-else-if="col.data == 'status_nhanhang' && slotProps.data[col.data] == 2">
-                        <Chip label="Khiếu nại" icon="pi pi-times" class="bg-danger text-white"/>
+                        <Chip label="Khiếu nại" icon="pi pi-times" class="bg-danger text-white" />
                     </template>
 
                     <template v-else-if="col.data == 'status_nhanhang'">
@@ -69,7 +93,7 @@ import { useMuahang } from '../../stores/muahang';
 
 const store_muahang = useMuahang();
 const { datatable, model } = storeToRefs(store_muahang);
-
+const minDate = ref(new Date());
 const loading = ref(false);
 const selected = ref();
 const columns = ref([
@@ -97,6 +121,10 @@ const columns = ref([
         label: "Số lượng(*)",
         "data": "soluong",
         "className": "text-center"
+    }, {
+        label: "Số lượng nhận hàng",
+        "data": "soluong_nhanhang",
+        "className": "text-center"
     },
     {
         label: "Ngày nhận hàng",
@@ -118,6 +146,12 @@ const columns = ref([
 const selectedColumns = computed(() => {
     return columns.value.filter(col => col.hide != true);
 });
+const props = defineProps({
+    editable: {
+        type: Boolean,
+        default: false,
+    },
+})
 onMounted(() => {
     // console.log(datatable.value);
 })

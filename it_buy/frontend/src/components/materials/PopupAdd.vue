@@ -35,6 +35,10 @@
         </div>
         <div class="row mb-2">
             <div class="field col">
+                <label for="name">Tiêu chuẩn</label>
+                <InputText id="name" class="p-inputtext-sm" v-model.trim="model.tieuchuan" />
+            </div>
+            <div class="field col">
                 <label for="name">Tên sản phẩm</label>
                 <InputText id="name" class="p-inputtext-sm" v-model.trim="model.tensp" />
             </div>

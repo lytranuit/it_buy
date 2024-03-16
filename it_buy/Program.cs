@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.AspNetCore.Authentication;
 using Vue.Middleware;
+using Microsoft.AspNetCore.Http;
 //using Vue.Middleware;
 
 namespace Vue
@@ -199,7 +200,8 @@ namespace Vue
                 else if (!context.User.Identity.IsAuthenticated)
                 {
                     //var token_query = context.Request.Cookies["Auth-Token"].ToString();
-                    context.Response.Redirect("/Identity/Account/Login");
+                    var ReturnUrl = Uri.EscapeDataString(context.Request.Path);
+                    context.Response.Redirect("/Identity/Account/Login?ReturnUrl=" + ReturnUrl);
                 }
                 else
                 {

@@ -1,8 +1,8 @@
 ﻿<template>
   <div class="row my-5">
     <div class="row col-12">
-      <div class="col-4">
-        <b class="">Phương thức thanh toán:</b>
+      <div class="col-md-4">
+        <b class="">Loại thanh toán:</b>
         <div class="mt-2">
           <select class="form-control form-control-sm" v-model="model.loaithanhtoan" :readonly="model.is_dathang">
             <option value="tra_truoc">Trả trước</option>
@@ -10,11 +10,23 @@
           </select>
         </div>
       </div>
-      <div class="col-4">
+      <div class="col-md-4">
+        <b class="">Phương thức thanh toán:</b>
+        <div class="mt-2">
+          <input v-model="model.ptthanhtoan" class="form-control form-control-sm" :readonly="model.is_dathang" />
+        </div>
+      </div>
+      <div class="col-md-4">
         <b class="">Yêu cầu giao hàng:</b>
         <div class="mt-2">
           <Calendar v-model="model.date" dateFormat="yy-mm-dd" class="date-custom" :manualInput="false" showIcon
             :minDate="minDate" :readonly="model.is_dathang" />
+        </div>
+      </div>
+      <div class="col-md-12 mt-2">
+        <b class="">Địa chỉ giao hàng:</b>
+        <div class="mt-2">
+          <textarea v-model="model.diachigiaohang" class="form-control form-control-sm" :readonly="model.is_dathang" ></textarea>
         </div>
       </div>
 
@@ -69,7 +81,8 @@ const xuatdondathang = async () => {
     waiting.value = false;
     if (response.success) {
       toast.add({ severity: 'success', summary: 'Thành công!', detail: 'Thay đổi thành công', life: 3000 });
-      location.reload();
+      // location.reload();
+      store_muahang.load_data(model.value.id);
     }
   });
 }

@@ -91,7 +91,8 @@ const submit = async () => {
   waiting.value = false;
   if (response.success) {
     toast.add({ severity: 'success', summary: 'Thành công!', detail: 'Thay đổi thành công', life: 3000 });
-    location.reload();
+    // location.reload();
+    store_muahang.load_data(model.value.id);
   }
   return true;
   // console.log(response)
@@ -104,7 +105,9 @@ const baogia = () => {
     waiting.value = false;
     if (response.success) {
       toast.add({ severity: 'success', summary: 'Thành công!', detail: 'Xuất file thành công', life: 3000 });
-      location.reload();
+      // location.reload();
+
+      store_muahang.load_data(model.value.id);
     }
   });
 }

@@ -180,6 +180,14 @@ namespace Vue.Controllers
                     }
                 }
             }
+            ////
+            var muahang_list = _context.MuahangModel.Where(d => d.deleted_at == null && d.date_finish == null && d.is_nhanhang == true && d.is_thanhtoan == true).ToList();
+            foreach (var item in muahang_list)
+            {
+                item.date_finish = DateTime.Now;
+                _context.Update(item);
+                _context.SaveChanges();
+            }
             return Json(new { success = true });
         }
     }

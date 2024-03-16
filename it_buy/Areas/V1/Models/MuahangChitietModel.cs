@@ -13,17 +13,21 @@ namespace Vue.Models
         public int muahang_id { get; set; }
         public string? hh_id { get; set; }
         public decimal? soluong { get; set; }
+        public decimal? soluong_nhanhang { get; set; }
         public int? status_id { get; set; }
         public string? note { get; set; }
         public int dutru_chitiet_id { get; set; }
         public string? note_nhanhang { get; set; }
         public int? status_nhanhang { get; set; }
         public DateTime? date_nhanhang { get; set; }
+        public string? user_nhanhang_id { get; set; }
+        [ForeignKey("user_nhanhang_id")]
+        public virtual UserModel? user_nhanhang { get; set; }
 
         [ForeignKey("muahang_id")]
-        public MuahangModel? muahang { get; set; }
+        public virtual MuahangModel? muahang { get; set; }
         [ForeignKey("dutru_chitiet_id")]
-        public DutruChitietModel? dutru_chitiet { get; set; }
+        public virtual DutruChitietModel? dutru_chitiet { get; set; }
 
         //[NotMapped]
         public string? mahh { get; set; }

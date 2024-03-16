@@ -8,6 +8,7 @@ namespace Vue.Models
     [Table("dutru_comment")]
     public class DutruCommentModel
     {
+        [Key]
         public int id { get; set; }
         public int dutru_id { get; set; }
         public string? comment { get; set; }
@@ -22,6 +23,8 @@ namespace Vue.Models
         [ForeignKey("user_id")]
         public virtual UserModel? user { get; set; }
         public virtual List<DutruCommentFileModel>? files { get; set; }
+        public virtual List<DutruCommentUserModel>? users_related { get; set; }
+
 
         public DateTime? created_at { get; set; }
         public DateTime? updated_at { get; set; }

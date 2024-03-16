@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
 using Microsoft.AspNetCore.Identity;
+using workflow.Models;
 
 namespace Vue.Models
 {
@@ -20,7 +21,8 @@ namespace Vue.Models
 		public DateTime? updated_at { get; set; }
 
 		public DateTime? deleted_at { get; set; }
-		[NotMapped]
+        public List<UserDepartmentModel> departments { get; set; }
+        [NotMapped]
 		public List<UserManagerModel> list_users { get; set; }
 		[NotMapped]
 		public UserManagerModel userreport { get; set; }

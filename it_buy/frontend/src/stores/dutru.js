@@ -5,7 +5,10 @@ export const useDutru = defineStore("dutru", () => {
   const model = ref({});
   const datatable = ref([]);
   const list_nhanhang = ref([]);
-
+  const list_muahang = ref([]);
+  const files = ref([]);
+  const tabviewActive = ref();
+  const waiting = ref();
   const list_add = computed(() => {
     return datatable.value.filter((item) => {
       return item.ids;
@@ -29,6 +32,10 @@ export const useDutru = defineStore("dutru", () => {
     list_update,
     list_delete,
     list_nhanhang,
+    list_muahang,
+    files,
+    tabviewActive,
+    waiting,
     reset,
   };
 });

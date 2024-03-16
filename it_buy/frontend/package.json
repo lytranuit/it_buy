@@ -25,6 +25,8 @@
     "chartjs-plugin-datalabels": "^2.2.0",
     "datatables.net-bs4": "^1.13.7",
     "datatables.net-vue3": "^2.1.3",
+    "devextreme": "^23.2.5",
+    "devextreme-vue": "^23.2.5",
     "moment": "^2.29.4",
     "pinia": "^2.1.7",
     "primeflex": "^3.3.1",

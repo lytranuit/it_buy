@@ -26,7 +26,7 @@ namespace Vue.Data
 
         public DbSet<AuditTrailsModel> AuditTrailsModel { get; set; }
 
-        public DbSet<UserModel> UserModel { get; set; }
+        public virtual DbSet<UserModel> UserModel { get; set; }
         public DbSet<UserRoleModel> UserRoleModel { get; set; }
         public DbSet<EmailModel> EmailModel { get; set; }
         public DbSet<TokenModel> TokenModel { get; set; }
@@ -35,20 +35,28 @@ namespace Vue.Data
         public DbSet<UserDepartmentModel> UserDepartmentModel { get; set; }
 
 
+        public DbSet<NhacungcapQLSXModel> NhacungcapQLSXModel { get; set; }
+        public DbSet<NVLQLSXModel> NVLQLSXModel { get; set; }
+        public DbSet<NVLRDQLSXModel> NVLRDQLSXModel { get; set; }
+        public DbSet<NsxModel> NsxModel { get; set; }
+
         public DbSet<MaterialModel> MaterialModel { get; set; }
         public DbSet<NhacungcapModel> NhacungcapModel { get; set; }
         public DbSet<DutruModel> DutruModel { get; set; }
         public DbSet<DutruChitietModel> DutruChitietModel { get; set; }
         public DbSet<DutruCommentModel> DutruCommentModel { get; set; }
+        public DbSet<DutruDinhkemModel> DutruDinhkemModel { get; set; }
+        public DbSet<DutruCommentUserModel> DutruCommentUserModel { get; set; }
         public DbSet<DutruCommentFileModel> DutruCommentFileModel { get; set; }
-        public DbSet<MuahangModel> MuahangModel { get; set; }
+        public virtual DbSet<MuahangModel> MuahangModel { get; set; }
         public DbSet<MuahangChitietModel> MuahangChitietModel { get; set; }
         public DbSet<MuahangCommentModel> MuahangCommentModel { get; set; }
+        public DbSet<MuahangCommentUserModel> MuahangCommentUserModel { get; set; }
         public DbSet<MuahangCommentFileModel> MuahangCommentFileModel { get; set; }
         public DbSet<MuahangNccModel> MuahangNccModel { get; set; }
         public DbSet<MuahangNccDinhkemModel> MuahangNccDinhkemModel { get; set; }
-        public DbSet<MuahangDondathangModel> MuahangDondathangModel { get; set; }
-        public DbSet<MuahangDinhkemModel> MuahangThanhtoanModel { get; set; }
+        public DbSet<MuahangDinhkemModel> MuahangDinhkemModel { get; set; }
+        public DbSet<MuahangUynhiemchiModel> MuahangUynhiemchiModel { get; set; }
         public DbSet<MuahangNccChitietModel> MuahangNccChitietModel { get; set; }
         public DbSet<QueueModel> QueueModel { get; set; }
 
@@ -156,7 +164,7 @@ namespace Vue.Data
             }
             var list_talbe2 = new List<string>()
             {
-                "dm_hanghoa","TBL_DANHMUCNHACC_SC"
+                "dm_hanghoa","TBL_DANHMUCNHACC","TBL_DANHMUCHANGHOA","TBL_DANHMUCNHASX"
             };
             //var tableName = "AspNetUsers";
             foreach (var tableName in list_talbe2)

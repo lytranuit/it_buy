@@ -35,7 +35,6 @@
                   {{ slotProps.data[col.data] }}
                 </template>
 
-
                 <template v-else-if="col.data == 'tonggiatri'">
                   {{ formatPrice(slotProps.data[col.data], 0) }} VNĐ
                 </template>
@@ -81,13 +80,6 @@
               <template #filter="{ filterModel, filterCallback }" v-if="col.filter == true">
                 <InputText type="text" v-model="filterModel.value" @keydown.enter="filterCallback()"
                   class="p-column-filter" />
-              </template>
-            </Column>
-            <Column style="width: 1rem">
-
-              <template #body="slotProps">
-                <a class="p-link text-danger font-16" @click="confirmDelete(slotProps.data['id'])"><i
-                    class="pi pi-trash"></i></a>
               </template>
             </Column>
           </DataTable>
@@ -152,7 +144,7 @@ const columns = ref([
     filter: true,
   },
   {
-    id: 5,
+    id: 4,
     label: "Tổng giá trị",
     data: "tonggiatri",
     className: "text-center",
@@ -166,7 +158,7 @@ const filters = ref({
 const totalRecords = ref(0);
 const loading = ref(true);
 const showing = ref([]);
-const column_cache = "columns_muahang"; ////
+const column_cache = "columns_thanhtoan"; ////
 const first = ref(0);
 const rows = ref(10);
 const draw = ref(0);
@@ -184,6 +176,7 @@ const lazyParams = computed(() => {
     start: first.value,
     length: rows.value,
     filters: data_filters,
+    type: "thanhtoan"
   };
 });
 const dt = ref(null);
@@ -205,21 +198,6 @@ const onPage = (event) => {
   loadLazyData();
 };
 
-const confirmDelete = (id) => {
-  confirm.require({
-    message: "Bạn có muốn xóa row này?",
-    header: "Xác nhận",
-    icon: "pi pi-exclamation-triangle",
-    accept: () => {
-      muahangApi.delete(id).then((res) => {
-        loadLazyData();
-      });
-    },
-  });
-};
-const taodondathang = () => {
-  console.log(selected.value);
-}
 onMounted(() => {
   let cache = localStorage.getItem(column_cache);
   if (!cache) {

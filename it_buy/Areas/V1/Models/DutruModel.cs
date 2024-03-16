@@ -12,18 +12,20 @@ namespace Vue.Models
         public int id { get; set; }
         public string? code { get; set; }
         public string? name { get; set; }
-        public string? bophan { get; set; }
+        public int? bophan_id { get; set; }
+        [ForeignKey("bophan_id")]
+        public virtual DepartmentModel? bophan { get; set; }
         public string? created_by { get; set; }
 
         [ForeignKey("created_by")]
-        public UserModel? user_created_by { get; set; }
+        public virtual UserModel? user_created_by { get; set; }
         public int? type_id { get; set; }
         public int? status_id { get; set; } = 1;
         public int? activeStep { get; set; }
         public string? note { get; set; }
         public string? pdf { get; set; }
         public int? esign_id { get; set; }
-        public List<DutruChitietModel>? chitiet { get; set; }
+        public virtual List<DutruChitietModel>? chitiet { get; set; }
 
         public DateTime? date_finish { get; set; }     ///Ngày hoàn thành
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]

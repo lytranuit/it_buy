@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using System.Diagnostics;
 using System.Text.Json.Serialization;
+using System.Security.Policy;
 
 namespace it_template.Areas.V1.Controllers
 {
@@ -131,7 +132,7 @@ namespace it_template.Areas.V1.Controllers
             var find = _context.TokenModel.Where(d => d.deleted_at == null && d.token == token && d.vaild_to > DateTime.Now).FirstOrDefault();
             if (find != null)
             {
-                var user = _context.UserModel.Where(d => d.deleted_at == null && d.Email.ToLower() == find.email.ToLower()).Include(d => d.list_users).ThenInclude(d => d.userManager).FirstOrDefault();
+                var user = _context.UserModel.Where(d => d.deleted_at == null && d.Email.ToLower() == find.email.ToLower()).Include(d => d.departments).FirstOrDefault();
                 if (user != null)
                 {
                     var roles = await UserManager.GetRolesAsync(user);
@@ -149,11 +150,11 @@ namespace it_template.Areas.V1.Controllers
                         image_url = user.image_url,
                         is_sign = is_sign,
                         image_sign = user.image_sign,
-                        list_users = user.list_users,
+                        departments = user.departments.Select(d => d.department_id).ToList(),
                         id = user.Id,
                         token = token,
                         vaild_to = find.vaild_to.Value.ToString("yyyy-MM-dd HH:mm:ss")
-                    }); ;
+                    });
                 }
             }
             return Json(new { success = false });
@@ -179,6 +180,129 @@ namespace it_template.Areas.V1.Controllers
             {
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             });
+        }
+
+        public async Task<JsonResult> Departments()
+        {
+            var All = GetChild(0);
+            //var jsonData = new { data = ProcessModel };
+            return Json(All);
+        }
+        private List<SelectResponse> GetChild(int parent)
+        {
+            var DepartmentModel = _context.DepartmentModel.Where(d => d.deleted_at == null && d.parent == parent).OrderBy(d => d.stt).ToList();
+            var list = new List<SelectResponse>();
+            if (DepartmentModel.Count() > 0)
+            {
+                foreach (var department in DepartmentModel)
+                {
+                    var DepartmentResponse = new SelectResponse
+                    {
+
+                        id = department.id.ToString(),
+                        label = department.name
+                    };
+                    var count_child = _context.DepartmentModel.Where(d => d.deleted_at == null && d.parent == department.id).Count();
+                    if (count_child > 0)
+                    {
+                        var child = GetChild(department.id);
+                        DepartmentResponse.children = child;
+                    }
+                    list.Add(DepartmentResponse);
+                }
+            }
+            return list;
+        }
+
+        public async Task<JsonResult> updateNCC()
+        {
+            var nccs = _context.NhacungcapQLSXModel.ToList();
+            foreach (var ncc in nccs)
+            {
+                var find = _context.NhacungcapModel.Where(d => d.mancc == ncc.mancc).FirstOrDefault();
+                if (find != null)
+                {
+                    find.tenncc = ncc.tenncc;
+                    _context.Update(find);
+                }
+                else
+                {
+                    _context.Add(new NhacungcapModel()
+                    {
+                        tenncc = ncc.tenncc,
+                        mancc = ncc.mancc,
+                    });
+                }
+            }
+            _context.SaveChanges();
+            return Json(new { success = true });
+        }
+        public async Task<JsonResult> updatehh()
+        {
+            var items = _context.NVLQLSXModel.Include(d => d.nhasanxuat).GroupBy(d => d.tenhh).Select(d => new
+            {
+                tenhh = d.Key,
+                value = d.FirstOrDefault()
+            }).ToList();
+            foreach (var item in items)
+            {
+                var value = item.value;
+                var find = _context.MaterialModel.Where(d => d.mahh == value.mahh).FirstOrDefault();
+                if (find != null)
+                {
+                    find.tenhh = value.tenhh;
+                    find.dvt = value.dvt;
+                    _context.Update(find);
+                }
+                else
+                {
+                    _context.Add(new MaterialModel()
+                    {
+                        tenhh = value.tenhh,
+                        mahh = value.mahh,
+                        dvt = value.dvt,
+                        masothietke = value.masothietke,
+                    });
+                }
+            }
+            var items1 = _context.NVLRDQLSXModel.Include(d => d.nhasanxuat).GroupBy(d => d.tenhh).Select(d => new
+            {
+                tenhh = d.Key,
+                value = d.FirstOrDefault()
+            }).ToList();
+            foreach (var item in items1)
+            {
+                var value = item.value;
+                var tennhasanxuat = value.nhasanxuat != null ? value.nhasanxuat.tennsx : "";
+                var find = _context.MaterialModel.Where(d => d.mahh == value.mahh).FirstOrDefault();
+                if (find != null)
+                {
+                    find.tenhh = value.tenhh;
+                    find.dvt = value.dvt;
+                    find.nhasx = tennhasanxuat;
+                    _context.Update(find);
+                }
+                else
+                {
+                    _context.Add(new MaterialModel()
+                    {
+                        tenhh = value.tenhh,
+                        mahh = value.mahh,
+                        dvt = value.dvt,
+                        nhasx = tennhasanxuat
+                    });
+                }
+            }
+            _context.SaveChanges();
+            return Json(new { success = true });
+        }
+        public class SelectResponse
+        {
+            public string id { get; set; }
+            public string label { get; set; }
+
+            public string name { get; set; }
+            public virtual List<SelectResponse> children { get; set; }
         }
     }
 }

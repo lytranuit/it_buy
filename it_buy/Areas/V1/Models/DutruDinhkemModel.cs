@@ -5,12 +5,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Vue.Models
 {
-    [Table("muahang_dinhkem")]
-    public class MuahangDinhkemModel
+    [Table("dutru_dinhkem")]
+    public class DutruDinhkemModel
     {
         [Key]
         public int id { get; set; }
-        public int muahang_id { get; set; }
+        public int dutru_id { get; set; }
         public string? name { get; set; }
         public string? url { get; set; }
         public string? ext { get; set; }
@@ -18,8 +18,8 @@ namespace Vue.Models
 
         public string? created_by { get; set; }
         public string note { get; set; }
-        [ForeignKey("muahang_id")]
-        public MuahangModel? muahang { get; set; }
+        [ForeignKey("dutru_id")]
+        public DutruModel? muahang { get; set; }
 
         public DateTime? deleted_at { get; set; }
         public DateTime? updated_at { get; set; }

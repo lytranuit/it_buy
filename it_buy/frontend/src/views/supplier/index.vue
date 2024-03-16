@@ -202,7 +202,7 @@ const hideDialog = () => {
 };
 const deleteProduct = () => {
   waiting.value = true;
-  supplierApi.remove({ item: [model.value.mancc] }).then((res) => {
+  supplierApi.remove({ item: [model.value.id] }).then((res) => {
     waiting.value = false;
     if (res.success) {
       toast.add({
@@ -227,7 +227,7 @@ const deleteProduct = () => {
 const deleteSelectedProducts = () => {
   // datatable.value = datatable.value.filter(val => !selectedProducts.value.includes(val));
   let items = selectedProducts.value.map((item) => {
-    return item.mancc;
+    return item.id;
   });
   waiting.value = true;
   supplierApi.remove({ item: items }).then((res) => {

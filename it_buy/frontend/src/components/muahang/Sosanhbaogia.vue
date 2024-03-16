@@ -97,6 +97,14 @@
       </tr>
     </tbody>
   </table>
+  <div class="col-md-12">
+    <div class="form-group row">
+      <b class="col-12 col-lg-12 col-form-label">Lý do chọn mua:</b>
+      <div class="col-12 col-lg-12 pt-1">
+        <textarea class="form-control" v-model="model.note_chonmua" :readonly="readonly"></textarea>
+      </div>
+    </div>
+  </div>
   <div class="text-center" v-if="readonly == false">
     <Button label="Xuất PDF" icon="pi pi-file" class="p-button-sm mr-2" @click.prevent="xuatpdf()"></Button>
   </div>
@@ -134,7 +142,8 @@ const xuatpdf = async () => {
     waiting.value = false;
     if (response.success) {
       toast.add({ severity: 'success', summary: 'Thành công!', detail: 'Xuất file thành công', life: 3000 });
-      location.reload();
+      // location.reload();
+      store_muahang.load_data(model.value.id);
     }
   });
 }

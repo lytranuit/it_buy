@@ -7,6 +7,7 @@ namespace Vue.Models
     [Table("muahang_comment_file")]
     public class MuahangCommentFileModel
     {
+        [Key]
         public int id { get; set; }
 
         [StringLength(255)]

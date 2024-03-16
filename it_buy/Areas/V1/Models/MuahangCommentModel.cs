@@ -8,6 +8,7 @@ namespace Vue.Models
     [Table("muahang_comment")]
     public class MuahangCommentModel
     {
+        [Key]
         public int id { get; set; }
         public int muahang_id { get; set; }
         public string? comment { get; set; }
@@ -22,6 +23,7 @@ namespace Vue.Models
         [ForeignKey("user_id")]
         public virtual UserModel? user { get; set; }
         public virtual List<MuahangCommentFileModel>? files { get; set; }
+        public virtual List<MuahangCommentUserModel>? users_related { get; set; }
 
         public DateTime? created_at { get; set; }
         public DateTime? updated_at { get; set; }

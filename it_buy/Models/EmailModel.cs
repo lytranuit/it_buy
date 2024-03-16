@@ -16,7 +16,20 @@ namespace Vue.Models
 		public string body { get; set; }
 
 		public DateTime? date { get; set; }
-
-		public string? error { get; set; }
+        public string? attachments { get; set; }
+        [NotMapped]
+        public virtual List<string> data_attachments
+        {
+            get
+            {
+                //Console.WriteLine(settings);
+                return Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(string.IsNullOrEmpty(attachments) ? "[]" : attachments);
+            }
+            set
+            {
+                attachments = Newtonsoft.Json.JsonConvert.SerializeObject(value);
+            }
+        }
+        public string? error { get; set; }
 	}
 }

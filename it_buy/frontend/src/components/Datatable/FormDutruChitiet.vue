@@ -19,7 +19,7 @@
             </template>
             <Column selectionMode="multiple" v-if="model.status_id == 1"></Column>
             <Column v-for="(col, index) in selectedColumns" :field="col.data" :header="col.label" :key="col.data"
-                :showFilterMatchModes="false" :class="col.data">
+                :showFilterMatchModes="false" :class="col.data" >
 
                 <template #body="slotProps">
 
@@ -33,12 +33,13 @@
                         </div>
                     </template>
 
-                    <template v-else-if="col.data == 'dvt' && model.status_id == 1">
+                    <template
+                        v-else-if="(col.data == 'dvt' || col.data == 'nhasx' || col.data == 'grade' || col.data == 'tensp' || col.data == 'masothietke') && model.status_id == 1">
                         <input v-model="slotProps.data[col.data]" class="p-inputtext p-inputtext-sm" required />
                     </template>
 
                     <template v-else-if="col.data == 'soluong' && model.status_id == 1">
-                        <InputNumber v-model="slotProps.data[col.data]" class="p-inputtext-sm" />
+                        <InputNumber v-model="slotProps.data[col.data]" class="p-inputtext-sm" :maxFractionDigits="2"/>
                     </template>
 
                     <template v-else-if="col.data == 'note' && model.status_id == 1">
@@ -233,6 +234,9 @@ onMounted(() => {
 
 <style>
 .hh_id {
-    max-width: 300px;
+    min-width: 300px;
+}
+.tenhh {
+    min-width: 300px;
 }
 </style>

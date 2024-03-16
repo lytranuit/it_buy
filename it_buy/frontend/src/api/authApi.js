@@ -14,4 +14,7 @@ export default {
   users() {
     return repository.get(`/v1/${resoure}/users`).then((res) => res.data);
   },
+  Departments() {
+    return repository.get(`/v1/${resoure}/Departments`).then((res) => res.data);
+  },
 };

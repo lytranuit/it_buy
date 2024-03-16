@@ -41,10 +41,13 @@
                   </div>
                 </div>
                 <div class="form-group row">
-                  <b class="col-12 col-lg-2 col-form-label">Quản lý:</b>
+                  <b class="col-12 col-lg-2 col-form-label">Bộ phận:</b>
                   <div class="col-lg-10 pt-1">
-                    <UserDepartmentTreeSelect v-model="data.list_users" multiple name="list_users[]">
-                    </UserDepartmentTreeSelect>
+                    <DepartmentTreeSelect v-model="data.departments" valueConsistsOf="ALL_WITH_INDETERMINATE" :flat="true"
+                      multiple></DepartmentTreeSelect>
+                    <select name="departments[]" v-model="data.departments" multiple class="d-none">
+                      <option v-for="option in data.departments" :key="option" :value="option"></option>
+                    </select>
                   </div>
                 </div>
               </div>
@@ -134,7 +137,7 @@ import { useRoute } from "vue-router";
 import userApi from "../../../api/userApi";
 import ImageManager from "../../../components/ImageManager.vue";
 import RoleTreeSelect from "../../../components/TreeSelect/RoleTreeSelect.vue";
-import UserDepartmentTreeSelect from "../../../components/TreeSelect/UserDepartmentTreeSelect.vue";
+import DepartmentTreeSelect from "../../../components/TreeSelect/DepartmentTreeSelect.vue";
 const route = useRoute();
 const messageError = ref();
 const messageSuccess = ref();

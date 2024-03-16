@@ -24,7 +24,7 @@
                 <div class="form-group row">
                   <b class="col-12 col-lg-12 col-form-label">Bộ phận dự trù:<i class="text-danger">*</i></b>
                   <div class="col-12 col-lg-12 pt-1">
-                    <input class="form-control" v-model="model.bophan" required>
+                    <DepartmentTreeSelect v-model="model.bophan_id" :clearable="false"></DepartmentTreeSelect>
                   </div>
                 </div>
               </div>
@@ -75,6 +75,7 @@ import { useDutru } from '../../../stores/dutru';
 import { storeToRefs } from "pinia";
 import { useToast } from "primevue/usetoast";
 import { rand } from "../../../utilities/rand";
+import DepartmentTreeSelect from "../../../components/TreeSelect/DepartmentTreeSelect.vue";
 const toast = useToast();
 const minDate = new Date();
 const route = useRoute();
@@ -88,7 +89,7 @@ onMounted(() => {
   model.value.type_id = route.params.id;
   model.value.status_id = 1;
   if (model.value.type_id == 1) {
-    model.value.bophan = "Phòng Kế hoạch sản xuất";
+    model.value.bophan_id = 19;
   }
   addRow();
 });

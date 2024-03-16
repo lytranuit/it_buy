@@ -17,7 +17,7 @@
 
                     <template v-else-if="col.data == 'dongia'">
                         <InputNumber v-model="slotProps.data[col.data]" class="p-inputtext-sm" suffix=" VND"
-                            @update:modelValue="changeDongia()" :readonly="readonly"/>
+                            @update:modelValue="changeDongia()" :readonly="readonly" :maxFractionDigits="2"/>
                     </template>
 
                     <template v-else-if="col.data == 'thanhtien'">
