@@ -117,7 +117,7 @@ const submit = () => {
   if (datatable.value.length) {
     for (let product of datatable.value) {
       if (!product.mahh) {
-        alert("Chưa chọn Mã NVL!");
+        alert("Chưa chọn Mã hàng hóa!");
         return false;
       }
       if (!product.dvt) {

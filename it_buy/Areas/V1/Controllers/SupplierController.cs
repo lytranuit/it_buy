@@ -34,6 +34,7 @@ namespace it_template.Areas.V1.Controllers
                 }
                 else
                 {
+                    NhacungcapModel.nhom = "Hanghoa";
                     _context.Add(NhacungcapModel);
                     _context.SaveChanges();
 

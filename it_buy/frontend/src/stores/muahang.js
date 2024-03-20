@@ -5,6 +5,7 @@ import muahangApi from "../api/muahangApi";
 
 export const useMuahang = defineStore("muahang", () => {
   const model = ref({});
+  const user_created_by = ref({});
   const tabviewActive = ref(0);
   const datatable = ref([]);
   const nccs = ref([]);
@@ -34,11 +35,13 @@ export const useMuahang = defineStore("muahang", () => {
     var uynhiemchi = res.uynhiemchi;
     var chitiet = res.chitiet;
     var list_ncc = res.nccs;
+    var user = res.user_created_by;
     res.date = res.date ? moment(res.date).format("YYYY-MM-DD") : null;
     delete res.chitiet;
     delete res.nccs;
     delete res.uynhiemchi;
     delete res.user_created_by;
+    user_created_by.value = user;
     model.value = res;
     datatable.value = chitiet;
     nccs.value = list_ncc;
@@ -63,6 +66,7 @@ export const useMuahang = defineStore("muahang", () => {
     waiting,
     tabviewActive,
     QrNhanhang,
+    user_created_by,
     load_data,
     getQrNhanhang,
     reset,

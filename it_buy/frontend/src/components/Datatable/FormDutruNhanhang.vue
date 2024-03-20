@@ -59,18 +59,11 @@
 <script setup>
 
 import { onMounted, ref, watch, computed } from 'vue';
-import Materials from "../../components/TreeSelect/MaterialTreeSelect.vue"
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
-import Button from 'primevue/button';
-import InputText from 'primevue/inputtext';
 import InputNumber from 'primevue/inputnumber';
 import { storeToRefs } from 'pinia'
 
-import { useConfirm } from "primevue/useconfirm";
-import { rand } from '../../utilities/rand'
-import { formatPrice } from '../../utilities/util'
-import { useMuahang } from '../../stores/muahang';
 import { useDutru } from '../../stores/dutru';
 
 import Calendar from "primevue/calendar";

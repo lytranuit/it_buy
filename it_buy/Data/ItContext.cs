@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DiagnosticAdapter;
 using System.Data.Common;
 using workflow.Models;
+using System.Reflection.Metadata;
 
 namespace Vue.Data
 {
@@ -35,9 +36,9 @@ namespace Vue.Data
         public DbSet<UserDepartmentModel> UserDepartmentModel { get; set; }
 
 
-        public DbSet<NhacungcapQLSXModel> NhacungcapQLSXModel { get; set; }
-        public DbSet<NVLQLSXModel> NVLQLSXModel { get; set; }
-        public DbSet<NVLRDQLSXModel> NVLRDQLSXModel { get; set; }
+        //public DbSet<NhacungcapQLSXModel> NhacungcapQLSXModel { get; set; }
+        //public DbSet<NVLQLSXModel> NVLQLSXModel { get; set; }
+        //public DbSet<NVLRDQLSXModel> NVLRDQLSXModel { get; set; }
         public DbSet<NsxModel> NsxModel { get; set; }
 
         public DbSet<MaterialModel> MaterialModel { get; set; }
@@ -48,6 +49,13 @@ namespace Vue.Data
         public DbSet<DutruDinhkemModel> DutruDinhkemModel { get; set; }
         public DbSet<DutruCommentUserModel> DutruCommentUserModel { get; set; }
         public DbSet<DutruCommentFileModel> DutruCommentFileModel { get; set; }
+
+        public DbSet<DanhgianhacungcapModel> DanhgianhacungcapModel { get; set; }
+        public DbSet<DanhgianhacungcapCommentModel> DanhgianhacungcapCommentModel { get; set; }
+        public DbSet<DanhgianhacungcapDinhkemModel> DanhgianhacungcapDinhkemModel { get; set; }
+        public DbSet<DanhgianhacungcapCommentUserModel> DanhgianhacungcapCommentUserModel { get; set; }
+        public DbSet<DanhgianhacungcapCommentFileModel> DanhgianhacungcapCommentFileModel { get; set; }
+
         public virtual DbSet<MuahangModel> MuahangModel { get; set; }
         public DbSet<MuahangChitietModel> MuahangChitietModel { get; set; }
         public DbSet<MuahangCommentModel> MuahangCommentModel { get; set; }
@@ -59,7 +67,19 @@ namespace Vue.Data
         public DbSet<MuahangUynhiemchiModel> MuahangUynhiemchiModel { get; set; }
         public DbSet<MuahangNccChitietModel> MuahangNccChitietModel { get; set; }
         public DbSet<QueueModel> QueueModel { get; set; }
+        public DbSet<RelatedEsignModel> RelatedEsignModel { get; set; }
 
+
+
+        public DbSet<DocumentModel> DocumentModel { get; set; }
+        public DbSet<DocumentFileModel> DocumentFileModel { get; set; }
+
+        public DbSet<DocumentAttachmentModel> DocumentAttachmentModel { get; set; }
+        public DbSet<DocumentSignatureModel> DocumentSignatureModel { get; set; }
+        public DbSet<DocumentUserReceiveModel> DocumentUserReceiveModel { get; set; }
+        public DbSet<DocumentEventModel> DocumentEventModel { get; set; }
+        public DbSet<DocumentTypeModel> DocumentTypeModel { get; set; }
+        public DbSet<DocumentTypeReceiveModel> DocumentTypeReceiveModel { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<UserRoleModel>().ToTable("AspNetUserRoles").HasKey(table => new
@@ -71,8 +91,12 @@ namespace Vue.Data
             modelBuilder.Entity<UserModel>().HasMany(e => e.list_users).WithOne(e => e.user).HasForeignKey(e => e.userId);
 
             modelBuilder.Entity<UserModel>().HasOne(e => e.userreport).WithOne(e => e.userManager).HasForeignKey<UserManagerModel>(e => e.userManagerId);
-
-
+            //    modelBuilder.Entity<NhacungcapModel>()
+            //.HasKey(e => e.mancc);
+            //modelBuilder.Entity<MaterialModel>()
+            //    .HasOne(e => e.nhacungcap)
+            //        .WithOne()
+            //    .HasPrincipalKey<NhacungcapModel>(e => e.mancc);
             //modelBuilder.Entity<UserManagerModel>().HasOne(e => e.user);
 
         }
@@ -152,7 +176,8 @@ namespace Vue.Data
 
             var list_talbe = new List<string>()
             {
-                "AspNetUsers","AspNetUserRoles","emails","Token","user_manager","department","user_department","queue"
+                "AspNetUsers","AspNetUserRoles","emails","Token","user_manager","department","user_department","queue",
+                "document","document_event","document_attachment","document_file","document_user_receive","document_signature","document_type","document_type_receive","related_esign"
             };
             //var tableName = "AspNetUsers";
             foreach (var tableName in list_talbe)

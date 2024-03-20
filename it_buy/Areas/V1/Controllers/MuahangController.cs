@@ -2,6 +2,7 @@
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using QRCoder;
 using System.Collections;
@@ -557,7 +558,7 @@ namespace it_template.Areas.V1.Controllers
                                 soluong = item.soluong.Value.ToString("#,##0"),
                                 dongia = item.dongia.Value.ToString("#,##0"),
                                 thanhtien = item.thanhtien.Value.ToString("#,##0"),
-                                nhasx = material.nhasx,
+                                //nhasx = material.nhasx,
                                 tieuchuan = material.tieuchuan,
                                 //note = item.note,
                                 tggh = data.date.Value.ToString("dd/MM/yyyy")
@@ -963,28 +964,119 @@ namespace it_template.Areas.V1.Controllers
             data.pdf = url_return;
             data.status_id = (int)Status.MuahangPDF;
             //_context.SaveChanges();
+
+
+            ///UPLOAD ESIGN
             System.Security.Claims.ClaimsPrincipal currentUser = this.User;
             var user_id = UserManager.GetUserId(currentUser);
-            var queue = new QueueModel()
+            var user = await UserManager.GetUserAsync(currentUser);
+            ///Document
+            var DocumentModel = new DocumentModel()
             {
-                status_id = 1,
+                name_vi = data.name,
+                description_vi = data.note,
+                priority = 2,
+                status_id = (int)DocumentStatus.Draft,
+                type_id = 73,
+                user_id = user_id,
+                user_next_signature_id = user_id,
+                is_sign_parellel = false,
                 created_at = DateTime.Now,
-                created_by = user_id,
-                type = "create_esign_muahang",
-                valueQ = new QueueValue()
-                {
-                    muahang = data
-                }
             };
-            _context.Add(queue);
-            _context.Update(data);
+            var count_type = _context.DocumentModel.Where(d => d.type_id == DocumentModel.type_id).Count();
+            var type = _context.DocumentTypeModel.Where(d => d.id == DocumentModel.type_id).Include(d => d.users_receive).FirstOrDefault();
+            DocumentModel.code = type.symbol + "00" + (count_type + 1);
+            _context.Add(DocumentModel);
+            _context.SaveChanges();
+            ///DocumentFile
+            DocumentFileModel DocumentFileModel = new DocumentFileModel
+            {
+                document_id = DocumentModel.id,
+                ext = ".pdf",
+                url = url_return,
+                name = data.name,
+                mimeType = "application/pdf",
+                created_at = DateTime.Now
+            };
+            _context.Add(DocumentFileModel);
+            ////Đính kèm
+            ///Lấy dự trù
+            var list_attachment = new List<DocumentAttachmentModel>();
+            var dutru = _context.MuahangChitietModel.Where(d => d.muahang_id == id).Include(d => d.dutru_chitiet).ThenInclude(d => d.dutru).Select(d => d.dutru_chitiet.dutru).ToList();
+            dutru = dutru.Distinct().ToList();
+            foreach (var d in dutru)
+            {
+                list_attachment.Add(new DocumentAttachmentModel()
+                {
+                    document_id = DocumentModel.id,
+                    name = "Dự trù " + d.code + "- " + d.name,
+                    ext = ".pdf",
+                    mimeType = "application/pdf",
+                    url = d.pdf,
+                    created_at = DateTime.Now
+                });
+            }
+
+            ///Lấy báo giá
+            var baogia = _context.MuahangNccModel.Where(d => d.muahang_id == id).Include(d => d.dinhkem).Include(d => d.ncc).ToList();
+            foreach (var d in baogia)
+            {
+                foreach (var item in d.dinhkem)
+                {
+                    list_attachment.Add(new DocumentAttachmentModel()
+                    {
+                        document_id = DocumentModel.id,
+                        name = item.name,
+                        ext = item.ext,
+                        mimeType = item.mimeType,
+                        url = item.url,
+                        created_at = item.created_at
+                    });
+                }
+            }
+            _context.AddRange(list_attachment);
+            ////Signature
+            for (int k = 0; k < 3; ++k)
+            {
+                DocumentSignatureModel DocumentSignatureModel = new DocumentSignatureModel() { document_id = DocumentModel.id, user_id = user_id, stt = k };
+                _context.Add(DocumentSignatureModel);
+            }
+            ////Receive
+            if (type.users_receive.Count() > 0)
+            {
+                foreach (var receive in type.users_receive)
+                {
+                    DocumentUserReceiveModel DocumentUserReceiveModel = new DocumentUserReceiveModel() { document_id = DocumentModel.id, user_id = receive.user_id };
+                    _context.Add(DocumentUserReceiveModel);
+                }
+            }
+            /////create event
+            DocumentEventModel DocumentEventModel = new DocumentEventModel
+            {
+                document_id = DocumentModel.id,
+                event_content = "<b>" + user.FullName + "</b> tạo hồ sơ mới",
+                created_at = DateTime.Now,
+            };
+            _context.Add(DocumentEventModel);
+            /////create Related 
+            RelatedEsignModel RelatedEsignModel = new RelatedEsignModel()
+            {
+                esign_id = DocumentModel.id,
+                related_id = data.id,
+                type = "muahang",
+                created_at = DateTime.Now
+            };
+            _context.Add(RelatedEsignModel);
+
+            //_context.SaveChanges();
+            data.status_id = (int)Status.MuahangEsign;
+            data.activeStep = 1;
+            data.esign_id = DocumentModel.id;
+            data.code = DocumentModel.code;
+
             _context.SaveChanges();
 
-            data.esign_id = queue.id;
-
-            _context.SaveChanges();
-
-            return Json(new { success = true, queue = queue.id });
+            return Json(new { success = true });
         }
 
         [HttpPost]

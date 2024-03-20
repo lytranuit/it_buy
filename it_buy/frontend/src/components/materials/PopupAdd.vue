@@ -15,8 +15,10 @@
                 <small class="p-error" v-if="submitted && !model.tenhh">Required.</small>
             </div>
             <div class="field col">
-                <label for="name">ĐVT</label>
-                <InputText id="name" class="p-inputtext-sm" v-model.trim="model.dvt" />
+                <label for="name">ĐVT<span class="text-danger">*</span></label>
+                <InputText id="name" class="p-inputtext-sm" v-model.trim="model.dvt" required="true"
+                    :class="{ 'p-invalid': submitted && !model.dvt }" />
+                <small class="p-error" v-if="submitted && !model.dvt">Required.</small>
             </div>
         </div>
         <div class="row mb-2">
@@ -122,6 +124,7 @@ const saveProduct = () => {
 const valid = () => {
     if (!model.value.mahh.trim()) return false;
     if (!model.value.tenhh.trim()) return false;
+    if (!model.value.dvt.trim()) return false;
     return true;
 };
 </script>

@@ -2,6 +2,26 @@
   <div>
     <div class="row clearfix">
       <div class="col-12">
+        <div class="card mb-2">
+          <div class="card-body">
+            <div class="flex-m">
+              <h5 class="title">
+                <span>
+                  {{ model.name }}</span>
+              </h5>
+
+            </div>
+            <div class="flex-m"><span class=""><span class="">ID</span>: <span class="font-weight-bold">{{ model.code
+                  }}</span></span><span class="mx-2">|</span>
+              <div class=""><span class="">Người tạo</span>: <span class="font-weight-bold">{{ user_created_by.fullName
+                  }}</span></div><span class="mx-2">|</span>
+              <div class=""><span class=""> Ngày tạo: </span><span class="font-weight-bold">{{
+                    formatDate(model.created_at) }}</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12">
         <section class="card card-fluid">
           <TabView v-model:activeIndex="tabviewActive">
             <TabPanel>
@@ -125,6 +145,7 @@ import Trinhky from "../../../components/muahang/Trinhky.vue";
 import Dondathang from "../../../components/muahang/Dondathang.vue";
 import Nhanhang from "../../../components/muahang/Nhanhang.vue";
 import Thanhtoan from "../../../components/muahang/Thanhtoan.vue";
+import { formatDate } from "../../../utilities/util";
 const activeStep = computed(() => {
   var value = 0;
   if (model.value.status_id == 6) {
@@ -149,7 +170,7 @@ const activeStep = computed(() => {
 });
 const route = useRoute();
 const storeMuahang = useMuahang();
-const { model, waiting, tabviewActive } = storeToRefs(storeMuahang);
+const { model, waiting, tabviewActive, user_created_by } = storeToRefs(storeMuahang);
 
 
 

@@ -25,6 +25,12 @@
           <span>Đề nghị thanh toán</span>
         </router-link>
       </li>
+      <li v-if="is_CungungNVL || is_Qa">
+        <router-link class="nav-link" to="/danhgianhacungcap">
+          <i class="fas fa-truck-moving"></i>
+          <span>Đánh giá nhà cung cấp</span>
+        </router-link>
+      </li>
       <li v-if="is_admin">
         <a href="javascript: void(0);">
           <i class="fas fa-wrench"></i>
@@ -71,7 +77,7 @@ import { storeToRefs } from "pinia";
 
 const { initMetisMenu, initActiveMenu } = useLayout();
 const store = useAuth();
-const { is_admin, is_Cungung, is_Ketoan } = storeToRefs(store);
+const { is_admin, is_Cungung, is_Ketoan, is_CungungNVL, is_Qa } = storeToRefs(store);
 onMounted(() => {
   initMetisMenu();
   initActiveMenu();

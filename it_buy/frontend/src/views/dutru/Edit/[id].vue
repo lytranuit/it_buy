@@ -1,6 +1,26 @@
 <template>
   <div class="row clearfix">
     <div class="col-12">
+      <div class="card mb-2">
+        <div class="card-body">
+          <div class="flex-m">
+            <h5 class="title">
+              <span>
+                {{ model.name }}</span>
+            </h5>
+
+          </div>
+          <div class="flex-m"><span class=""><span class="">ID</span>: <span class="font-weight-bold">{{ model.code
+                }}</span></span><span class="mx-2">|</span>
+            <div class=""><span class="">Người tạo</span>: <span class="font-weight-bold">{{ user_created_by.fullName
+                }}</span></div><span class="mx-2">|</span>
+            <div class=""><span class=""> Ngày tạo: </span><span class="font-weight-bold">{{
+                  formatDate(model.created_at) }}</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12">
       <section class="card">
         <div class="card-body">
           <TabView v-model:activeIndex="tabviewActive">
@@ -58,7 +78,7 @@
                       <div class="col-md-12 text-center" v-if="model.status_id == 1">
                         <Button label="Lưu lại" icon="pi pi-save" class="p-button-success p-button-sm mr-2"
                           @click.prevent="submit()"></Button>
-                        <Button label="Xuất PDF" icon="pi pi-file" class="p-button-sm mr-2"
+                        <Button label="Xuất PDF và trình ký" icon="pi pi-file" class="p-button-sm mr-2"
                           @click.prevent="xuatpdf()"></Button>
                       </div>
 
@@ -74,17 +94,20 @@
                           <i class="far fa-file text-danger" style="font-size: 40px; margin-right: 10px;"></i>
                           {{ model.pdf }}
                         </a>
-                        <div class="d-inline-block ml-5" v-if="model.status_id == 2">
+                        <!-- <div class="d-inline-block ml-5" v-if="model.status_id == 2">
                           <a :href="path_esign + '/admin/document/create?queue_id=' + model.esign_id">
                             <Button label="Bắt đầu trình ký" class="p-button-primary p-button-sm mr-2"
                               icon="fas fa-long-arrow-alt-right"></Button>
                           </a>
-                        </div>
+                        </div> -->
 
-                        <div class="d-inline-block ml-5" v-else-if="model.status_id == 3">
+                        <div class="d-inline-block ml-5" v-if="model.status_id == 3">
                           <a :href="path_esign + '/admin/document/details/' + model.esign_id">
                             <Button label="Đang trình ký" class="p-button-warning p-button-sm mr-2"
                               icon="fas fa-spinner fa-spin"></Button>
+                          </a>
+                          <a :href="path_esign + '/admin/document/edit/' + model.esign_id">
+                            <Button label="Đi đến cài đặt" class="p-button-sm mr-2" icon="fas fa-cog"></Button>
                           </a>
                         </div>
 
@@ -245,7 +268,7 @@ const toast = useToast();
 const minDate = new Date();
 const route = useRoute();
 const storeDutru = useDutru();
-const { model, datatable, list_add, list_update, list_delete, list_nhanhang, tabviewActive, waiting, list_muahang } = storeToRefs(storeDutru);
+const { model, datatable, list_add, list_update, list_delete, list_nhanhang, tabviewActive, waiting, list_muahang, user_created_by } = storeToRefs(storeDutru);
 
 const muahangActive = (muahang) => {
   let ret = 0;
@@ -265,8 +288,11 @@ const muahangActive = (muahang) => {
 onMounted(() => {
   dutruApi.get(route.params.id).then((res) => {
     var chitiet = res.chitiet;
+    var user = res.user_created_by;
     res.date = moment(res.date).format("YYYY-MM-DD");
     delete res.chitiet;
+    delete res.user_created_by;
+    user_created_by.value = user;
     model.value = res;
     datatable.value = chitiet;
     if ([2, 3, 5].indexOf(model.value.status_id) != -1) {

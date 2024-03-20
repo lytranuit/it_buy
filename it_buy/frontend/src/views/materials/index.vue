@@ -30,7 +30,10 @@
               :showFilterMatchModes="false">
 
               <template #body="slotProps">
-                <div v-html="slotProps.data[col.data]"></div>
+                <template v-if="col.data == 'mahh'">
+                  <RouterLink :to="'/materials/edit/' + slotProps.data['id']" class="text-blue">{{ slotProps.data[col.data] }}</RouterLink>
+                </template>
+                <div v-else v-html="slotProps.data[col.data]"></div>
               </template>
 
               <template #filter="{ filterModel, filterCallback }" v-if="col.filter == true">
@@ -100,6 +103,7 @@ import { useAuth } from "../../stores/auth";
 import PopupAdd from "../../components/materials/PopupAdd.vue";
 import { useMaterials } from "../../stores/materials";
 import { storeToRefs } from "pinia";
+import { RouterLink } from "vue-router";
 const store = useAuth();
 const toast = useToast();
 ////Datatable

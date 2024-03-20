@@ -114,7 +114,7 @@ namespace it_template.Areas.V1.Controllers
         [HttpPost]
         public async Task<JsonResult> Edit(UserModel User, List<string> roles, List<int> departments)
         {
-            UserModel User_old = await UserManager.FindByIdAsync(User.Id);
+            UserModel User_old = _context.UserModel.Where(d => d.Id == User.Id).FirstOrDefault();
             var OldValues = JsonConvert.SerializeObject(User_old);
             User_old.Email = User.Email;
             User_old.UserName = User.Email;

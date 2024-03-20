@@ -5,17 +5,20 @@
         <i class="far fa-file text-danger" style="font-size: 40px; margin-right: 10px;"></i>
         {{ model.pdf }}
       </a>
-      <div class="d-inline-block ml-5" v-if="model.status_id == 8">
+      <!-- <div class="d-inline-block ml-5" v-if="model.status_id == 8">
         <a :href="path_esign + '/admin/document/create?queue_id=' + model.esign_id">
           <Button label="Bắt đầu trình ký" class="p-button-primary p-button-sm mr-2"
             icon="fas fa-long-arrow-alt-right"></Button>
         </a>
-      </div>
+      </div> -->
 
-      <div class="d-inline-block ml-5" v-else-if="model.status_id == 9">
+      <div class="d-inline-block ml-5" v-if="model.status_id == 9">
         <a :href="path_esign + '/admin/document/details/' + model.esign_id">
           <Button label="Đang trình ký" class="p-button-warning p-button-sm mr-2"
             icon="fas fa-spinner fa-spin"></Button>
+        </a>
+        <a :href="path_esign + '/admin/document/edit/' + model.esign_id">
+          <Button label="Đi đến cài đặt" class="p-button-sm mr-2" icon="fas fa-cog"></Button>
         </a>
       </div>
 

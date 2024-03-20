@@ -25,6 +25,7 @@ using QRCoder;
 using static QRCoder.PayloadGenerator;
 using NuGet.Packaging;
 using Vue.Services;
+using Microsoft.CodeAnalysis;
 
 namespace it_template.Areas.V1.Controllers
 {
@@ -42,7 +43,7 @@ namespace it_template.Areas.V1.Controllers
         }
         public JsonResult Get(int id)
         {
-            var data = _context.DutruModel.Where(d => d.id == id).Include(d => d.chitiet).FirstOrDefault();
+            var data = _context.DutruModel.Where(d => d.id == id).Include(d => d.chitiet).Include(d => d.user_created_by).FirstOrDefault();
             if (data != null)
             {
                 var stt = 1;
@@ -432,28 +433,89 @@ namespace it_template.Areas.V1.Controllers
             data.pdf = url_return;
             data.status_id = (int)Status.PDF;
             //_context.SaveChanges();
+
+
+            ///UPLOAD ESIGN
             System.Security.Claims.ClaimsPrincipal currentUser = this.User;
             var user_id = UserManager.GetUserId(currentUser);
-            var queue = new QueueModel()
+            var user = await UserManager.GetUserAsync(currentUser);
+
+            ///Document
+            var type_id = 72;
+            if (data.type_id == 1)
             {
-                status_id = 1,
+                type_id = 78;
+            }
+            var DocumentModel = new DocumentModel()
+            {
+                name_vi = data.name,
+                description_vi = data.note,
+                priority = 2,
+                status_id = (int)DocumentStatus.Draft,
+                type_id = type_id,
+                user_id = user_id,
+                user_next_signature_id = user_id,
+                is_sign_parellel = false,
                 created_at = DateTime.Now,
-                created_by = user_id,
-                type = "create_esign_dutru",
-                valueQ = new QueueValue()
-                {
-                    dutru = data
-                }
             };
-            _context.Add(queue);
-            _context.Update(data);
+            var count_type = _context.DocumentModel.Where(d => d.type_id == DocumentModel.type_id).Count();
+            var type = _context.DocumentTypeModel.Where(d => d.id == DocumentModel.type_id).Include(d => d.users_receive).FirstOrDefault();
+            DocumentModel.code = type.symbol + "00" + (count_type + 1);
+            _context.Add(DocumentModel);
+            _context.SaveChanges();
+            ///DocumentFile
+            DocumentFileModel DocumentFileModel = new DocumentFileModel
+            {
+                document_id = DocumentModel.id,
+                ext = ".pdf",
+                url = url_return,
+                name = data.name,
+                mimeType = "application/pdf",
+                created_at = DateTime.Now
+            };
+            _context.Add(DocumentFileModel);
+            ////Signature
+            for (int k = 0; k < 3; ++k)
+            {
+                DocumentSignatureModel DocumentSignatureModel = new DocumentSignatureModel() { document_id = DocumentModel.id, user_id = user_id, stt = k };
+                _context.Add(DocumentSignatureModel);
+            }
+            ////Receive
+            if (type.users_receive.Count() > 0)
+            {
+                foreach (var receive in type.users_receive)
+                {
+                    DocumentUserReceiveModel DocumentUserReceiveModel = new DocumentUserReceiveModel() { document_id = DocumentModel.id, user_id = receive.user_id };
+                    _context.Add(DocumentUserReceiveModel);
+                }
+            }
+            /////create event
+            DocumentEventModel DocumentEventModel = new DocumentEventModel
+            {
+                document_id = DocumentModel.id,
+                event_content = "<b>" + user.FullName + "</b> tạo hồ sơ mới",
+                created_at = DateTime.Now,
+            };
+            _context.Add(DocumentEventModel);
+            /////create Related 
+            RelatedEsignModel RelatedEsignModel = new RelatedEsignModel()
+            {
+                esign_id = DocumentModel.id,
+                related_id = data.id,
+                type = "dutru",
+                created_at = DateTime.Now
+            };
+            _context.Add(RelatedEsignModel);
+
+            //_context.SaveChanges();
+            data.status_id = (int)Status.Esign;
+            data.activeStep = 1;
+            data.esign_id = DocumentModel.id;
+            data.code = DocumentModel.code;
+
             _context.SaveChanges();
 
-            data.esign_id = queue.id;
-
-            _context.SaveChanges();
-
-            return Json(new { success = true, queue = queue.id });
+            return Json(new { success = true });
         }
         [HttpPost]
         public async Task<JsonResult> Table()

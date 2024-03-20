@@ -21,6 +21,12 @@ namespace it_template.Areas.V1.Controllers
             _configuration = configuration;
             UserManager = UserMgr;
         }
+        public JsonResult Get(int id)
+        {
+            var data = _context.MaterialModel.Where(d => d.id == id).FirstOrDefault();
+
+            return Json(data);
+        }
         [HttpPost]
         public async Task<JsonResult> Save(MaterialModel HangHoaModel)
         {
@@ -39,6 +45,7 @@ namespace it_template.Areas.V1.Controllers
                 }
                 else
                 {
+                    HangHoaModel.nhom = "Other";
                     _context.Add(HangHoaModel);
                     _context.SaveChanges();
                     return Json(new { success = true, data = HangHoaModel });

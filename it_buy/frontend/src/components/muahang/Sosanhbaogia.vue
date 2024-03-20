@@ -106,7 +106,7 @@
     </div>
   </div>
   <div class="text-center" v-if="readonly == false">
-    <Button label="Xuất PDF" icon="pi pi-file" class="p-button-sm mr-2" @click.prevent="xuatpdf()"></Button>
+    <Button label="Xuất PDF và trình ký" icon="pi pi-file" class="p-button-sm mr-2" @click.prevent="xuatpdf()"></Button>
   </div>
 </template>
 <script setup>

@@ -3,6 +3,7 @@ import { defineStore } from "pinia";
 
 export const useDutru = defineStore("dutru", () => {
   const model = ref({});
+  const user_created_by = ref({});
   const datatable = ref([]);
   const list_nhanhang = ref([]);
   const list_muahang = ref([]);
@@ -27,6 +28,7 @@ export const useDutru = defineStore("dutru", () => {
   };
   return {
     model,
+    user_created_by,
     datatable,
     list_add,
     list_update,

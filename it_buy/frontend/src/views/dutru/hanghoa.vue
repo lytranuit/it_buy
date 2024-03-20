@@ -87,15 +87,12 @@
 <script setup>
 import { onMounted, ref, computed, watch } from "vue";
 import dutruApi from "../../api/dutruApi";
-import Avatar from "primevue/avatar";
 import Badge from "primevue/badge";
+import Button from "primevue/button";
 import DataTable from "primevue/datatable";
 import { FilterMatchMode } from "primevue/api";
 import Column from "primevue/column"; ////Datatable
 import InputText from "primevue/inputtext";
-import ConfirmDialog from "primevue/confirmdialog";
-import { useConfirm } from "primevue/useconfirm";
-import Loading from "../../components/Loading.vue";
 import { formatDate, formatPrice } from "../../utilities/util";
 import { useMuahang } from "../../stores/muahang";
 import { storeToRefs } from "pinia";
@@ -105,7 +102,6 @@ const type = ref("chitiet");
 const store_muahang = useMuahang();
 const { datatable } = storeToRefs(store_muahang);
 const router = useRouter();
-const confirm = useConfirm();
 const datatable1 = ref();
 const selected = ref();
 const columns = ref([

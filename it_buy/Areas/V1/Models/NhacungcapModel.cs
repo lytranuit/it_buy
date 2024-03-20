@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 namespace Vue.Models
 {
 
-    [Table("nhacungcap")]
+    [Table("TBL_DANHMUCNHACC")]
     public class NhacungcapModel
     {
         [Key]
@@ -40,6 +40,8 @@ namespace Vue.Models
         public string? taikhoannh { get; set; }
         [Column("masothue")]
         public string? masothue { get; set; }
+        [Column("nhom")]
+        public string? nhom { get; set; }
 
     }
 }

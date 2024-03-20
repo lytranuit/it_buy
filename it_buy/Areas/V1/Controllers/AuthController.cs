@@ -214,88 +214,82 @@ namespace it_template.Areas.V1.Controllers
             return list;
         }
 
-        public async Task<JsonResult> updateNCC()
-        {
-            var nccs = _context.NhacungcapQLSXModel.ToList();
-            foreach (var ncc in nccs)
-            {
-                var find = _context.NhacungcapModel.Where(d => d.mancc == ncc.mancc).FirstOrDefault();
-                if (find != null)
-                {
-                    find.tenncc = ncc.tenncc;
-                    _context.Update(find);
-                }
-                else
-                {
-                    _context.Add(new NhacungcapModel()
-                    {
-                        tenncc = ncc.tenncc,
-                        mancc = ncc.mancc,
-                    });
-                }
-            }
-            _context.SaveChanges();
-            return Json(new { success = true });
-        }
-        public async Task<JsonResult> updatehh()
-        {
-            var items = _context.NVLQLSXModel.Include(d => d.nhasanxuat).GroupBy(d => d.tenhh).Select(d => new
-            {
-                tenhh = d.Key,
-                value = d.FirstOrDefault()
-            }).ToList();
-            foreach (var item in items)
-            {
-                var value = item.value;
-                var find = _context.MaterialModel.Where(d => d.mahh == value.mahh).FirstOrDefault();
-                if (find != null)
-                {
-                    find.tenhh = value.tenhh;
-                    find.dvt = value.dvt;
-                    _context.Update(find);
-                }
-                else
-                {
-                    _context.Add(new MaterialModel()
-                    {
-                        tenhh = value.tenhh,
-                        mahh = value.mahh,
-                        dvt = value.dvt,
-                        masothietke = value.masothietke,
-                    });
-                }
-            }
-            var items1 = _context.NVLRDQLSXModel.Include(d => d.nhasanxuat).GroupBy(d => d.tenhh).Select(d => new
-            {
-                tenhh = d.Key,
-                value = d.FirstOrDefault()
-            }).ToList();
-            foreach (var item in items1)
-            {
-                var value = item.value;
-                var tennhasanxuat = value.nhasanxuat != null ? value.nhasanxuat.tennsx : "";
-                var find = _context.MaterialModel.Where(d => d.mahh == value.mahh).FirstOrDefault();
-                if (find != null)
-                {
-                    find.tenhh = value.tenhh;
-                    find.dvt = value.dvt;
-                    find.nhasx = tennhasanxuat;
-                    _context.Update(find);
-                }
-                else
-                {
-                    _context.Add(new MaterialModel()
-                    {
-                        tenhh = value.tenhh,
-                        mahh = value.mahh,
-                        dvt = value.dvt,
-                        nhasx = tennhasanxuat
-                    });
-                }
-            }
-            _context.SaveChanges();
-            return Json(new { success = true });
-        }
+        //public async Task<JsonResult> updateNCC()
+        //{
+        //    var nccs = _context.NhacungcapQLSXModel.ToList();
+        //    foreach (var ncc in nccs)
+        //    {
+        //        var find = _context.NhacungcapModel.Where(d => d.mancc == ncc.mancc).FirstOrDefault();
+        //        if (find != null)
+        //        {
+        //            find.tenncc = ncc.tenncc;
+        //            _context.Update(find);
+        //        }
+        //        else
+        //        {
+        //            _context.Add(new NhacungcapModel()
+        //            {
+        //                tenncc = ncc.tenncc,
+        //                mancc = ncc.mancc,
+        //            });
+        //        }
+        //    }
+        //    _context.SaveChanges();
+        //    return Json(new { success = true });
+        //}
+        //public async Task<JsonResult> updatehh()
+        //{
+        //    var items = _context.NVLQLSXModel.Include(d => d.nhasanxuat).ToList();
+        //    foreach (var value in items)
+        //    {
+        //        var tennhasanxuat = value.nhasanxuat != null ? value.nhasanxuat.tennsx : "";
+        //        var find = _context.MaterialModel.Where(d => d.mahh == value.mahh).FirstOrDefault();
+        //        if (find != null)
+        //        {
+        //            find.tenhh = value.tenhh;
+        //            find.dvt = value.dvt;
+        //            find.nhasx = tennhasanxuat;
+        //            _context.Update(find);
+        //        }
+        //        else
+        //        {
+        //            _context.Add(new MaterialModel()
+        //            {
+        //                tenhh = value.tenhh,
+        //                mahh = value.mahh,
+        //                dvt = value.dvt,
+        //                nhasx = tennhasanxuat,
+        //                masothietke = value.masothietke,
+        //            });
+        //        }
+        //        _context.SaveChanges();
+        //    }
+        //    var items1 = _context.NVLRDQLSXModel.Include(d => d.nhasanxuat).ToList();
+        //    foreach (var value in items1)
+        //    {
+        //        var tennhasanxuat = value.nhasanxuat != null ? value.nhasanxuat.tennsx : "";
+        //        var find = _context.MaterialModel.Where(d => d.mahh == value.mahh).FirstOrDefault();
+        //        if (find != null)
+        //        {
+        //            find.tenhh = value.tenhh;
+        //            find.dvt = value.dvt;
+        //            find.nhasx = tennhasanxuat;
+        //            _context.Update(find);
+        //        }
+        //        else
+        //        {
+        //            _context.Add(new MaterialModel()
+        //            {
+        //                tenhh = value.tenhh,
+        //                mahh = value.mahh,
+        //                dvt = value.dvt,
+        //                nhasx = tennhasanxuat
+        //            });
+        //        }
+        //        _context.SaveChanges();
+        //    }
+        //    return Json(new { success = true });
+        //}
         public class SelectResponse
         {
             public string id { get; set; }
