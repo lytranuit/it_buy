@@ -96,41 +96,75 @@ const changeLanguage = (lang) => {
 const toggle = (event) => {
   menu.value.toggle(event);
 };
+const application = ref({
+  "Esign": {
+    "hide": false,
+    "active": false,
+    "link": "https://esign.astahealthcare.com/",
+    "label": "Chữ ký điện tử",
+    "image": "/images/esign.png",
+    "width": 35
+  },
+  "Esign-gmp": {
+    "hide": false,
+    "active": false,
+    "link": "https://esign-gmp.astahealthcare.com/",
+    "label": "Hồ sơ GMP",
+    "image": "/images/gmp.png",
+    "width": 28
+  },
+  "Task": {
+    "hide": false,
+    "active": false,
+    "link": "https://task.astahealthcare.com/",
+    "label": "Công việc",
+    "image": "/images/task.png",
+    "width": 28
+  },
+  "Workflow": {
+    "hide": false,
+    "active": false,
+    "link": "https://flow.astahealthcare.com/",
+    "label": "Quy trình",
+    "image": "/images/workflow.png",
+    "width": 28
+  },
+  "QrCode": {
+    "hide": false,
+    "active": false,
+    "link": "https://qrcode.astahealthcare.com/",
+    "label": "QR Code",
+    "image": "/images/qrcode.png",
+    "width": 28
+  },
+  "Purchase": {
+    "hide": false,
+    "active": true,
+    "link": "https://purchase.astahealthcare.com/",
+    "label": "Mua hàng",
+    "image": "/images/purchase.png",
+    "width": 28
+  }
+})
 </script>
-
 <template>
   <div class="layout-topbar">
     <router-link to="/" class="layout-topbar-logo justify-content-center">
       <span>
-        <img src="../../assets/images/clientlogo_astahealthcare.com_f1800.png" alt="logo-large" class="logo-lg logo-light"
-          width="100" />
+        <img src="../../assets/images/clientlogo_astahealthcare.com_f1800.png" alt="logo-large"
+          class="logo-lg logo-light" width="100" />
       </span>
     </router-link>
 
     <button class="p-link layout-menu-button layout-topbar-button" @click="onMenuToggle()">
       <i class="pi pi-bars"></i>
     </button>
-    <div class="d-none d-xl-block">
-      <div class="soft">
-        <a href="https://esign.astahealthcare.com/">
-          <img src="../../assets/images/esign.png" width="35" alt="" />
-          <strong class="d-block">Chữ ký điện tử</strong>
-        </a>
-      </div>
-
-      <div class="soft">
-        <a href="https://task.astahealthcare.com/">
-          <img src="../../assets/images/task.png" width="28" alt="" />
-          <strong class="d-block">Công việc</strong>
-        </a>
-
-      </div>
-
-      <div class="soft">
-
-        <a href="https://flow.astahealthcare.com/">
-          <img src="../../assets/images/workflow.png" width="28" alt="" />
-          <strong class="d-block">Quy trình</strong>
+    <div class="d-none d-xl-block h-100">
+      <div class="soft" v-for="(item, key) in application" :key="key" v-show="!item.hide"
+        :class="{ 'active': item.active }">
+        <a :href="item.link">
+          <img :src="'/assets' + item.image" :width="item.width" alt="" />
+          <strong class="d-block">{{ item.label }}</strong>
         </a>
       </div>
     </div>
@@ -174,14 +208,17 @@ const toggle = (event) => {
     </div>
   </div>
 </template>
-
 <style lang="scss" scoped>
 .soft {
   height: 100%;
   align-content: center;
   justify-items: center;
   display: inline-grid;
-  margin-left: 20px;
+  padding: 10px;
   text-align: center;
+}
+
+.soft.active {
+  background: #ededed;
 }
 </style>

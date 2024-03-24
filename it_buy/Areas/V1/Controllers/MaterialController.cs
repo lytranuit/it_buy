@@ -23,12 +23,12 @@ namespace it_template.Areas.V1.Controllers
         }
         public JsonResult Get(int id)
         {
-            var data = _context.MaterialModel.Where(d => d.id == id).FirstOrDefault();
+            var data = _context.MaterialModel.Where(d => d.id == id).Include(d => d.nhacungcap).FirstOrDefault();
 
             return Json(data);
         }
         [HttpPost]
-        public async Task<JsonResult> Save(MaterialModel HangHoaModel)
+        public async Task<JsonResult> Save(MaterialModel HangHoaModel, string surfix)
         {
             var jsonData = new { success = true, message = "" };
             try
@@ -45,9 +45,19 @@ namespace it_template.Areas.V1.Controllers
                 }
                 else
                 {
-                    HangHoaModel.nhom = "Other";
+                    HangHoaModel.nhom = "Khac";
+                    if (surfix != null)
+                    {
+                        HangHoaModel.mahh = surfix + new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
+                    }
                     _context.Add(HangHoaModel);
                     _context.SaveChanges();
+                    if (surfix != null)
+                    {
+                        HangHoaModel.mahh = surfix + HangHoaModel.id;
+                        _context.Update(HangHoaModel);
+                        _context.SaveChanges();
+                    }
                     return Json(new { success = true, data = HangHoaModel });
                 }
             }
@@ -104,7 +114,7 @@ namespace it_template.Areas.V1.Controllers
                 customerData = customerData.Where(d => d.tenhh.Contains(tenhh));
             }
             int recordsFiltered = customerData.Count();
-            var datapost = customerData.OrderBy(d => d.mahh).Skip(skip).Take(pageSize).ToList();
+            var datapost = customerData.Include(d => d.nhasanxuat).Include(d => d.nhacungcap).OrderBy(d => d.mahh).Skip(skip).Take(pageSize).ToList();
             //var data = new ArrayList();
             //foreach (var record in datapost)
             //{

@@ -29,6 +29,7 @@ namespace Vue.Models
         [ForeignKey("dutru_chitiet_id")]
         public virtual DutruChitietModel? dutru_chitiet { get; set; }
 
+        public virtual List<MuahangNccChitietModel> muahang_ncc_chitiet { get; set; }
         //[NotMapped]
         public string? mahh { get; set; }
         //[NotMapped]

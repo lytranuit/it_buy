@@ -18,6 +18,7 @@ namespace Vue.Models
         public string? dvt { get; set; }
 
         public string? nhom { get; set; }
+        public virtual MaterialGroupModel? nhomhang { get; set; }
         public string? masothietke { get; set; }
         public string? grade { get; set; }
         //public string? nhasx { get; set; }
@@ -33,11 +34,9 @@ namespace Vue.Models
 
         public string? mansx { get; set; }
 
-        //[ForeignKey("mansx")]
-        //public virtual NsxModel? nhasanxuat { get; set; }
-        //public string? mancc { get; set; }
-        //[ForeignKey("mancc")]
-        //public virtual NhacungcapModel? nhacungcap { get; set; }
+        public virtual NsxModel? nhasanxuat { get; set; }
+        public string? mancc { get; set; }
+        public virtual NhacungcapModel? nhacungcap { get; set; }
 
 
 

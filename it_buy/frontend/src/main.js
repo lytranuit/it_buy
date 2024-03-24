@@ -14,8 +14,6 @@ import DialogService from "primevue/dialogservice";
 // import { KanbanPlugin } from '@syncfusion/ej2-vue-kanban';
 // import { GanttPlugin } from '@syncfusion/ej2-vue-gantt';
 
-
-
 import Accordion from "primevue/accordion";
 import AccordionTab from "primevue/accordiontab";
 import Calendar from "primevue/calendar";
@@ -28,6 +26,9 @@ import "vue3-acies-treeselect/dist/vue3-treeselect.css";
 import "@/assets/styles.scss";
 import "@/assets/lib/sortable/sortable.css";
 
+// import as directive
+import BadgeDirective from "primevue/badgedirective";
+
 // registerLicense('ORg4AjUWIQA/Gnt2VFhiQlhPcUBFQmFJfFBmRGNTfF96dVFWACFaRnZdQV1lSXlRdEZnXHhZeXVd');
 // registerLicense('tran');
 const app = createApp(App);
@@ -37,6 +38,7 @@ app
   .component("Calendar", Calendar)
   .component("TreeSelect", TreeSelect);
 
+app.directive("badge", BadgeDirective);
 // app.use(GanttPlugin);
 // app.use(KanbanPlugin);
 // app.use(TreeGridPlugin);

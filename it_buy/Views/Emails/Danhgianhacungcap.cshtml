@@ -1,0 +1,40 @@
+﻿@{
+    ViewData["Title"] = "Index";
+    Layout = null;
+}
+<center>
+    <table>
+        <tbody>
+            <tr>
+                <td width="600">
+                    <div>
+
+                        <p style="text-align:center;margin-bottom:30px">
+                            <img style="border:0;height:auto;line-height:100%;outline:none;text-decoration:none;width:400px;" src="@Model.link_logo" />
+                        </p>
+                        <div style="box-sizing:border-box;margin:0;padding:0 40px">
+                            <h2 style="text-align:left">Xin chào,</h2>
+                            <p style="text-align:left">Phòng Cung ứng xin thông báo đánh giá nhà cung cấp.</p>
+                            <p style="text-align:left">Tên nguyên liệu: <b>@Model.data.tenhh</b></p>
+                            <p style="text-align:left">Grade: <b>@Model.data.grade</b></p>
+                            <p style="text-align:left">Nhà sản xuất: <b>@Model.data.nhasanxuat?.tennsx</b></p>
+                            <p style="text-align:left">Nhà cung cấp: <b>@Model.data.nhacungcap?.tenncc</b></p>
+                            <p>Đường dẫn:</p>
+                            <p style="text-align:center;">
+                                <a href="@Model.link" style="padding: 10px 30px;
+    background: #ffb009;
+    color: white;
+    text-decoration: none;
+    font-size: 13px;
+    border-radius: 5px;">Đi Đến</a>
+                            </p>
+                            <p style="text-align:left">Trân trọng.</p>
+                            <p style="text-align:left">ASTA</p>
+                            <br>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</center>

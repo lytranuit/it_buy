@@ -32,16 +32,19 @@
                   </RouterLink>
                 </template>
 
-                <template v-else-if="col.data == 'material_id'">
-                  {{ slotProps.data.material.mahh }} - {{ slotProps.data.material.tenhh }}
+                <template v-else-if="col.data == 'mancc'">
+                  {{ slotProps.data.nhacungcap.mancc }} - {{ slotProps.data.nhacungcap.tenncc }}
                 </template>
-                <template v-else-if="col.data == 'ncc_id'">
-                  {{ slotProps.data.ncc.mancc }} - {{ slotProps.data.ncc.tenncc }}
+                
+                <template v-else-if="col.data == 'mansx'">
+                  {{ slotProps.data.nhasanxuat.mansx}} - {{ slotProps.data.nhasanxuat.tennsx }}
                 </template>
                 <template v-else-if="col.data == 'status_id'">
                   <div class="text-center">
-                    <Button label="Chấp nhận" class="p-button-success" size="small"
-                      v-if="slotProps.data['is_chapnhan']"></Button>
+                    <Button label="Nháp" class="p-button-secondary" size="small"
+                      v-if="!slotProps.data['is_thongbao']"></Button>
+                    <Button label="Đã chấp nhận" class="p-button-success" size="small"
+                      v-else-if="slotProps.data['is_chapnhan']"></Button>
                     <Button label="Đang duyệt" class="p-button-warning" size="small" v-else></Button>
                   </div>
                 </template>
@@ -105,23 +108,29 @@ const columns = ref([
     className: "text-center",
     filter: true,
   },
-
   {
     id: 1,
     label: "Nguyên liệu",
-    data: "material_id",
+    data: "tenhh",
     className: "text-center",
     filter: true,
   },
   {
     id: 2,
-    label: "Nhà cung cấp",
-    data: "ncc_id",
+    label: "Nhà sản xuất",
+    data: "mansx",
     className: "text-center",
     filter: true,
   },
   {
     id: 3,
+    label: "Nhà cung cấp",
+    data: "mancc",
+    className: "text-center",
+    filter: true,
+  },
+  {
+    id: 4,
     label: "Trạng thái",
     data: "status_id",
     className: "text-center",
@@ -129,7 +138,7 @@ const columns = ref([
   },
 
   {
-    id: 4,
+    id: 5,
     label: "Người tạo",
     data: "created_by",
     className: "text-center",

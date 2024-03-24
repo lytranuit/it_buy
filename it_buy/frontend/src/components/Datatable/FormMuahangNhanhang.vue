@@ -42,7 +42,7 @@
 
                     <template v-else-if="editable == true && col.data == 'status_nhanhang'">
                         <select class="form-control form-control-sm" v-model="slotProps.data[col.data]"
-                            :readonly="model.date_finish">
+                            :readonly="model.date_finish" @change="changeNhanhang(slotProps.data)">
                             <option value="0">Chưa nhận hàng</option>
                             <option value="1">Đã nhận hàng</option>
                             <option value="2">Khiếu nại</option>
@@ -50,6 +50,14 @@
                     </template>
 
 
+                    <template v-else-if="col.data == 'user_nhanhang'">
+                        <div v-if="slotProps.data['user_nhanhang']" class="d-flex">
+                            <Avatar :image="slotProps.data.user_nhanhang.image_url"
+                                :title="slotProps.data.user_nhanhang.fullName" size="small" shape="circle" /> <span
+                                class="align-self-center ml-2">{{
+            slotProps.data.user_nhanhang.fullName }}</span>
+                        </div>
+                    </template>
                     <template v-else-if="col.data == 'status_nhanhang' && slotProps.data[col.data] == 1">
                         <Chip label="Đã nhận hàng" icon="pi pi-check" class="bg-success text-white" />
                     </template>
@@ -65,6 +73,7 @@
                     <template v-else-if="col.data == 'date_nhanhang' && slotProps.data[col.data]">
                         {{ formatDate(slotProps.data[col.data]) }}
                     </template>
+
                     <template v-else>
                         {{ slotProps.data[col.data] }}
                     </template>
@@ -77,22 +86,21 @@
 <script setup>
 
 import { onMounted, ref, watch, computed } from 'vue';
-import Materials from "../../components/TreeSelect/MaterialTreeSelect.vue";
 import Chip from 'primevue/chip';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
-import Button from 'primevue/button';
-import InputText from 'primevue/inputtext';
 import InputNumber from 'primevue/inputnumber';
+import Avatar from 'primevue/avatar';
 import { storeToRefs } from 'pinia'
 
-import { useConfirm } from "primevue/useconfirm";
-import { rand } from '../../utilities/rand'
 import { formatDate, formatPrice } from '../../utilities/util'
 import { useMuahang } from '../../stores/muahang';
+import { useAuth } from '../../stores/auth';
 
+const store_auth = useAuth();
 const store_muahang = useMuahang();
 const { datatable, model } = storeToRefs(store_muahang);
+const { user } = storeToRefs(store_auth);
 const minDate = ref(new Date());
 const loading = ref(false);
 const selected = ref();
@@ -140,12 +148,22 @@ const columns = ref([
         label: "Trạng thái",
         "data": "status_nhanhang",
         "className": "text-center"
+    },
+    {
+        label: "Người nhận hàng",
+        "data": "user_nhanhang",
+        "className": "text-center"
     }
-])
+]);
 
 const selectedColumns = computed(() => {
     return columns.value.filter(col => col.hide != true);
 });
+const changeNhanhang = (row) => {
+    if (row.status_nhanhang == 1) {
+        row.user_nhanhang_id = user.value.id;
+    }
+}
 const props = defineProps({
     editable: {
         type: Boolean,

@@ -77,7 +77,8 @@ namespace it_template.Areas.V1.Controllers
         public JsonResult GetNhanhang(int id)
         {
             var list_items = _context.DutruChitietModel.Where(d => d.dutru_id == id).Select(d => d.id).ToList();
-            var data = _context.MuahangChitietModel.Include(d => d.muahang).Where(d => list_items.Contains(d.dutru_chitiet_id) && d.muahang.is_dathang == true && d.muahang.deleted_at == null).ToList();
+            var data = _context.MuahangChitietModel.Include(d => d.muahang).ThenInclude(d => d.muahang_chonmua).ThenInclude(d => d.ncc)
+                .Where(d => list_items.Contains(d.dutru_chitiet_id) && d.muahang.is_dathang == true && d.muahang.deleted_at == null).Include(d => d.user_nhanhang).ToList();
             if (data != null)
             {
                 //var stt = 1;
@@ -89,8 +90,8 @@ namespace it_template.Areas.V1.Controllers
                     //    item.tenhh = material.tenhh;
                     //    item.mahh = material.mahh;
                     //}
-                    var chonmua = _context.MuahangNccModel.Where(d => d.id == item.muahang.muahang_chonmua_id).Include(d => d.ncc).FirstOrDefault();
-                    item.muahang.muahang_chonmua = chonmua;
+                    //var chonmua = _context.MuahangNccModel.Where(d => d.id == item.muahang.muahang_chonmua_id).Include(d => d.ncc).FirstOrDefault();
+                    //item.muahang.muahang_chonmua = chonmua;
                     item.soluong_nhanhang = item.soluong;
                 }
             }
@@ -193,7 +194,7 @@ namespace it_template.Areas.V1.Controllers
             {
                 foreach (var item in list)
                 {
-                    item.user_nhanhang_id = user_id;
+                    item.user_nhanhang = null;
                     if (item.status_nhanhang == 1)
                     {
                         list_check_muahang.Add(item.muahang_id);
@@ -234,11 +235,11 @@ namespace it_template.Areas.V1.Controllers
                     muahang.is_nhanhang = true;
                     _context.Update(muahang);
                 }
-                if (muahang.is_thanhtoan == true && muahang.is_nhanhang == true)
-                {
-                    muahang.date_finish = DateTime.Now;
-                    _context.Update(muahang);
-                }
+                //if (muahang.is_thanhtoan == true && muahang.is_nhanhang == true)
+                //{
+                //    muahang.date_finish = DateTime.Now;
+                //    _context.Update(muahang);
+                //}
             }
             _context.SaveChanges();
 
@@ -274,7 +275,9 @@ namespace it_template.Areas.V1.Controllers
                 else
                 {
 
-                    DutruModel_old = _context.DutruModel.Where(d => d.id == DutruModel.id).FirstOrDefault();
+                    DutruModel_old = _context.DutruModel.Where(d => d.id == DutruModel.id).Include(d => d.user_created_by).FirstOrDefault();
+
+                    DutruModel.user_created_by = DutruModel_old.user_created_by;
                     CopyValues<DutruModel>(DutruModel_old, DutruModel);
                     DutruModel_old.updated_at = DateTime.Now;
 
@@ -331,6 +334,26 @@ namespace it_template.Areas.V1.Controllers
                     //public string soluong { get; set; }
                     //public string date { get; set; }
                     //public string note { get; set; }
+                    //if (item.mahh == null && data.type_id != 1)
+                    //{
+                    //    //tao ma
+                    //    var hh = new MaterialModel()
+                    //    {
+                    //        nhom = "Khac",
+                    //        mahh = "HH-" + new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds(),
+                    //        tenhh = item.tenhh,
+                    //        dvt = item.dvt,
+                    //    };
+                    //    _context.Add(hh);
+                    //    _context.SaveChanges();
+                    //    hh.mahh = "HH-" + hh.id;
+                    //    _context.Update(hh);
+                    //    item.hh_id = "m-" + hh.mahh;
+                    //    item.mahh = hh.mahh;
+                    //    _context.Update(item);
+                    //    _context.SaveChanges();
+
+                    //}
                     RawDetails.Add(new RawDetails
                     {
                         stt = stt++,
@@ -446,6 +469,10 @@ namespace it_template.Areas.V1.Controllers
             {
                 type_id = 78;
             }
+            else if (data.type_id == 3)
+            {
+                type_id = 79;
+            }
             var DocumentModel = new DocumentModel()
             {
                 name_vi = data.name,
@@ -474,6 +501,22 @@ namespace it_template.Areas.V1.Controllers
                 created_at = DateTime.Now
             };
             _context.Add(DocumentFileModel);
+            ////Đính kèm
+            var list_attachment = new List<DocumentAttachmentModel>();
+            var dinhkem = _context.DutruDinhkemModel.Where(d => d.dutru_id == id).ToList();
+            foreach (var d in dinhkem)
+            {
+                list_attachment.Add(new DocumentAttachmentModel()
+                {
+                    document_id = DocumentModel.id,
+                    name = d.name,
+                    ext = d.ext,
+                    mimeType = d.mimeType,
+                    url = d.url,
+                    created_at = d.created_at
+                });
+            }
+            _context.AddRange(list_attachment);
             ////Signature
             for (int k = 0; k < 3; ++k)
             {
@@ -584,14 +627,16 @@ namespace it_template.Areas.V1.Controllers
             var start = Request.Form["start"].FirstOrDefault();
             var length = Request.Form["length"].FirstOrDefault();
             int pageSize = length != null ? Convert.ToInt32(length) : 0;
-            var type = Request.Form["type"].FirstOrDefault();
+            var type_id_string = Request.Form["type_id"].FirstOrDefault();
+            int type_id = type_id_string != null ? Convert.ToInt32(type_id_string) : 0;
             var mahh = Request.Form["filters[mahh]"].FirstOrDefault();
             var tenhh = Request.Form["filters[tenhh]"].FirstOrDefault();
             var list_dutru = Request.Form["filters[list_dutru]"].FirstOrDefault();
 
             var departments = _context.UserDepartmentModel.Where(d => d.user_id == user_id).Select(d => d.department_id).ToList();
             var is_CungungNVL = departments.Contains(29) == true;
-            var is_Cungungis_CungungGiantiep = departments.Contains(14) == true;
+            var is_CungungGiantiep = departments.Contains(14) == true;
+            var is_CungungHCTT = departments.Contains(30) == true;
 
 
             //var tenhh = Request.Form["filters[tenhh]"].FirstOrDefault();
@@ -600,21 +645,13 @@ namespace it_template.Areas.V1.Controllers
                 .Include(d => d.muahang_chitiet).ThenInclude(d => d.muahang)
                 .Include(d => d.dutru).Where(d => d.dutru.status_id == (int)Status.EsignSuccess);
 
-            if (is_CungungNVL && is_Cungungis_CungungGiantiep)
-            {
+            //if (is_CungungNVL && is_CungungGiantiep)
+            //{
 
-            }
-            else if (is_CungungNVL)
+            //}
+            if (type_id != null && type_id != 0)
             {
-                customerData = customerData.Where(d => d.dutru.type_id == 1);
-            }
-            else if (is_Cungungis_CungungGiantiep)
-            {
-                customerData = customerData.Where(d => d.dutru.type_id == 2);
-            }
-            else
-            {
-                customerData = customerData.Where(d => 0 == 1);
+                customerData = customerData.Where(d => d.dutru.type_id == type_id);
             }
 
             int recordsTotal = customerData.Count();
@@ -652,8 +689,9 @@ namespace it_template.Areas.V1.Controllers
                 //}
                 //}
                 var list_muahang_ncc_id = record.muahang_chitiet.Select(d => d.muahang.muahang_chonmua_id).ToList();
+                var list_muahang_chitiet_id = record.muahang_chitiet.Select(d => d.id).ToList();
 
-                var thanhtien = _context.MuahangNccChitietModel.Where(d => list_muahang_ncc_id.Contains(d.muahang_ncc_id) && d.hh_id == record.hh_id).Sum(d => d.thanhtien);
+                var thanhtien = _context.MuahangNccChitietModel.Where(d => list_muahang_ncc_id.Contains(d.muahang_ncc_id) && list_muahang_chitiet_id.Contains(d.muahang_chitiet_id)).Sum(d => d.thanhtien);
                 var muahang_chitiet = record.muahang_chitiet.Where(d => d.muahang.status_id != 11).ToList();
                 var soluong_dutru = record.soluong;
                 var soluong_mua = muahang_chitiet.Sum(d => d.soluong);
@@ -661,12 +699,15 @@ namespace it_template.Areas.V1.Controllers
                 var soluong = soluong_mua < soluong_dutru ? soluong_dutru - soluong_mua : 0;
                 data.Add(new
                 {
+                    id = record.id,
                     hh_id = record.hh_id,
                     soluong_dutru = soluong_dutru,
                     soluong_mua = soluong_mua,
                     thanhtien = thanhtien,
                     mahh = mahh1,
                     tenhh = tenhh1,
+                    grade = record.grade,
+                    masothietke = record.masothietke,
                     dvt = record.dvt,
                     soluong = soluong,
                     dutru_chitiet_id = record.id,
@@ -825,6 +866,92 @@ namespace it_template.Areas.V1.Controllers
 
             return Json(new { success = 1, comments });
         }
+        [HttpPost]
+        public async Task<IActionResult> thongbaodoima(int dutru_chitiet_id, string hh_id)
+        {
+            System.Security.Claims.ClaimsPrincipal currentUser = this.User;
+            var user_id = UserManager.GetUserId(currentUser);
+            var user_doima = await UserManager.GetUserAsync(currentUser);
+
+            var data = _context.DutruChitietModel.Where(d => d.id == dutru_chitiet_id).Include(d => d.dutru).ThenInclude(d => d.user_created_by).FirstOrDefault();
+            var hh = _context.MaterialModel.Where(d => "m-" + d.id == hh_id).FirstOrDefault();
+            //SEND MAIL
+            if (hh != null && data != null)
+            {
+                var from_mahh = data.mahh;
+                var user = data.dutru.user_created_by;
+                var mail_string = user.Email;
+                string Domain = (HttpContext.Request.IsHttps ? "https://" : "http://") + HttpContext.Request.Host.Value;
+                var body = _view.Render("Emails/Doima",
+                    new
+                    {
+                        link_logo = Domain + "/images/clientlogo_astahealthcare.com_f1800.png",
+                        link = Domain + "/dutru/edit/" + data.dutru.id,
+                        from_mahh = from_mahh,
+                        user_doima = user_doima,
+                        hh = hh
+                    });
+
+                var email = new EmailModel
+                {
+                    email_to = mail_string,
+                    subject = "[Thông báo đổi mã] " + data.dutru.name,
+                    body = body,
+                    email_type = "doima_purchase",
+                    status = 1,
+                };
+                _context.Add(email);
+                _context.SaveChanges();
+            }
+            return Json(new
+            {
+                success = true,
+            });
+        }
+        [HttpPost]
+        public async Task<IActionResult> savedoima(int dutru_chitiet_id, string hh_id)
+        {
+            System.Security.Claims.ClaimsPrincipal currentUser = this.User;
+            var user_id = UserManager.GetUserId(currentUser);
+            var user_doima = await UserManager.GetUserAsync(currentUser);
+
+            var data = _context.DutruChitietModel.Where(d => d.id == dutru_chitiet_id)
+                .Include(d => d.dutru).ThenInclude(d => d.user_created_by)
+                .Include(d => d.muahang_chitiet).ThenInclude(d => d.muahang_ncc_chitiet)
+                .FirstOrDefault();
+            var hh = _context.MaterialModel.Where(d => "m-" + d.id == hh_id).FirstOrDefault();
+
+            if (hh != null && data != null)
+            {
+                data.hh_id = hh_id;
+                data.mahh = hh.mahh;
+
+                _context.Update(data);
+                _context.SaveChanges();
+                foreach (var d in data.muahang_chitiet)
+                {
+
+                    d.hh_id = hh_id;
+                    d.mahh = hh.mahh;
+
+                    _context.Update(d);
+                    _context.SaveChanges();
+
+                    foreach (var c in d.muahang_ncc_chitiet)
+                    {
+                        c.hh_id = hh_id;
+                        c.mahh = hh.mahh;
+                        _context.Update(c);
+                        _context.SaveChanges();
+                    }
+                }
+            }
+            return Json(new
+            {
+                success = true,
+            });
+        }
+
         private void CopyValues<T>(T target, T source)
         {
             Type t = typeof(T);
@@ -864,7 +991,7 @@ namespace it_template.Areas.V1.Controllers
         public int stt { get; set; }
 
         public string tennvl { get; set; }
-        public string manvl { get; set; }
+        public string? manvl { get; set; }
         public string? artwork { get; set; }
         public string? dvt { get; set; }
         public string soluong { get; set; }

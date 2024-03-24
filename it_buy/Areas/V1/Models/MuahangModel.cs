@@ -32,8 +32,8 @@ namespace Vue.Models
         public string? loaithanhtoan { get; set; } // Trả trước or trả sau
         public string? ptthanhtoan { get; set; }
         public string? diachigiaohang { get; set; }
-        //[ForeignKey("muahang_chonmua_id")]
-        [NotMapped]
+        [ForeignKey("muahang_chonmua_id")]
+        //[NotMapped]
         public MuahangNccModel? muahang_chonmua { get; set; }
         public virtual List<MuahangChitietModel>? chitiet { get; set; }
         public virtual List<MuahangNccModel>? nccs { get; set; }

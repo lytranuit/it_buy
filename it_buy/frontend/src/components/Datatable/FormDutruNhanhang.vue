@@ -28,25 +28,36 @@
 
                     <template v-else-if="col.data == 'date_nhanhang'">
                         <Calendar v-model="slotProps.data[col.data]" dateFormat="yy-mm-dd" class="date-custom"
-                            :manualInput="false" showIcon :minDate="minDate" :readonly="model.date_finish"/>
+                            :manualInput="false" showIcon :minDate="minDate" :readonly="model.date_finish" />
                     </template>
 
                     <template v-else-if="col.data == 'soluong_nhanhang'">
-                        <InputNumber v-model="slotProps.data[col.data]" class="p-inputtext-sm" :readonly="model.date_finish" :maxFractionDigits="2"/>
+                        <InputNumber v-model="slotProps.data[col.data]" class="p-inputtext-sm"
+                            :readonly="model.date_finish" :maxFractionDigits="2" />
                     </template>
 
                     <template v-else-if="col.data == 'note_nhanhang'">
-                        <textarea v-model="slotProps.data[col.data]" class="form-control form-control-sm" :readonly="model.date_finish"></textarea>
+                        <textarea v-model="slotProps.data[col.data]" class="form-control form-control-sm"
+                            :readonly="model.date_finish"></textarea>
                     </template>
 
                     <template v-else-if="col.data == 'status_nhanhang'">
-                        <select class="form-control form-control-sm" v-model="slotProps.data[col.data]" :readonly="model.date_finish">
+                        <select class="form-control form-control-sm" v-model="slotProps.data[col.data]"
+                            :readonly="model.date_finish" @change="changeNhanhang(slotProps.data)">
                             <option value="0">Chưa nhận hàng</option>
                             <option value="1">Đã nhận hàng</option>
                             <option value="2">Khiếu nại</option>
                         </select>
                     </template>
 
+                    <template v-else-if="col.data == 'user_nhanhang'">
+                        <div v-if="slotProps.data['user_nhanhang']" class="d-flex">
+                            <Avatar :image="slotProps.data.user_nhanhang.image_url"
+                                :title="slotProps.data.user_nhanhang.fullName" size="small" shape="circle" /> <span
+                                class="align-self-center ml-2">{{
+            slotProps.data.user_nhanhang.fullName }}</span>
+                        </div>
+                    </template>
                     <template v-else>
                         {{ slotProps.data[col.data] }}
                     </template>
@@ -62,13 +73,19 @@ import { onMounted, ref, watch, computed } from 'vue';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import InputNumber from 'primevue/inputnumber';
+import Avatar from 'primevue/avatar';
 import { storeToRefs } from 'pinia'
 
 import { useDutru } from '../../stores/dutru';
 
 import Calendar from "primevue/calendar";
+import { useAuth } from '../../stores/auth';
 const store_dutru = useDutru();
 const { list_nhanhang, model } = storeToRefs(store_dutru);
+
+const store_auth = useAuth();
+const { user } = storeToRefs(store_auth);
+
 
 const minDate = ref(new Date());
 const loading = ref(false);
@@ -113,12 +130,23 @@ const columns = ref([
         label: "Trạng thái (*)",
         "data": "status_nhanhang",
         "className": "text-center"
+    },
+    {
+        label: "Người nhận hàng",
+        "data": "user_nhanhang",
+        "className": "text-center"
     }
 ])
 
 const selectedColumns = computed(() => {
     return columns.value.filter(col => col.hide != true);
 });
+
+const changeNhanhang = (row) => {
+    if (row.status_nhanhang == 1) {
+        row.user_nhanhang_id = user.value.id;
+    }
+}
 const props = defineProps({
     index: Number,
 })

@@ -40,6 +40,9 @@ export const useAuth = defineStore("auth", () => {
   const is_CungungNVL = computed(() => {
     return in_departments([29]);
   });
+  const is_CungungHCTT = computed(() => {
+    return in_departments([30]);
+  });
   const is_Ketoan = computed(() => {
     return in_departments([11]);
   });
@@ -149,6 +152,7 @@ export const useAuth = defineStore("auth", () => {
     is_CungungGiantiep,
     is_CungungNVL,
     is_Ketoan,
+    is_CungungHCTT,
     is_LeadQa,
     list_users,
     getUser,

@@ -36,9 +36,29 @@ namespace it_template.Areas.V1.Controllers
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             });
         }
+
+        public async Task<JsonResult> group_materials()
+        {
+            var All = _context.MaterialGroupModel.Include(d => d.items).ToList();
+            //var jsonData = new { data = ProcessModel };
+            return Json(All, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles
+            });
+        }
         public async Task<JsonResult> nhacc()
         {
             var All = _context.NhacungcapModel.ToList();
+            //var jsonData = new { data = ProcessModel };
+            return Json(All, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            });
+        }
+        public async Task<JsonResult> nhasx()
+        {
+            var All = _context.NsxModel.ToList();
             //var jsonData = new { data = ProcessModel };
             return Json(All, new System.Text.Json.JsonSerializerOptions()
             {
@@ -100,6 +120,19 @@ namespace it_template.Areas.V1.Controllers
                 }
             }
             return list;
+        }
+
+
+        public async Task<JsonResult> HomeBadge()
+        {
+            var sodutru = _context.DutruModel.Where(d => d.deleted_at == null).Count();
+            var somuahang = _context.MuahangModel.Where(d => d.deleted_at == null).Count();
+            var success = _context.MuahangModel.Where(d => d.deleted_at == null && d.date_finish != null).Count();
+            //var jsonData = new { data = ProcessModel };
+            return Json(new { sodutru = sodutru, somuahang = somuahang, success = success, failed = 0 }, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            });
         }
     }
 

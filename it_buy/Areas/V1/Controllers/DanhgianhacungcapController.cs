@@ -42,7 +42,7 @@ namespace it_template.Areas.V1.Controllers
         }
         public JsonResult Get(int id)
         {
-            var data = _context.DanhgianhacungcapModel.Where(d => d.id == id).Include(d => d.user_created_by).Include(d => d.user_chapnhan).Include(d => d.ncc).Include(d => d.material).FirstOrDefault();
+            var data = _context.DanhgianhacungcapModel.Where(d => d.id == id).Include(d => d.user_created_by).Include(d => d.user_chapnhan).FirstOrDefault();
 
             return Json(data);
         }
@@ -239,7 +239,7 @@ namespace it_template.Areas.V1.Controllers
                 customerData = customerData.Where(d => d.id == id);
             }
             int recordsFiltered = customerData.Count();
-            var datapost = customerData.OrderByDescending(d => d.id).Skip(skip).Take(pageSize).Include(d => d.user_created_by).Include(d => d.ncc).Include(d => d.material).ToList();
+            var datapost = customerData.OrderByDescending(d => d.id).Skip(skip).Take(pageSize).Include(d => d.user_created_by).Include(d => d.nhacungcap).Include(d => d.nhasanxuat).ToList();
             //var data = new ArrayList();
             //foreach (var record in datapost)
             //{
@@ -333,7 +333,7 @@ namespace it_template.Areas.V1.Controllers
                 _context.SaveChanges();
             }
             ///lây user liên quan
-            var danhgianhacungcap = _context.DanhgianhacungcapModel.Where(d => d.id == CommentModel.danhgianhacungcap_id).Include(d => d.ncc).Include(d => d.material).FirstOrDefault();
+            var danhgianhacungcap = _context.DanhgianhacungcapModel.Where(d => d.id == CommentModel.danhgianhacungcap_id).Include(d => d.nhacungcap).FirstOrDefault();
             var comments = _context.DanhgianhacungcapCommentModel.Where(d => d.danhgianhacungcap_id == CommentModel.danhgianhacungcap_id).Include(d => d.users_related).ToList();
 
             var users_related_id = new List<string>();
@@ -370,7 +370,7 @@ namespace it_template.Areas.V1.Controllers
                 var email = new EmailModel
                 {
                     email_to = mail_string,
-                    subject = "[Tin nhắn mới] Đánh giá " + danhgianhacungcap.ncc.tenncc + " cho nguyên liệu " + danhgianhacungcap.material.tenhh,
+                    subject = "[Tin nhắn mới] Đánh giá " + danhgianhacungcap.nhacungcap.tenncc + " cho nguyên liệu " + danhgianhacungcap.tenhh,
                     body = body,
                     email_type = "new_comment_purchase",
                     status = 1,
@@ -415,6 +415,45 @@ namespace it_template.Areas.V1.Controllers
 
 
             return Json(new { success = 1, comments });
+        }
+        [HttpPost]
+        public async Task<IActionResult> thongbao(int danhgianhacungcap_id, List<string> list_user)
+        {
+
+            var data = _context.DanhgianhacungcapModel.Where(d => d.id == danhgianhacungcap_id).Include(d => d.nhacungcap).Include(d => d.nhasanxuat).FirstOrDefault();
+            //SEND MAIL
+            if (list_user != null && list_user.Count() > 0 && data != null)
+            {
+                var users_related_obj = _context.UserModel.Where(d => list_user.Contains(d.Id)).Select(d => d.Email).ToList();
+                var mail_string = string.Join(",", users_related_obj.ToArray());
+                string Domain = (HttpContext.Request.IsHttps ? "https://" : "http://") + HttpContext.Request.Host.Value;
+                var body = _view.Render("Emails/Danhgianhacungcap",
+                    new
+                    {
+                        link_logo = Domain + "/images/clientlogo_astahealthcare.com_f1800.png",
+                        link = Domain + "/danhgianhacungcap/details/" + danhgianhacungcap_id,
+                        data = data,
+                    });
+                var attach = _context.DanhgianhacungcapDinhkemModel.Where(d => d.danhgianhacungcap_id == danhgianhacungcap_id).Select(d => d.url).ToList();
+                var email = new EmailModel
+                {
+                    email_to = mail_string,
+                    subject = "[Đánh giá nhà cung cấp] " + data.tenhh,
+                    body = body,
+                    email_type = "danhgianhacungcap_purchase",
+                    status = 1,
+                    data_attachments = attach
+                };
+                _context.Add(email);
+
+                data.is_thongbao = true;
+                _context.Update(data);
+                _context.SaveChanges();
+            }
+            return Json(new
+            {
+                success = true,
+            });
         }
         private void CopyValues<T>(T target, T source)
         {

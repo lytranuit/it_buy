@@ -1,8 +1,9 @@
 <template>
 
-    <Dialog v-model:visible="visibleDialog" :header="headerForm" :modal="true" class="p-fluid">
+    <Dialog v-model:visible="visibleDialog" :header="headerForm" :modal="true" class="p-fluid" style="width: 75vw;"
+        :breakpoints="{ '1199px': '75vw', '575px': '95vw' }">
         <div class="row mb-2">
-            <div class="field col">
+            <div class="field col" v-if="type != 'HH'">
                 <label for="name">Mã hàng hóa <span class="text-danger">*</span></label>
                 <InputText id="name" class="p-inputtext-sm" v-model.trim="model.mahh" required="true"
                     :class="{ 'p-invalid': submitted && !model.mahh }" />
@@ -21,7 +22,19 @@
                 <small class="p-error" v-if="submitted && !model.dvt">Required.</small>
             </div>
         </div>
-        <div class="row mb-2">
+        <div class="row mb-2" v-if="type != 'HH'">
+            <div class="field col">
+                <label for="name">Nhà sản xuất</label>
+                <NsxTreeSelect v-model="model.mansx" :required="true" :useID="false">
+                </NsxTreeSelect>
+            </div>
+            <div class="field col">
+                <label for="name">Nhà cung cấp</label>
+                <NccTreeSelect v-model="model.mancc" :required="true" :useID="false">
+                </NccTreeSelect>
+            </div>
+        </div>
+        <div class="row mb-2" v-if="type != 'HH'">
             <div class="field col">
                 <label for="name">Mã Artwork</label>
                 <InputText id="name" class="p-inputtext-sm" v-model.trim="model.masothietke" />
@@ -30,12 +43,8 @@
                 <label for="name">Grade</label>
                 <InputText id="name" class="p-inputtext-sm" v-model.trim="model.grade" />
             </div>
-            <div class="field col">
-                <label for="name">Nhà sản xuất</label>
-                <InputText id="name" class="p-inputtext-sm" v-model.trim="model.nhasx" />
-            </div>
         </div>
-        <div class="row mb-2">
+        <div class="row mb-2" v-if="type != 'HH'">
             <div class="field col">
                 <label for="name">Tiêu chuẩn</label>
                 <InputText id="name" class="p-inputtext-sm" v-model.trim="model.tieuchuan" />
@@ -72,7 +81,14 @@ import Dialog from "primevue/dialog";
 import Button from "primevue/button";
 import InputText from "primevue/inputtext";
 import { useMaterials } from '../../stores/materials';
-
+import NccTreeSelect from "../TreeSelect/NccTreeSelect.vue";
+import NsxTreeSelect from "../TreeSelect/NsxTreeSelect.vue";
+const props = defineProps({
+    type: {
+        type: String,
+        default: "NVL"
+    }
+});
 const toast = useToast();
 const store_materials = useMaterials();
 const { visibleDialog, headerForm, model } = storeToRefs(store_materials);
@@ -87,6 +103,7 @@ const saveProduct = () => {
     submitted.value = true;
     if (!valid()) return;
     // waiting.value = true;
+    model.value.surfix = props.type;
     materialApi.save(model.value).then((res) => {
         // waiting.value = false;
         visibleDialog.value = false;
@@ -122,7 +139,7 @@ const saveProduct = () => {
 
 ///Form
 const valid = () => {
-    if (!model.value.mahh.trim()) return false;
+    if (props.type != "HH" && !model.value.mahh.trim()) return false;
     if (!model.value.tenhh.trim()) return false;
     if (!model.value.dvt.trim()) return false;
     return true;

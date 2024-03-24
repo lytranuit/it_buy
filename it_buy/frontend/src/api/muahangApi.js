@@ -78,6 +78,15 @@ export default {
       })
       .then((res) => res.data);
   },
+  thongbaothanhtoan(params) {
+    return repository
+      .post(`/v1/${resoure}/thongbaothanhtoan`, params, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => res.data);
+  },
   xuatdondathang(id) {
     return repository
       .post(
@@ -154,9 +163,14 @@ export default {
       })
       .then((res) => res.data);
   },
+  getHistory(hh_id) {
+    return repository
+      .get(`/v1/${resoure}/getHistory`, { params: { hh_id: hh_id } })
+      .then((res) => res.data);
+  },
   get(id) {
     return repository
-      .get(`/v1/${resoure}/Get`, { params: { id: id } })
+      .get(`/v1/${resoure}/get`, { params: { id: id } })
       .then((res) => res.data);
   },
   getUserNhanhang(id) {

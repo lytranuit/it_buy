@@ -37,10 +37,11 @@ namespace Vue.Data
 
 
         //public DbSet<NhacungcapQLSXModel> NhacungcapQLSXModel { get; set; }
-        //public DbSet<NVLQLSXModel> NVLQLSXModel { get; set; }
+        public DbSet<NVLQLSXModel> NVLQLSXModel { get; set; }
         //public DbSet<NVLRDQLSXModel> NVLRDQLSXModel { get; set; }
         public DbSet<NsxModel> NsxModel { get; set; }
 
+        public DbSet<MaterialGroupModel> MaterialGroupModel { get; set; }
         public DbSet<MaterialModel> MaterialModel { get; set; }
         public DbSet<NhacungcapModel> NhacungcapModel { get; set; }
         public DbSet<DutruModel> DutruModel { get; set; }
@@ -91,13 +92,38 @@ namespace Vue.Data
             modelBuilder.Entity<UserModel>().HasMany(e => e.list_users).WithOne(e => e.user).HasForeignKey(e => e.userId);
 
             modelBuilder.Entity<UserModel>().HasOne(e => e.userreport).WithOne(e => e.userManager).HasForeignKey<UserManagerModel>(e => e.userManagerId);
-            //    modelBuilder.Entity<NhacungcapModel>()
-            //.HasKey(e => e.mancc);
-            //modelBuilder.Entity<MaterialModel>()
-            //    .HasOne(e => e.nhacungcap)
-            //        .WithOne()
-            //    .HasPrincipalKey<NhacungcapModel>(e => e.mancc);
+
+            modelBuilder.Entity<MaterialModel>()
+            .HasOne(s => s.nhacungcap)
+            .WithMany()
+            .HasForeignKey(e => e.mancc).HasPrincipalKey(d => d.mancc);
+
+            modelBuilder.Entity<MaterialModel>()
+            .HasOne(s => s.nhasanxuat)
+            .WithMany()
+            .HasForeignKey(e => e.mansx).HasPrincipalKey(d => d.mansx);
+
+            modelBuilder.Entity<MaterialModel>()
+              .HasOne(s => s.nhomhang)
+              .WithMany(d => d.items)
+              .HasForeignKey(e => e.nhom).HasPrincipalKey(d => d.manhom);
+
+
+            modelBuilder.Entity<MuahangModel>()
+              .HasOne(s => s.muahang_chonmua)
+              .WithMany()
+              .HasForeignKey(e => e.muahang_chonmua_id);
             //modelBuilder.Entity<UserManagerModel>().HasOne(e => e.user);
+
+            modelBuilder.Entity<DanhgianhacungcapModel>()
+            .HasOne(s => s.nhacungcap)
+            .WithMany()
+            .HasForeignKey(e => e.mancc).HasPrincipalKey(d => d.id);
+
+            modelBuilder.Entity<DanhgianhacungcapModel>()
+            .HasOne(s => s.nhasanxuat)
+            .WithMany()
+            .HasForeignKey(e => e.mansx).HasPrincipalKey(d => d.id);
 
         }
         public override int SaveChanges()
@@ -189,7 +215,7 @@ namespace Vue.Data
             }
             var list_talbe2 = new List<string>()
             {
-                "dm_hanghoa","TBL_DANHMUCNHACC","TBL_DANHMUCHANGHOA","TBL_DANHMUCNHASX"
+                "dm_hanghoa","TBL_DANHMUCNHACC","TBL_DANHMUCHANGHOA","TBL_DANHMUCNHASX","TBL_DANHMUCNHOMHANG"
             };
             //var tableName = "AspNetUsers";
             foreach (var tableName in list_talbe2)

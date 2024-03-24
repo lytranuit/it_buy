@@ -11,6 +11,7 @@ namespace Vue.Models
         [Key]
         public int id { get; set; }
         public int muahang_ncc_id { get; set; }
+        public int muahang_chitiet_id { get; set; }
         public string? hh_id { get; set; }
         public decimal? soluong { get; set; }
         public decimal? dongia { get; set; }
@@ -18,8 +19,9 @@ namespace Vue.Models
 
 
         [ForeignKey("muahang_ncc_id")]
-        public MuahangNccModel? muahang_ncc { get; set; }
-
+        public virtual MuahangNccModel? muahang_ncc { get; set; }
+        [ForeignKey("muahang_chitiet_id")]
+        public virtual MuahangChitietModel? muahang_chitiet { get; set; }
         //[NotMapped]
         public string? mahh { get; set; }
         //[NotMapped]

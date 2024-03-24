@@ -132,7 +132,7 @@
                   <Panel header="Đề nghị mua hàng" v-if="model.status_id == 4">
                     <div class="row">
                       <div class="col-md-12" v-if="list_muahang.length > 0">
-                        <TabView v-model:activeIndex="active1">
+                        <TabView>
                           <TabPanel v-for="(item, key) in list_muahang" :key="key">
                             <template #header>
                               {{ item.code }} - {{ item.name }}
@@ -285,8 +285,8 @@ const muahangActive = (muahang) => {
   }
   return ret;
 }
-onMounted(() => {
-  dutruApi.get(route.params.id).then((res) => {
+const load_data = (id) => {
+  dutruApi.get(id).then((res) => {
     var chitiet = res.chitiet;
     var user = res.user_created_by;
     res.date = moment(res.date).format("YYYY-MM-DD");
@@ -304,15 +304,18 @@ onMounted(() => {
       activeStep.value = 3;
     }
   });
-  dutruApi.getNhanhang(route.params.id).then((res) => {
+  dutruApi.getNhanhang(id).then((res) => {
     list_nhanhang.value = res;
     // console.log(res);
   });
-  dutruApi.getMuahang(route.params.id).then((res) => {
+  dutruApi.getMuahang(id).then((res) => {
     list_muahang.value = res;
   });
+}
+onMounted(() => {
+  load_data(route.params.id)
 });
-const submit = () => {
+const submit = async () => {
   if (!model.value.name) {
     alert("Chưa nhập tiêu đề!");
     return false;
@@ -327,9 +330,23 @@ const submit = () => {
   }
   if (datatable.value.length) {
     for (let product of datatable.value) {
-      if (!product.mahh) {
-        alert("Chưa chọn Mã NVL!");
+      if (!product.tenhh) {
+        alert("Chưa nhập hàng hóa!");
         return false;
+      }
+      if (model.value.type_id == 1) {
+        if (!product.grade) {
+          alert("Chưa nhập Grade!");
+          return false;
+        }
+        if (!product.tensp) {
+          alert("Chưa nhập Tên SP!");
+          return false;
+        }
+        if (!product.dangbaoche) {
+          alert("Chưa nhập Dạng bào chế!");
+          return false;
+        }
       }
 
       if (!product.dvt) {
@@ -349,27 +366,23 @@ const submit = () => {
   model.value.list_update = list_update.value
   model.value.list_delete = list_delete.value
   waiting.value = true;
-  dutruApi.save(model.value).then((response) => {
-    waiting.value = false;
-    if (response.success) {
-      toast.add({ severity: 'success', summary: 'Thành công!', detail: 'Thay đổi thành công', life: 3000 });
-    }
-    // console.log(response)
-  });
+  var response = await dutruApi.save(model.value);
+  waiting.value = false;
+  if (response.success) {
+    toast.add({ severity: 'success', summary: 'Thành công!', detail: 'Thay đổi thành công', life: 3000 });
+  }
 };
-const xuatpdf = () => {
+const xuatpdf = async () => {
+  await submit();
   waiting.value = true;
-  dutruApi.xuatpdf(model.value.id).then((response) => {
-    waiting.value = false;
-    if (response.success) {
-      toast.add({ severity: 'success', summary: 'Thành công!', detail: 'Xuất file thành công', life: 3000 });
-      location.reload();
-    }
-
-    // console.log(response)
-  });
+  var response = await dutruApi.xuatpdf(model.value.id);
+  waiting.value = false;
+  if (response.success) {
+    toast.add({ severity: 'success', summary: 'Thành công!', detail: 'Xuất file thành công', life: 3000 });
+    load_data(model.value.id);
+  }
 }
-const savenhanhang = () => {
+const savenhanhang = async () => {
   // console.log(list_nhanhang);
   var items = [];
   for (var list of list_nhanhang.value) {
@@ -390,13 +403,13 @@ const savenhanhang = () => {
   }
   // console.log(items);
   // return false;
-  dutruApi.savenhanhang({ dutru_id: model.value.id, list: items }).then((response) => {
-    waiting.value = false;
-    if (response.success) {
-      toast.add({ severity: 'success', summary: 'Thành công!', detail: 'Thay đổi thành công', life: 3000 });
-      location.reload();
-    }
-  });
+  waiting.value = true;
+  var response = await dutruApi.savenhanhang({ dutru_id: model.value.id, list: items });
+  waiting.value = false;
+  if (response.success) {
+    toast.add({ severity: 'success', summary: 'Thành công!', detail: 'Thay đổi thành công', life: 3000 });
+    load_data(model.value.id);
+  }
 }
 </script>
 <style>

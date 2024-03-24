@@ -1,5 +1,6 @@
 <template>
   <div class="row clearfix">
+    <Toast />
     <div class="col-12">
       <h5 class="card-header drag-handle">
         <Button label="Tạo mới" icon="pi pi-plus" class="p-button-success p-button-sm mr-2" @click="openNew"></Button>
@@ -12,8 +13,7 @@
             scrollHeight="70vh" v-model:selection="selectedProducts" :paginator="true"
             :rowsPerPageOptions="[10, 50, 100]" :rows="rows" :totalRecords="totalRecords" @page="onPage($event)"
             :rowHover="true" :loading="loading" responsiveLayout="scroll" :resizableColumns="true"
-            columnResizeMode="expand" v-model:filters="filters" filterDisplay="menu" editMode="cell"
-            @cell-edit-complete="onCellEditComplete">
+            columnResizeMode="expand" v-model:filters="filters" filterDisplay="menu">
             <template #header>
               <div style="width: 200px">
                 <TreeSelect :options="columns" v-model="showing" multiple :limit="0"
@@ -22,22 +22,13 @@
               </div>
             </template>
 
-            <template #empty>
-              <div class="text-center">Không có dữ liệu.</div>
-            </template>
+            <template #empty> Không có dữ liệu. </template>
             <Column selectionMode="multiple" style="width: 3rem" :exportable="false"></Column>
             <Column v-for="col of selectedColumns" :field="col.data" :header="col.label" :key="col.data"
               :showFilterMatchModes="false">
 
               <template #body="slotProps">
-
-                <template v-if="col.data == 'mansx'">
-                  {{ slotProps.data.nhasanxuat?.tennsx }}
-                </template>
-                <template v-else-if="col.data == 'mancc'">
-                  {{ slotProps.data.nhacungcap?.tenncc }}
-                </template>
-                <div v-else v-html="slotProps.data[col.data]"></div>
+                <div v-html="slotProps.data[col.data]"></div>
               </template>
 
               <template #filter="{ filterModel, filterCallback }" v-if="col.filter == true">
@@ -61,10 +52,11 @@
     </div>
 
     <PopupAdd @save="loadLazyData"></PopupAdd>
+
     <Dialog v-model:visible="deleteProductDialog" header="Xác nhận" :modal="true">
       <div class="confirmation-content">
         <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-        <span v-if="model">Bạn có muốn xóa <b>{{ model.mahh }}</b> này không?</span>
+        <span v-if="model">Bạn có muốn xóa <b>{{ model.mansx }}</b> này không?</span>
       </div>
 
       <template #footer>
@@ -90,8 +82,8 @@
 
 <script setup>
 import { onMounted, ref, watch, computed } from "vue";
-import moment from "moment";
 import Loading from "../../components/Loading.vue";
+// import the component
 
 import DataTable from "primevue/datatable";
 import { FilterMatchMode } from "primevue/api";
@@ -99,62 +91,43 @@ import Column from "primevue/column";
 import Button from "primevue/button";
 import Dialog from "primevue/dialog";
 import InputText from "primevue/inputtext";
-import Calendar from "primevue/calendar";
 
+import Toast from "primevue/toast";
 import { useToast } from "primevue/usetoast";
-import materialApi from "../../api/materialApi";
+import producerApi from "../../api/producerApi";
 import { useAuth } from "../../stores/auth";
-import PopupAdd from "../../components/materials/PopupAdd.vue";
-import { useMaterials } from "../../stores/materials";
+import { useProducer } from "../../stores/producer";
+import PopupAdd from "../../components/producer/PopupAdd.vue";
 import { storeToRefs } from "pinia";
-import { RouterLink } from "vue-router";
-const store = useAuth();
 const toast = useToast();
+
+const store = useAuth();
 ////Datatable
 const datatable = ref();
 const columns = ref([
   {
     id: 0,
-    label: "Mã hàng hóa",
-    data: "mahh",
+    label: "Mã",
+    data: "mansx",
     className: "text-center",
     filter: true,
   },
   {
     id: 1,
-    label: "Tên hàng hóa",
-    data: "tenhh",
+    label: "Tên",
+    data: "tennsx",
     className: "text-center",
     filter: true,
   },
-  {
-    id: 2,
-    label: "ĐVT",
-    data: "dvt",
-    className: "text-center",
-  },
-
-  {
-    id: 3,
-    label: "Nhà sản xuất",
-    data: "mansx",
-    className: "text-center",
-  },
-  {
-    id: 4,
-    label: "Nhà cung cấp",
-    data: "mancc",
-    className: "text-center",
-  },
 ]);
 const filters = ref({
-  mahh: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  tenhh: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  mansx: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  tennsx: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
 const totalRecords = ref(0);
 const loading = ref(true);
 const showing = ref([]);
-const column_cache = "columns_materials"; ////
+const column_cache = "columns_producer"; ////
 const first = ref(0);
 const rows = ref(10);
 const draw = ref(0);
@@ -174,41 +147,13 @@ const lazyParams = computed(() => {
     filters: data_filters,
   };
 });
-
-const onCellEditComplete = (event) => {
-  let { newValue, value, newData, index } = event;
-  if (newValue == value) {
-    return false;
-  }
-  newData.old_key = newData.mahh;
-  // console.log(event)
-  datatable.value[index] = newData;
-  materialApi.save(newData).then((res) => {
-    if (res.success) {
-      toast.add({
-        severity: "success",
-        summary: "Thành công",
-        detail: "Thay đổi thành công",
-        life: 3000,
-      });
-    } else {
-      toast.add({
-        severity: "error",
-        summary: "Lỗi",
-        detail: res.message,
-        life: 3000,
-      });
-    }
-    loadLazyData();
-  });
-};
 const dt = ref(null);
 
 ////Form
-// const model = ref();
-const store_materials = useMaterials();
-const { model, headerForm, visibleDialog } = storeToRefs(store_materials);
+const store_producer = useProducer();
+const { model, headerForm, visibleDialog } = storeToRefs(store_producer);
 ///Control
+const productDialog = ref();
 const deleteProductsDialog = ref();
 const deleteProductDialog = ref();
 const waiting = ref(false);
@@ -216,7 +161,7 @@ const waiting = ref(false);
 ////Data table
 const loadLazyData = () => {
   loading.value = true;
-  materialApi.table(lazyParams.value).then((res) => {
+  producerApi.table(lazyParams.value).then((res) => {
     // console.log(res);
     if (!res.data) store.logout();
     datatable.value = res.data;
@@ -231,6 +176,7 @@ const onPage = (event) => {
   loadLazyData();
 };
 
+///Form
 const openNew = () => {
   model.value = {};
   headerForm.value = "Tạo mới";
@@ -249,9 +195,13 @@ const confirmDeleteProduct = (m) => {
   model.value = m;
   deleteProductDialog.value = true;
 };
+const hideDialog = () => {
+  productDialog.value = false;
+  submitted.value = false;
+};
 const deleteProduct = () => {
   waiting.value = true;
-  materialApi.remove({ item: [model.value.id] }).then((res) => {
+  producerApi.remove({ item: [model.value.id] }).then((res) => {
     waiting.value = false;
     if (res.success) {
       toast.add({
@@ -275,11 +225,11 @@ const deleteProduct = () => {
 };
 const deleteSelectedProducts = () => {
   // datatable.value = datatable.value.filter(val => !selectedProducts.value.includes(val));
-  let list = selectedProducts.value.map((item) => {
+  let items = selectedProducts.value.map((item) => {
     return item.id;
   });
   waiting.value = true;
-  materialApi.remove({ item: list }).then((res) => {
+  producerApi.remove({ item: items }).then((res) => {
     waiting.value = false;
     if (res.success) {
       toast.add({

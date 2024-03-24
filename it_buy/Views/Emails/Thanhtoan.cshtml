@@ -1,0 +1,61 @@
+﻿@{
+    ViewData["Title"] = "Index";
+    Layout = null;
+}
+<center>
+    <table>
+        <tbody>
+            <tr>
+                <td width="600">
+                    <div>
+
+                        <p style="text-align:center;margin-bottom:30px">
+                            <img style="border:0;height:auto;line-height:100%;outline:none;text-decoration:none;width:400px;" src="@Model.link_logo" />
+                        </p>
+                        <div style="box-sizing:border-box;margin:0;padding:0 40px">
+                            <h2 style="text-align:left">Xin chào,</h2>
+                            <p style="text-align:left">Đề nghị thanh toán cho đơn hàng.</p>
+                            <p style="text-align:left"><b>Hàng hóa:</b></p>
+                            <table style="width:100%">
+                                <thead style="background:#f1f5fa;">
+                                    <tr>
+                                        <td style="padding:10px;">Stt</td>
+                                        <td style="padding:10px;">Tên hàng hóa</td>
+                                        <td style="padding:10px;">Số lượng</td>
+                                        <td style="padding:10px;">DVT</td>
+                                        <td style="padding:10px;">Mô tả</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.data)
+                                    {
+                                        <tr>
+                                            <td style="padding:10px;">@item.stt</td>
+                                            <td style="padding:10px;">@item.tenhh</td>
+                                            <td style="padding:10px;">@item.soluong.ToString("#,##0")</td>
+                                            <td style="padding:10px;">@item.dvt</td>
+                                            <td style="padding:10px;">@item.note</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                            <p>Ngày giao hàng dự kiến: <b>@Model.date.ToString("dd/MM/yyyy")</b></p>
+                            <p>Đường dẫn:</p>
+                            <p style="text-align:center;">
+                                <a href="@Model.link" style="padding: 10px 30px;
+    background: #ffb009;
+    color: white;
+    text-decoration: none;
+    font-size: 13px;
+    border-radius: 5px;">Nhận hàng</a>
+                            </p>
+                            <p style="text-align:left">Trân trọng.</p>
+                            <p style="text-align:left">ASTA</p>
+                            <br>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</center>

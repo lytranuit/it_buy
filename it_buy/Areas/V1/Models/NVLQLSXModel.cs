@@ -21,8 +21,5 @@ namespace Vue.Models
         public string? mancc { get; set; }
         public string? mansx { get; set; }
         public string? masothietke { get; set; }
-
-        [ForeignKey("mansx")]
-        public NsxModel? nhasanxuat { get; set; }
     }
 }

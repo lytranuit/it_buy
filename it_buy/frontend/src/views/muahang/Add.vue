@@ -66,29 +66,6 @@ const router = useRouter();
 const messageError = ref();
 const store = useAuth();
 const { model, datatable, list_add } = storeToRefs(storeMuahang);
-const items = ref([
-  {
-    label: 'Dự trù'
-  },
-  {
-    label: 'Trình ký'
-  },
-  {
-    label: 'Đề nghị mua hàng'
-  },
-  {
-    label: 'Trình ký'
-  },
-  {
-    label: 'Đơn mua hàng'
-  },
-  {
-    label: 'Nhận hàng'
-  },
-  {
-    label: 'Hoàn thành'
-  }
-]);
 onMounted(() => {
   console.log(datatable.value)
   model.value = {};
@@ -111,10 +88,6 @@ const submit = () => {
   // return false;
   if (datatable.value.length) {
     for (let product of datatable.value) {
-      if (!product.mahh) {
-        alert("Chưa chọn Mã NVL!");
-        return false;
-      }
       if (!(product.soluong > 0)) {
         alert("Chưa chọn nhập số lượng");
         return false;

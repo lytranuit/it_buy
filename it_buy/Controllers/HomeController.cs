@@ -8,6 +8,7 @@ using System.Net.Mime;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using System;
 
 namespace Vue.Controllers
 {
@@ -181,12 +182,57 @@ namespace Vue.Controllers
                 }
             }
             ////
-            var muahang_list = _context.MuahangModel.Where(d => d.deleted_at == null && d.date_finish == null && d.is_nhanhang == true && d.is_thanhtoan == true).ToList();
+            var muahang_list = _context.MuahangModel.Where(d => d.deleted_at == null && d.date_finish == null && d.is_nhanhang == true && d.is_thanhtoan == true)
+                .Include(d => d.chitiet).ThenInclude(d => d.dutru_chitiet)
+                .Include(d => d.chitiet).ThenInclude(d => d.muahang_ncc_chitiet)
+                .ToList();
             foreach (var item in muahang_list)
             {
                 item.date_finish = DateTime.Now;
                 _context.Update(item);
                 _context.SaveChanges();
+                /////
+                var chitiet_no_mahh = item.chitiet.Where(d => d.mahh == null).ToList();
+                foreach (var c in chitiet_no_mahh)
+                {
+                    //////tao ma
+                    var hh = new MaterialModel()
+                    {
+                        nhom = "Khac",
+                        mahh = "HH-" + new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds(),
+                        tenhh = c.tenhh,
+                        dvt = c.dvt,
+                    };
+                    _context.Add(hh);
+                    _context.SaveChanges();
+                    hh.mahh = "HH-" + hh.id;
+                    _context.Update(hh);
+                    _context.SaveChanges();
+                    /////update chitiet muahang
+                    c.hh_id = "m-" + hh.id;
+                    c.mahh = hh.mahh;
+                    _context.Update(c);
+                    _context.SaveChanges();
+                    ///Update chitiet ncc
+                    foreach (var ncc_c in c.muahang_ncc_chitiet)
+                    {
+                        ncc_c.mahh = hh.mahh;
+                        ncc_c.hh_id = "m-" + hh.id;
+
+                        _context.Update(ncc_c);
+                        _context.SaveChanges();
+                    }
+
+                    ///// update chitiet dutru
+                    c.dutru_chitiet.mahh = hh.mahh;
+                    c.dutru_chitiet.hh_id = "m-" + hh.id;
+
+                    _context.Update(c.dutru_chitiet);
+                    _context.SaveChanges();
+
+
+                }
+
             }
             return Json(new { success = true });
         }

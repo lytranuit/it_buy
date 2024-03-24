@@ -11,6 +11,15 @@ export default {
       })
       .then((res) => res.data);
   },
+  thongbao(params) {
+    return repository
+      .post(`/v1/${resoure}/thongbao`, params, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => res.data);
+  },
   chapnhan(id) {
     return repository
       .post(

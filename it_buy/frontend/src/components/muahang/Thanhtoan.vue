@@ -1,10 +1,10 @@
 ﻿<template>
   <div class="row my-5">
-    <div class="col-md-6 text-center">
+    <div class="col-md-4 text-center">
       <h3>Kiểm tra thông tin</h3>
       <a href="#" @click.prevent="tabviewActive = 1">-> Files</a>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-4">
       <b class="">Ủy nhiệm chi:<span class="text-danger">*</span></b>
       <div class="custom-file mt-2" v-if="model.is_dathang == true && !model.is_thanhtoan && is_Ketoan">
         <input type="file" class="uynhiemchi-file-input" :id="'uynhiemchi'" :multiple="true"
@@ -23,8 +23,13 @@
         </div>
       </div>
     </div>
+
+    <div class="col-md-4 align-self-center" v-if="model.is_dathang == true && !model.is_thanhtoan">
+      <Button label="Thông báo thanh toán" icon="far fa-paper-plane" size="small" @click.prevent="thongbaothanhtoan()">
+      </Button>
+    </div>
     <div class="col-md-12 mt-3" v-if="model.is_dathang == true && !model.is_thanhtoan && is_Ketoan">
-      <Button label="Chấp nhận thanh toán" icon="fas fa-long-arrow-alt-down" class="p-button-success p-button-sm mr-2"
+      <Button label="Hoàn thành thanh toán" icon="fas fa-long-arrow-alt-down" class="p-button-success p-button-sm mr-2"
         @click.prevent="thanhtoan()">
       </Button>
     </div>
@@ -37,6 +42,8 @@ import { storeToRefs } from "pinia";
 import muahangApi from "../../api/muahangApi";
 import Button from 'primevue/button';
 import { useAuth } from "../../stores/auth";
+import { useToast } from "primevue/usetoast";
+const toast = useToast();
 const store_muahang = useMuahang();
 const { model, tabviewActive, waiting, list_uynhiemchi } = storeToRefs(store_muahang);
 
@@ -65,8 +72,22 @@ const thanhtoan = async () => {
   await muahangApi.saveUynhiemchi(params);
   model.value.is_thanhtoan = true;
   await muahangApi.save(model.value);
+  store_muahang.load_data(model.value.id);
   waiting.value = false;
   emit("next");
+}
+
+const thongbaothanhtoan = async () => {
+  // visibleDialog.value = false;
+  var res = await muahangApi.thongbaothanhtoan({ muahang_id: model.value.id });
+  if (res.success) {
+    toast.add({
+      severity: "success",
+      summary: "Thành công",
+      detail: "Thành công",
+      life: 3000,
+    });
+  }
 }
 onMounted(() => {
 

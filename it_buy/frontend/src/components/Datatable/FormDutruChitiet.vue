@@ -19,35 +19,40 @@
             </template>
             <Column selectionMode="multiple" v-if="model.status_id == 1"></Column>
             <Column v-for="(col, index) in selectedColumns" :field="col.data" :header="col.label" :key="col.data"
-                :showFilterMatchModes="false" :class="col.data" >
+                :showFilterMatchModes="false" :class="col.data">
 
                 <template #body="slotProps">
 
-                    <template v-if="col.data == 'hh_id' && model.status_id == 1">
+                    <template v-if="col.data == 'tenhh' && model.status_id == 1">
                         <div class="d-flex align-items-center">
-                            <Materials v-model="slotProps.data[col.data]"
-                                @update:modelValue="changeMaterial($event, slotProps.data)" :required="true">
-                            </Materials>
-                            <span class="fas fa-plus ml-3 text-success" style="cursor: pointer;"
-                                @click="openNew(slotProps.index)"></span>
+                            <MaterialAutoComplete v-model="slotProps.data[col.data]"
+                                :disabled="slotProps.data['hh_id'] != null" :type_id="model.type_id"
+                                @item-select="select($event, slotProps.data)">
+                            </MaterialAutoComplete>
+                            <!-- <span class="fas fa-plus ml-3 text-success" style="cursor: pointer;"
+                                @click="openNew(slotProps.index)" v-if="model.type_id != 1"></span> -->
                         </div>
                     </template>
 
                     <template
-                        v-else-if="(col.data == 'dvt' || col.data == 'nhasx' || col.data == 'grade' || col.data == 'tensp' || col.data == 'masothietke') && model.status_id == 1">
+                        v-else-if="(col.data == 'dvt' || col.data == 'dangbaoche' || col.data == 'grade' || col.data == 'tensp' || col.data == 'masothietke') && model.status_id == 1">
                         <input v-model="slotProps.data[col.data]" class="p-inputtext p-inputtext-sm" required />
                     </template>
-
+                    <template v-else-if="col.data == 'nhasx' && model.status_id == 1">
+                        <NsxTreeSelect v-model="slotProps.data['mansx']" :required="true" :useID="false"
+                            @update:modelValue="changeProducer(slotProps.data)">
+                        </NsxTreeSelect>
+                    </template>
                     <template v-else-if="col.data == 'soluong' && model.status_id == 1">
-                        <InputNumber v-model="slotProps.data[col.data]" class="p-inputtext-sm" :maxFractionDigits="2"/>
+                        <InputNumber v-model="slotProps.data[col.data]" class="p-inputtext-sm" :maxFractionDigits="2" />
                     </template>
 
                     <template v-else-if="col.data == 'note' && model.status_id == 1">
                         <textarea v-model="slotProps.data[col.data]" class="form-control" />
                     </template>
 
-                    <template v-else-if="col.data == 'hh_id' && model.status_id != 1">
-                        {{ slotProps.data["mahh"] }}
+                    <template v-else-if="col.data == 'tenhh' && model.status_id != 1">
+                        {{ label(slotProps.data) }}
                     </template>
 
                     <template v-else>
@@ -56,7 +61,6 @@
                 </template>
             </Column>
         </DataTable>
-        <PopupAdd @save="changeNewMaterial"></PopupAdd>
     </div>
 </template>
 
@@ -78,7 +82,26 @@ import { useDutru } from '../../stores/dutru';
 import { useGeneral } from '../../stores/general';
 import PopupAdd from '../materials/PopupAdd.vue';
 import { useMaterials } from '../../stores/materials';
-
+import NsxTreeSelect from '../TreeSelect/NsxTreeSelect.vue';
+import AutoComplete from 'primevue/autocomplete';
+import MaterialAutoComplete from '../AutoComplete/MaterialAutoComplete.vue';
+const type_hh = computed(() => {
+    if (model.value.type_id != 1) {
+        // console.log(model.value.type_id)
+        return "HH";
+    }
+    return null;
+});
+const label = (row) => {
+    return row.mahh ? row.mahh + ' - ' + row.tenhh : row.tenhh;
+}
+const select = (event, row) => {
+    console.log(event)
+    var id = event.value.id;
+    row.hh_id = "m-" + id
+    store_general.changeMaterial(row);
+    console.log(row)
+}
 const store_dutru = useDutru();
 const store_general = useGeneral();
 const store_materials = useMaterials();
@@ -87,7 +110,9 @@ const modelMaterial = RefMaterials.model;
 const { headerForm, visibleDialog } = RefMaterials;
 
 const { datatable, model, list_delete } = storeToRefs(store_dutru);
+const { materials } = storeToRefs(store_general);
 const changeMaterial = store_general.changeMaterial;
+const changeProducer = store_general.changeProducer;
 const confirm = useConfirm();
 
 const loading = ref(false);
@@ -101,30 +126,26 @@ const columns = computed(() => {
                 className: "text-center",
             },
             {
-                label: "Mã(*)",
-                "data": "hh_id",
+                label: "Hàng hóa(*)",
+                "data": "tenhh",
                 "className": "text-center",
             },
+            // {
+            //     label: "Tên(*)",
+            //     "data": "tenhh",
+            //     "className": "text-center"
+            // },
             {
-                label: "Tên(*)",
-                "data": "tenhh",
-                "className": "text-center"
-            },
-            {
-                label: "Grade",
+                label: "Grade(*)",
                 "data": "grade",
                 "className": "text-center"
             }, {
-                label: "Mã Artwork",
-                "data": "masothietke",
-                "className": "text-center"
-            }, {
-                label: "Tên SP",
+                label: "Tên SP(*)",
                 "data": "tensp",
                 "className": "text-center"
             }, {
-                label: "Nhà sản xuất",
-                "data": "nhasx",
+                label: "Dạng bào chế(*)",
+                "data": "dangbaoche",
                 "className": "text-center"
             },
             {
@@ -135,6 +156,14 @@ const columns = computed(() => {
             {
                 label: "Số lượng(*)",
                 "data": "soluong",
+                "className": "text-center"
+            }, {
+                label: "Mã Artwork",
+                "data": "masothietke",
+                "className": "text-center"
+            }, {
+                label: "Nhà sản xuất",
+                "data": "nhasx",
                 "className": "text-center"
             },
             {
@@ -151,14 +180,9 @@ const columns = computed(() => {
                 className: "text-center",
             },
             {
-                label: "Mã(*)",
-                "data": "hh_id",
-                "className": "text-center",
-            },
-            {
-                label: "Tên(*)",
+                label: "Hàng hóa(*)",
                 "data": "tenhh",
-                "className": "text-center"
+                "className": "text-center",
             },
             {
                 label: "ĐVT(*)",
@@ -228,7 +252,10 @@ const confirmDeleteSelected = () => {
         }
     });
 }
-onMounted(() => {
+onMounted(async () => {
+    await store_general.fetchMaterials();
+
+    // if(items)
 })
 </script>
 
@@ -236,6 +263,7 @@ onMounted(() => {
 .hh_id {
     min-width: 300px;
 }
+
 .tenhh {
     min-width: 300px;
 }

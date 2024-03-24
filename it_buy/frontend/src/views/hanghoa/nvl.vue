@@ -5,15 +5,13 @@
       :totalRecords="totalRecords" @page="onPage($event)" :rowHover="true" :loading="loading" responsiveLayout="scroll"
       :resizableColumns="true" columnResizeMode="expand" v-model:filters="filters" filterDisplay="menu">
       <template #header>
-        <div class="d-inline-flex" style="width:200px">
-          <Button label="Tạo đề nghị mua hàng" icon="pi pi-plus" class="p-button-success p-button-sm"
-            :disabled="!selected || !selected.length" @click="taodenghimuahang()"></Button>
-        </div>
+        <Button label="Tạo đề nghị mua hàng" icon="pi pi-plus" class="p-button-success p-button-sm"
+          :disabled="!selected || !selected.length" @click="taodenghimuahang()"></Button>
         <div class="d-inline-flex float-right">
           <!-- <Button label="Chi tiết" class="p-button-primary p-button-sm" @click="chitiet()"
-            v-if="type == 'tonghop'"></Button>
-          <Button label="Tổng hợp" class="p-button-warning p-button-sm" @click="tonghop()"
-            v-else-if="type == 'chitiet'"></Button> -->
+            v-if="type == 'tonghop'"></Button>-->
+          <Button label="Đánh giá nhà cung cấp" icon="fas fa-truck-moving" class="p-button-warning p-button-sm"
+            @click="danhgianhacungcap()" :disabled="!selected || selected.length != 1"></Button>
         </div>
       </template>
 
@@ -33,19 +31,19 @@
 
           <template v-else-if="col.data == 'list_muahang'">
             <div v-for="item of slotProps.data[col.data]" :key="item.id">
-              <RouterLink :to="'/muahang/edit/' + item.id" class="text-primary">{{ item.id }} - {{ item.code }}
+              <RouterLink :to="'/muahang/edit/' + item.id" class="text-primary mr-2">{{ item.id }} - {{ item.code }}
               </RouterLink>
-              <Badge value="Hoàn thành" size="small" severity="success" v-if="item['date_finish']"></Badge>
-              <Badge value="Chờ nhận hàng & thanh toán" size="small" severity="warning" v-else-if="item['is_dathang']">
-              </Badge>
-              <Badge value="Đang thực hiện" size="small" severity="warning" v-else-if="item['status_id'] == 1"></Badge>
+              <Badge value="Hoàn thành" size="small" severity="success" v-if="item['date_finish']" />
+              <Badge value="Chờ nhận hàng & thanh toán" size="small" severity="warning"
+                v-else-if="item['is_dathang']" />
+              <Badge value="Đang thực hiện" size="small" severity="warning" v-else-if="item['status_id'] == 1" />
               <Badge value="Đang gửi và nhận báo giá" size="small" severity="warning"
-                v-else-if="item['status_id'] == 6"></Badge>
-              <Badge value="So sánh giá" size="small" severity="warning" v-else-if="item['status_id'] == 7"></Badge>
-              <Badge value="Đang trình ký" size="small" v-else-if="item['status_id'] == 8"></Badge>
-              <Badge value="Chờ ký duyệt" size="small" severity="warning" v-else-if="item['status_id'] == 9"></Badge>
-              <Badge value="Đã duyệt" size="small" severity="success" v-else-if="item['status_id'] == 10"></Badge>
-              <Badge value="Không duyệt" size="small" severity="danger" v-else-if="item['status_id'] == 11"></Badge>
+                v-else-if="item['status_id'] == 6" />
+              <Badge value="So sánh giá" size="small" severity="warning" v-else-if="item['status_id'] == 7" />
+              <Badge value="Đang trình ký" size="small" v-else-if="item['status_id'] == 8" />
+              <Badge value="Chờ ký duyệt" size="small" severity="warning" v-else-if="item['status_id'] == 9" />
+              <Badge value="Đã duyệt" size="small" severity="success" v-else-if="item['status_id'] == 10" />
+              <Badge value="Không duyệt" size="small" severity="danger" v-else-if="item['status_id'] == 11" />
             </div>
           </template>
 
@@ -70,6 +68,10 @@
           <template v-else-if="col.data == 'soluong'">
             {{ slotProps.data[col.data] }} {{ slotProps.data["dvt"] }}
           </template>
+          <template v-else-if="col.data == 'mahh'">
+            {{ slotProps.data[col.data] }} <i class="fas fa-sync-alt" style="cursor: pointer;"
+              @click="openNew(slotProps.data)"></i>
+          </template>
           <template v-else>
             {{ slotProps.data[col.data] }}
           </template>
@@ -81,6 +83,64 @@
         </template>
       </Column>
     </DataTable>
+    <Dialog v-model:visible="visibleDialog" header="Đổi mã hàng hóa" :modal="true" style="width: 75vw;"
+      :breakpoints="{ '1199px': '75vw', '575px': '95vw' }">
+      <div class="row mb-2">
+        <div class="field col">
+          <label for="name">Chuyển từ</label>
+          <div>
+            {{ modelDialog.from_hh }}
+          </div>
+        </div>
+        <div class="field col">
+          <label for="name">sang</label>
+          <div>
+            <MaterialTreeSelect v-model="modelDialog.to_id" :useID="false" @update:model-value="changeMahh()">
+            </MaterialTreeSelect>
+          </div>
+        </div>
+        <div class="field col">
+          <label for="name">Thông báo đến người dự trù</label>
+          <div>
+            <Button label="Thông báo" icon="far fa-paper-plane" size="small" class="mr-2"
+              @click="thongbaodoima"></Button>
+            <Button label="Lưu lại" icon="pi pi-check" size="small" severity="success" @click="savedoima"></Button>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          Lịch sử mua hàng của mã {{ modelDialog.to }}
+        </div>
+        <div class="col-12 mt-2">
+          <table class="table table-border">
+            <thead>
+              <tr>
+                <th>Đề nghị mua hàng</th>
+                <th>Hàng hóa</th>
+                <th>Số lượng</th>
+                <th>Đơn giá</th>
+                <th>Thành tiền</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in modelDialog.history">
+                <th>
+                  <RouterLink :to="'/muahang/edit/' + item.muahang.id">{{ item.muahang.code }} - {{ item.muahang.name }}
+                  </RouterLink>
+                </th>
+                <th>{{ item.tenhh }}</th>
+                <th>{{ item.soluong }}</th>
+                <th>{{ formatPrice(item.dongia, 0) }} VND</th>
+                <th>{{ formatPrice(item.thanhtien, 0) }} VND</th>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </Dialog>
+
+    <PopupAdd></PopupAdd>
   </div>
 </template>
 
@@ -88,6 +148,7 @@
 import { onMounted, ref, computed, watch } from "vue";
 import dutruApi from "../../api/dutruApi";
 import Badge from "primevue/badge";
+import Dialog from "primevue/dialog";
 import Button from "primevue/button";
 import DataTable from "primevue/datatable";
 import { FilterMatchMode } from "primevue/api";
@@ -98,7 +159,13 @@ import { useMuahang } from "../../stores/muahang";
 import { storeToRefs } from "pinia";
 import { useRoute, useRouter } from "vue-router";
 import { rand } from "../../utilities/rand";
-const type = ref("chitiet");
+import MaterialTreeSelect from "../../components/TreeSelect/MaterialTreeSelect.vue";
+import muahangApi from "../../api/muahangApi";
+import { useToast } from "primevue/usetoast";
+import PopupAdd from "../../components/danhgianhacungcap/PopupAdd.vue";
+import { useDanhgianhacungcap } from "../../stores/danhgianhacungcap";
+const type_id = ref(1);
+const toast = useToast();
 const store_muahang = useMuahang();
 const { datatable } = storeToRefs(store_muahang);
 const router = useRouter();
@@ -123,7 +190,7 @@ const columns = ref([
 
   {
     id: 3,
-    label: "Dự trù",
+    label: "Số lượng dự trù",
     data: "soluong_dutru",
     className: "text-center",
   },
@@ -193,7 +260,7 @@ const lazyParams = computed(() => {
     start: first.value,
     length: rows.value,
     filters: data_filters,
-    type: type.value
+    type_id: type_id.value
   };
 });
 const dt = ref(null);
@@ -227,20 +294,71 @@ const taodenghimuahang = () => {
   datatable.value = selected.value.map((item, key) => {
     delete item.list_dutru;
     delete item.list_muahang;
+    delete item.id;
     item.stt = key + 1;
     item.ids = rand();
     return item;
   });
   router.push("/muahang/add?no_reset=1");
 }
-const chitiet = () => {
-  type.value = "chitiet";
-  loadLazyData();
+
+const visibleDialog = ref();
+const modelDialog = ref({});
+const openNew = async (row) => {
+  visibleDialog.value = true;
+  modelDialog.value.id = row.id;
+  modelDialog.value.from_hh = row.mahh;
+  modelDialog.value.to_id = row.hh_id;
+  changeMahh();
 }
-const tonghop = () => {
-  type.value = "tonghop";
-  loadLazyData();
+const savedoima = async () => {
+  visibleDialog.value = false;
+  var res = await dutruApi.savedoima({ dutru_chitiet_id: modelDialog.value.id, hh_id: modelDialog.value.to_id });
+  if (res.success) {
+    toast.add({
+      severity: "success",
+      summary: "Thành công",
+      detail: "Thành công",
+      life: 3000,
+    });
+    loadLazyData();
+  }
 }
+const thongbaodoima = async () => {
+  // visibleDialog.value = false;
+  var res = await dutruApi.thongbaodoima({ dutru_chitiet_id: modelDialog.value.id, hh_id: modelDialog.value.to_id });
+  if (res.success) {
+    toast.add({
+      severity: "success",
+      summary: "Thành công",
+      detail: "Thành công",
+      life: 3000,
+    });
+  }
+}
+const changeMahh = async () => {
+
+  var res = await muahangApi.getHistory(modelDialog.value.to_id);
+  // console.log(res);
+  modelDialog.value.to = res.to;
+  modelDialog.value.history = res.data;
+}
+
+
+const store_danhgianhacungcap = useDanhgianhacungcap();
+const re = storeToRefs(store_danhgianhacungcap);
+const danhgianhacungcap = () => {
+  var select = selected.value[0];
+  var tmp = {};
+  tmp.tenhh = select.tenhh;
+  tmp.grade = select.grade;
+  tmp.dvt = select.dvt;
+  tmp.mansx = select.mansx;
+  tmp.masothietke = select.masothietke;
+  re.model.value = tmp;
+  re.headerForm.value = "Tạo mới";
+  re.visibleDialog.value = true;
+};
 onMounted(() => {
   let cache = localStorage.getItem(column_cache);
   if (!cache) {

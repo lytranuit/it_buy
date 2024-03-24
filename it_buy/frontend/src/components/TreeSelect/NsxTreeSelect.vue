@@ -1,5 +1,5 @@
 <template>
-  <TreeSelect :options="supliers" :multiple="multiple" :normalizer="normalizer" :modelValue="modelValue" :name="name"
+  <TreeSelect :options="producers" :multiple="multiple" :normalizer="normalizer" :modelValue="modelValue" :name="name"
     :required="required" :append-to-body="appendToBody" @update:modelValue="emit('update:modelValue', $event)"
     zIndex="3000" :disableFuzzyMatching="true">
   </TreeSelect>
@@ -12,14 +12,14 @@ import { onMounted, computed, ref } from 'vue';
 import { useGeneral } from '../../stores/general';
 
 const store = useGeneral();
-const { supliers } = storeToRefs(store)
+const { producers } = storeToRefs(store)
 const props = defineProps({
   appendToBody: {
     type: Boolean,
     default: true,
   },
   modelValue: {
-    type: [String, Array,Number],
+    type: [String, Array, Number],
   },
   multiple: {
     type: Boolean,
@@ -31,7 +31,7 @@ const props = defineProps({
   },
   name: {
     type: String,
-    default: "supplier",
+    default: "producer",
   },
   useID: {
     type: Boolean,
@@ -41,14 +41,14 @@ const props = defineProps({
 const emit = defineEmits(["update:modelValue"]);
 
 const normalizer = (node) => {
-  // console.log(node);
-  var id = props.useID ? node.id : node.mancc;
+  var id = props.useID ? node.id : node.mansx;
+  // console.log(id);
   return {
     id: id,
-    label: node.mancc + " - " + node.tenncc,
+    label: node.mansx + " - " + node.tennsx,
   }
 }
 onMounted(() => {
-  store.fetchNhacc();
+  store.fetchNhasx();
 });
 </script>

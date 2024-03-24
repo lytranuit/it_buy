@@ -26,13 +26,17 @@ const router = useRouter();
 const visible = ref();
 const groups = ref([
   {
+    id: 2,
+    name: "Mua hàng gián tiếp"
+  },
+  {
+    id: 3,
+    name: "Hóa chất, thuốc thử QC"
+  },
+  {
     id: 1,
     name: "Nguyên vật liệu"
   },
-  {
-    id: 2,
-    name: "Mua hàng gián tiếp"
-  }
 ]);
 const execute = (id) => {
   visible.value = false;

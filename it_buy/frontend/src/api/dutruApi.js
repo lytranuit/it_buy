@@ -11,7 +11,24 @@ export default {
       })
       .then((res) => res.data);
   },
-  
+  savedoima(params) {
+    return repository
+      .post(`/v1/${resoure}/savedoima`, params, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => res.data);
+  },
+  thongbaodoima(params) {
+    return repository
+      .post(`/v1/${resoure}/thongbaodoima`, params, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => res.data);
+  },
   saveDinhkem(params) {
     return repository
       .post(`/v1/${resoure}/saveDinhkem`, params, {

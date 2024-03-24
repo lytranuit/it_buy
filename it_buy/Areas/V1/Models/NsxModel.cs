@@ -8,6 +8,7 @@ namespace Vue.Models
     public class NsxModel
     {
         [Key]
+        public int id { get; set; }
         [Column("MaNSX")]
         public string mansx { get; set; }
         [Column("TenNSX")]

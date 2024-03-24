@@ -163,9 +163,10 @@ const addNCC = () => {
   var chitiet = [];
   for (let item of datatable.value) {
     let obj = Object.assign({}, item);
-    delete obj.id;
+    obj.muahang_chitiet_id = obj.id
     obj.dongia = 0;
     obj.thanhtien = 0;
+    delete obj.id;
     chitiet.push(obj);
   }
   ncc.chitiet = chitiet;

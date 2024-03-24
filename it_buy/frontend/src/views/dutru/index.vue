@@ -56,6 +56,7 @@
                   <div class="text-center">
                     <span v-if="slotProps.data[col.data] == 1">Nguyên vật liệu</span>
                     <span v-else-if="slotProps.data[col.data] == 2">Mua hàng gián tiếp</span>
+                    <span v-else-if="slotProps.data[col.data] == 3">Hóa chất, thuốc thử QC</span>
                   </div>
                 </template>
 
@@ -94,7 +95,7 @@
 <script setup>
 import { onMounted, ref, computed, watch } from "vue";
 import dutruApi from "../../api/dutruApi";
-import PopupDutru from "../../components/PopupDutru.vue";
+import PopupDutru from "../../components/dutru/PopupDutru.vue";
 import Avatar from "primevue/avatar";
 import Button from "primevue/button";
 import DataTable from "primevue/datatable";

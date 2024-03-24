@@ -25,7 +25,7 @@
         <div class="row">
           <b class="col-12">Người nhận:</b>
           <div class="col-12 mt-2">
-            <UserDepartmentTreeSelect multiple required v-model="listuser" :name="'user_' + index">
+            <UserDepartmentTreeSelect multiple required v-model="listuser" :name="'user_nhanhang'">
             </UserDepartmentTreeSelect>
           </div>
         </div>
@@ -48,11 +48,14 @@ import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import UserDepartmentTreeSelect from '../TreeSelect/UserDepartmentTreeSelect.vue';
 import FormMuahangNhanhangVue from "../Datatable/FormMuahangNhanhang.vue";
+import { useToast } from "primevue/usetoast";
 const store_muahang = useMuahang();
 const { model, QrNhanhang } = storeToRefs(store_muahang);
 const visibleDialog = ref();
 const minDate = ref(new Date());
 const listuser = ref([]);
+const toast = useToast();
+
 const changeNgaygiaohang = async () => {
   await muahangApi.save(model.value);
 }
@@ -68,7 +71,15 @@ const openThongbao = async () => {
 }
 const thongbao = async () => {
   visibleDialog.value = false;
-  await muahangApi.thongbao({ muahang_id: model.value.id, list_user: listuser.value });
+  var res = await muahangApi.thongbao({ muahang_id: model.value.id, list_user: listuser.value });
+  if (res.success) {
+    toast.add({
+      severity: "success",
+      summary: "Thành công",
+      detail: "Thành công",
+      life: 3000,
+    });
+  }
 }
 onMounted(() => {
   store_muahang.getQrNhanhang(model.value.id);

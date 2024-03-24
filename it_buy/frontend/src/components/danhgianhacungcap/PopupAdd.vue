@@ -4,17 +4,49 @@
         :breakpoints="{ '1199px': '75vw', '575px': '95vw' }">
         <div class="row mb-2">
             <div class="field col">
-                <label for="name">Nguyên vật liệu <span class="text-danger">*</span></label>
+                <label for="name">Tên nguyên liệu <span class="text-danger">*</span></label>
                 <div>
-                    <MaterialTreeSelect v-model="model.material_id" :required="true" :useID="true">
-                    </MaterialTreeSelect>
+                    <InputText v-model="model.tenhh" class="form-control form-control-sm" />
+                </div>
+            </div>
+            <div class="field col">
+                <label for="name">ĐVT <span class="text-danger">*</span></label>
+                <div>
+                    <InputText v-model="model.dvt" class="form-control form-control-sm" />
+                </div>
+            </div>
+            <div class="field col">
+                <label for="name">Grade <span class="text-danger">*</span></label>
+                <div>
+                    <InputText v-model="model.grade" class="form-control form-control-sm" />
+                </div>
+            </div>
+        </div>
+        <div class="row mb-2">
+            <div class="field col">
+                <label for="name">Nhà sản xuất <span class="text-danger">*</span></label>
+                <div>
+                    <NsxTreeSelect v-model="model.mansx"></NsxTreeSelect>
                 </div>
             </div>
             <div class="field col">
                 <label for="name">Nhà cung cấp <span class="text-danger">*</span></label>
                 <div>
-                    <NccTreeSelect v-model="model.ncc_id" :required="true">
-                    </NccTreeSelect>
+                    <NccTreeSelect v-model="model.mancc"></NccTreeSelect>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-2">
+            <div class="field col">
+                <label for="name">Mã số thiết kế</label>
+                <div>
+                    <InputText v-model="model.masothietke" class="form-control form-control-sm" />
+                </div>
+            </div>
+            <div class="field col">
+                <label for="name">Qui cách</label>
+                <div>
+                    <InputText v-model="model.quicach" class="form-control form-control-sm" />
                 </div>
             </div>
         </div>
@@ -34,7 +66,7 @@ import Dialog from "primevue/dialog";
 import Button from "primevue/button";
 import InputText from "primevue/inputtext";
 import { useDanhgianhacungcap } from '../../stores/danhgianhacungcap';
-import MaterialTreeSelect from "../TreeSelect/MaterialTreeSelect.vue";
+import NsxTreeSelect from "../TreeSelect/NsxTreeSelect.vue";
 import NccTreeSelect from "../TreeSelect/NccTreeSelect.vue";
 
 const toast = useToast();
@@ -78,8 +110,10 @@ const save = () => {
 
 ///Form
 const valid = () => {
-    if (!model.value.material_id) return false;
-    if (!model.value.ncc_id) return false;
+    if (!model.value.tenhh) return false;
+    if (!model.value.dvt) return false;
+    if (!model.value.mancc) return false;
+    if (!model.value.mansx) return false;
     return true;
 };
 </script>
