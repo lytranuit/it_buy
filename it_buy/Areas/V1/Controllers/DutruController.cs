@@ -518,7 +518,7 @@ namespace it_template.Areas.V1.Controllers
             }
             _context.AddRange(list_attachment);
             ////Signature
-            for (int k = 0; k < 3; ++k)
+            for (int k = 0; k < 1; ++k)
             {
                 DocumentSignatureModel DocumentSignatureModel = new DocumentSignatureModel() { document_id = DocumentModel.id, user_id = user_id, stt = k };
                 _context.Add(DocumentSignatureModel);

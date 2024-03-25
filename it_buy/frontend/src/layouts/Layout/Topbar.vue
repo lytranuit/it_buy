@@ -163,7 +163,7 @@ const application = ref({
       <div class="soft" v-for="(item, key) in application" :key="key" v-show="!item.hide"
         :class="{ 'active': item.active }">
         <a :href="item.link">
-          <img :src="'/assets' + item.image" :width="item.width" alt="" />
+          <img :src="item.image" :width="item.width" alt="" />
           <strong class="d-block">{{ item.label }}</strong>
         </a>
       </div>
