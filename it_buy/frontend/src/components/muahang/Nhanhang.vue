@@ -89,7 +89,7 @@ const thongbao = async () => {
   }
 }
 onMounted(() => {
-  store_muahang.getQrNhanhang(model.value.id);
+  store_muahang.getQrNhanhang(route.params.id);
 })
 </script>
 

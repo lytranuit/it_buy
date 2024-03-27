@@ -67,6 +67,8 @@ import {
   DxHtmlEditor,
 } from 'devextreme-vue/html-editor';
 import { useAuth } from "../../stores/auth";
+import { useRoute } from "vue-router";
+const route = useRoute();
 const store = useAuth();
 const { users } = storeToRefs(store);
 const store_danhgianhacungcap = useDanhgianhacungcap();
@@ -88,12 +90,11 @@ const mentions_employee = computed(() => {
 })
 const getComments = async () => {
   /// Lấy comments
-  var model_id = model.value.id;
   var from_id;
   if (comments.value.length > 0) {
     from_id = comments.value[comments.value.length - 1].id;
   }
-  var ress = await danhgianhacungcapApi.morecomment(model_id, from_id);
+  var ress = await danhgianhacungcapApi.morecomment(route.params.id, from_id);
   var comments_tmp = ress.comments;
   if (comments_tmp.length == 10) {
     comments_tmp.pop();
@@ -114,7 +115,7 @@ const add_comment = async (e) => {
   var files = $("[name='file[]']")[0].files;
   // console.log(comment);
   // return false;
-  if (comment == "" && !files.length) {
+  if (!comment && !files.length) {
     alert("Mời nhập bình luận!");
     return false;
   }
