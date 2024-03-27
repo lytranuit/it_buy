@@ -1,9 +1,6 @@
 <template>
   <div class="row clearfix">
     <div class="col-12">
-      <h5 class="card-header drag-handle">
-        <PopupDutru></PopupDutru>
-      </h5>
       <section class="card card-fluid">
         <div class="card-body" style="overflow: auto; position: relative">
           <DataTable class="p-datatable-customers" showGridlines :value="datatable" :lazy="true" ref="dt"
@@ -51,15 +48,6 @@
                       v-else-if="slotProps.data[col.data] == 5"></Button>
                   </div>
                 </template>
-
-                <template v-else-if="col.data == 'type_id'">
-                  <div class="text-center">
-                    <span v-if="slotProps.data[col.data] == 1">Nguyên vật liệu</span>
-                    <span v-else-if="slotProps.data[col.data] == 2">Mua hàng gián tiếp</span>
-                    <span v-else-if="slotProps.data[col.data] == 3">Hóa chất, thuốc thử QC</span>
-                  </div>
-                </template>
-
                 <template v-else-if="col.data == 'created_by'">
                   <div v-if="slotProps.data['user_created_by']" class="d-flex">
                     <Avatar :image="slotProps.data.user_created_by.image_url"
@@ -75,13 +63,6 @@
               <template #filter="{ filterModel, filterCallback }" v-if="col.filter == true">
                 <InputText type="text" v-model="filterModel.value" @keydown.enter="filterCallback()"
                   class="p-column-filter" />
-              </template>
-            </Column>
-            <Column style="width: 1rem">
-
-              <template #body="slotProps">
-                <a class="p-link text-danger font-16" @click="confirmDelete(slotProps.data['id'])"><i
-                    class="pi pi-trash"></i></a>
               </template>
             </Column>
           </DataTable>
@@ -104,6 +85,7 @@ import Column from "primevue/column"; ////Datatable
 import InputText from "primevue/inputtext";
 import { useConfirm } from "primevue/useconfirm";
 import Loading from "../../components/Loading.vue";
+const type_id = ref(1);
 const confirm = useConfirm();
 const datatable = ref();
 const columns = ref([
@@ -136,16 +118,8 @@ const columns = ref([
     className: "text-center",
     filter: false,
   },
-
   {
     id: 4,
-    label: "Loại",
-    data: "type_id",
-    className: "text-center",
-    filter: false,
-  },
-  {
-    id: 5,
     label: "Người thực hiện",
     data: "created_by",
     className: "text-center",
@@ -178,6 +152,7 @@ const lazyParams = computed(() => {
     start: first.value,
     length: rows.value,
     filters: data_filters,
+    type_id: type_id.value
   };
 });
 const dt = ref(null);

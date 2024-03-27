@@ -564,7 +564,7 @@ namespace it_template.Areas.V1.Controllers
                 if (muahang_chonmua != null)
                 {
                     var ncc_chon = muahang_chonmua;
-                    raw.Add("tonggiatri", ncc_chon.tonggiatri.Value.ToString("#,##0"));
+                    raw.Add("tonggiatri", ncc_chon.tonggiatri.Value.ToString("#,##0.##"));
                     raw.Add("tggh", data.date.Value.ToString("dd/MM/yyyy"));
                     var stt = 1;
                     foreach (var item in ncc_chon.chitiet)
@@ -578,9 +578,9 @@ namespace it_template.Areas.V1.Controllers
                                 tenhh = item.tenhh,
                                 mahh = item.mahh,
                                 dvt = item.dvt,
-                                soluong = item.soluong.Value.ToString("#,##0"),
-                                dongia = item.dongia.Value.ToString("#,##0"),
-                                thanhtien = item.thanhtien.Value.ToString("#,##0"),
+                                soluong = item.soluong.Value.ToString("#,##0.##"),
+                                dongia = item.dongia.Value.ToString("#,##0.##"),
+                                thanhtien = item.thanhtien.Value.ToString("#,##0.##"),
                                 //nhasx = material.nhasx,
                                 tieuchuan = material.tieuchuan,
                                 //note = item.note,
@@ -883,7 +883,7 @@ namespace it_template.Areas.V1.Controllers
                 if (muahang_chonmua != null)
                 {
                     var ncc_chon = muahang_chonmua;
-                    raw.Add("tonggiatri", ncc_chon.tonggiatri.Value.ToString("#,##0"));
+                    raw.Add("tonggiatri", ncc_chon.tonggiatri.Value.ToString("#,##0.##"));
                     var stt = 1;
                     foreach (var item in ncc_chon.chitiet)
                     {
@@ -896,9 +896,9 @@ namespace it_template.Areas.V1.Controllers
                             tenhh = item.tenhh,
                             mahh = item.mahh,
                             dvt = item.dvt,
-                            soluong = item.soluong.Value.ToString("#,##0.00"),
-                            dongia = item.dongia.Value.ToString("#,##0") + " VND",
-                            thanhtien = item.thanhtien.Value.ToString("#,##0") + " VND",
+                            soluong = item.soluong.Value.ToString("#,##0.##"),
+                            dongia = item.dongia.Value.ToString("#,##0.##") + " VND",
+                            thanhtien = item.thanhtien.Value.ToString("#,##0.##") + " VND",
                             //note = item.note,
                             //artwork = material.masothietke,
                             //date = data.date.Value.ToString("yyyy-MM-dd")
@@ -914,7 +914,7 @@ namespace it_template.Areas.V1.Controllers
                         ncc.chonmua = true;
                     }
                     raw.Add("bang_ncc_ten_" + key, ncc.ncc.tenncc);
-                    raw.Add("bang_ncc_tong_" + key, ncc.tonggiatri.Value.ToString("#,##0.00"));
+                    raw.Add("bang_ncc_tong_" + key, ncc.tonggiatri.Value.ToString("#,##0.##"));
                     raw.Add("bang_ncc_dap_ung_" + key, ncc.dapung == true ? "X" : "");
                     raw.Add("bang_ncc_time_delivery_" + key, ncc.thoigiangiaohang);
                     raw.Add("bang_ncc_policy_" + key, ncc.baohanh);
@@ -1251,7 +1251,7 @@ namespace it_template.Areas.V1.Controllers
             return Json(new { success = 1, comments });
         }
         [HttpPost]
-        public async Task<IActionResult> thongbao(int muahang_id, List<string> list_user)
+        public async Task<IActionResult> thongbao(int muahang_id, List<string> list_user, string note)
         {
 
             var data = _context.MuahangModel.Where(d => d.id == muahang_id).Include(d => d.chitiet).FirstOrDefault();
@@ -1272,7 +1272,8 @@ namespace it_template.Areas.V1.Controllers
                         link_logo = Domain + "/images/clientlogo_astahealthcare.com_f1800.png",
                         link = Domain + "/muahang/nhanhang/" + muahang_id,
                         date = data.date,
-                        data = data.chitiet
+                        data = data.chitiet,
+                        note = note
                     });
 
                 var email = new EmailModel

@@ -52,11 +52,11 @@ const search = (event) => {
 
   for (let item of items.value) {
     if (props.type_id != 1) {
-      if (["0721", "0722", "0723", "0724", "0725", "Khac"].indexOf(item.manhom) == -1) {
+      if (["0716", "0706", "0721", "0722", "0723", "0724", "0725", "Khac"].indexOf(item.manhom) == -1) {
         continue;
       }
     } else {
-      if (["0721", "0722", "0723", "0724", "0725", "Khac"].indexOf(item.manhom) != -1) {
+      if (["0716", "0706", "0721", "0722", "0723", "0724", "0725", "Khac"].indexOf(item.manhom) != -1) {
         continue;
       }
     }

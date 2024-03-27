@@ -246,6 +246,7 @@ namespace it_template.Areas.V1.Controllers
                 var find = _context.MaterialModel.Where(d => d.mahh == value.mahh).FirstOrDefault();
                 if (find != null)
                 {
+                    find.nhom = value.manhom;
                     find.tenhh = value.tenhh;
                     find.dvt = value.dvt;
                     find.mansx = value.mansx;
@@ -263,6 +264,7 @@ namespace it_template.Areas.V1.Controllers
                         mancc = value.mancc,
                         mansx = value.mansx,
                         masothietke = value.masothietke,
+                        nhom = value.manhom
                     });
                 }
                 _context.SaveChanges();

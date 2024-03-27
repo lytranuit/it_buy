@@ -8,6 +8,9 @@
         <Button label="Tạo đề nghị mua hàng" icon="pi pi-plus" class="p-button-success p-button-sm"
           :disabled="!selected || !selected.length" @click="taodenghimuahang()"></Button>
         <div class="d-inline-flex float-right">
+          <SelectButton v-model="filterTable" :options="['Đã xử lý', 'Chưa xử lý']" aria-labelledby="basic"
+            :pt="{ 'button': 'form-control-sm' }" @change="loadLazyData" />
+
           <!-- <Button label="Chi tiết" class="p-button-primary p-button-sm" @click="chitiet()"
             v-if="type == 'tonghop'"></Button>
           <Button label="Tổng hợp" class="p-button-warning p-button-sm" @click="tonghop()"
@@ -152,6 +155,7 @@ import DataTable from "primevue/datatable";
 import { FilterMatchMode } from "primevue/api";
 import Column from "primevue/column"; ////Datatable
 import InputText from "primevue/inputtext";
+import SelectButton from "primevue/selectbutton";
 import { formatDate, formatPrice } from "../../utilities/util";
 import { useMuahang } from "../../stores/muahang";
 import { storeToRefs } from "pinia";
@@ -161,6 +165,7 @@ import MaterialTreeSelect from "../../components/TreeSelect/MaterialTreeSelect.v
 import muahangApi from "../../api/muahangApi";
 import { change } from "@syncfusion/ej2-grids";
 import { useToast } from "primevue/usetoast";
+const filterTable = ref();
 const type_id = ref(2);
 const toast = useToast();
 const store_muahang = useMuahang();
@@ -257,7 +262,8 @@ const lazyParams = computed(() => {
     start: first.value,
     length: rows.value,
     filters: data_filters,
-    type_id: type_id.value
+    type_id: type_id.value,
+    filterTable: filterTable.value
   };
 });
 const dt = ref(null);

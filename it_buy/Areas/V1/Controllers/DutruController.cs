@@ -360,7 +360,7 @@ namespace it_template.Areas.V1.Controllers
                         tennvl = item.tenhh,
                         manvl = item.mahh,
                         dvt = item.dvt,
-                        soluong = item.soluong.Value.ToString("#,##0.00"),
+                        soluong = item.soluong.Value.ToString("#,##0.##"),
                         note = item.note,
                         artwork = item.masothietke,
                         date = data.date.Value.ToString("yyyy-MM-dd"),
@@ -572,11 +572,21 @@ namespace it_template.Areas.V1.Controllers
             var name = Request.Form["filters[name]"].FirstOrDefault();
             var id_text = Request.Form["filters[id]"].FirstOrDefault();
             int id = id_text != null ? Convert.ToInt32(id_text) : 0;
+            var type_id_string = Request.Form["type_id"].FirstOrDefault();
+            int type_id = type_id_string != null ? Convert.ToInt32(type_id_string) : 0;
             //var tenhh = Request.Form["filters[tenhh]"].FirstOrDefault();
             int skip = start != null ? Convert.ToInt32(start) : 0;
             var customerData = _context.DutruModel.Where(d => d.deleted_at == null);
 
-            customerData = customerData.Where(d => d.created_by == user_id);
+            if (type_id != null && type_id != 0)
+            {
+                customerData = customerData.Where(d => d.type_id == type_id);
+            }
+            else
+            {
+                customerData = customerData.Where(d => d.created_by == user_id);
+            }
+
 
 
             int recordsTotal = customerData.Count();
@@ -632,6 +642,7 @@ namespace it_template.Areas.V1.Controllers
             var mahh = Request.Form["filters[mahh]"].FirstOrDefault();
             var tenhh = Request.Form["filters[tenhh]"].FirstOrDefault();
             var list_dutru = Request.Form["filters[list_dutru]"].FirstOrDefault();
+            var filterTable = Request.Form["filterTable"].FirstOrDefault();
 
             var departments = _context.UserDepartmentModel.Where(d => d.user_id == user_id).Select(d => d.department_id).ToList();
             var is_CungungNVL = departments.Contains(29) == true;
@@ -649,6 +660,14 @@ namespace it_template.Areas.V1.Controllers
             //{
 
             //}
+            if (filterTable != null && filterTable == "Chưa xử lý")
+            {
+                customerData = customerData.Where(d => d.muahang_chitiet.Count() == 0);
+            }
+            else if (filterTable != null && filterTable == "Đã xử lý")
+            {
+                customerData = customerData.Where(d => d.muahang_chitiet.Count() > 0);
+            }
             if (type_id != null && type_id != 0)
             {
                 customerData = customerData.Where(d => d.dutru.type_id == type_id);
@@ -670,10 +689,9 @@ namespace it_template.Areas.V1.Controllers
                 var listdutru = _context.DutruModel.Where(d => d.code.Contains(list_dutru)).Select(d => d.id).ToList();
                 customerData = customerData.Where(d => listdutru.Contains(d.dutru_id));
             }
-
-            var datapost = customerData.ToList();
+            int recordsFiltered = customerData.Count();
+            var datapost = customerData.OrderByDescending(d => d.id).Skip(skip).Take(pageSize).ToList();
             var data = new ArrayList();
-            int recordsFiltered = datapost.Count();
             foreach (var record in datapost)
             {
                 var dutru = record.dutru;
@@ -681,12 +699,13 @@ namespace it_template.Areas.V1.Controllers
                 var mahh1 = record.mahh;
                 //if (dutru.type_id == 1)
                 //{
-                //var material = _context.MaterialModel.Where(d => record.hh_id == "m-" + d.id).FirstOrDefault();
-                //if (material != null)
-                //{
-                //    tenhh1 = material.tenhh;
-                //    mahh1 = material.mahh;
-                //}
+                var nhasx = record.nhasx;
+                var nhacc = "";
+                var material = _context.MaterialModel.Where(d => record.hh_id == "m-" + d.id).Include(d => d.nhacungcap).FirstOrDefault();
+                if (material != null)
+                {
+                    nhacc = material.nhacungcap != null ? material.nhacungcap.tenncc : "";
+                }
                 //}
                 var list_muahang_ncc_id = record.muahang_chitiet.Select(d => d.muahang.muahang_chonmua_id).ToList();
                 var list_muahang_chitiet_id = record.muahang_chitiet.Select(d => d.id).ToList();
@@ -704,6 +723,8 @@ namespace it_template.Areas.V1.Controllers
                     soluong_dutru = soluong_dutru,
                     soluong_mua = soluong_mua,
                     thanhtien = thanhtien,
+                    nhacc = nhacc,
+                    nhasx = nhasx,
                     mahh = mahh1,
                     tenhh = tenhh1,
                     grade = record.grade,
@@ -969,7 +990,7 @@ namespace it_template.Areas.V1.Controllers
         {
             string libreOfficePath = _configuration["LibreOffice:Path"];
             //// FIXME: file name escaping: I have not idea how to do it in .NET.
-            ProcessStartInfo procStartInfo = new ProcessStartInfo(libreOfficePath, string.Format("--convert-to pdf --nologo " + file + " --outdir " + outputDirectory));
+            ProcessStartInfo procStartInfo = new ProcessStartInfo(libreOfficePath, string.Format("--headless --convert-to pdf --nologo " + file + " --outdir " + outputDirectory));
             procStartInfo.RedirectStandardOutput = true;
             procStartInfo.UseShellExecute = false;
             procStartInfo.CreateNoWindow = true;

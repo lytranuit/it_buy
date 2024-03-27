@@ -30,7 +30,7 @@
                 </div>
             </div>
             <div class="field col">
-                <label for="name">Nhà cung cấp <span class="text-danger">*</span></label>
+                <label for="name">Nhà phân phối <span class="text-danger">*</span></label>
                 <div>
                     <NccTreeSelect v-model="model.mancc"></NccTreeSelect>
                 </div>

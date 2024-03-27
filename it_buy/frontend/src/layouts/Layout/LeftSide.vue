@@ -2,7 +2,7 @@
   <div class="left-sidenav">
     <ul class="metismenu left-sidenav-menu">
       <li>
-        <router-link class="nav-link" to="/">
+        <router-link class="nav-link" to="/admin" v-if="is_admin">
           <i class="fas fa-chart-bar"></i>
           <span>Tổng quan</span>
         </router-link>
@@ -10,8 +10,29 @@
       <li>
         <router-link class="nav-link" to="/dutru">
           <i class="ti-briefcase"></i>
-          <span>Dự trù</span>
+          <span>Dự trù của tôi</span>
         </router-link>
+      </li>
+      <li v-if="is_CungungGiantiep || is_CungungNVL || is_CungungHCTT">
+        <a href="javascript: void(0);">
+          <i class="fas fa-shopping-bag"></i>
+          <span>Tổng hợp dự trù</span>
+          <span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span>
+        </a>
+        <ul class="nav-second-level" aria-expanded="false">
+          <li class="nav-item" v-if="is_CungungGiantiep">
+            <router-link class="nav-link" to="/dutru/giantiep"><i class="ti-control-record"></i>Mua hàng gián
+              tiếp</router-link>
+          </li>
+          <li class="nav-item" v-if="is_CungungHCTT">
+            <router-link class="nav-link" to="/dutru/hoachat"><i class="ti-control-record"></i>Hóa chất, thuốc thử
+              QC</router-link>
+          </li>
+          <li class="nav-item" v-if="is_CungungNVL">
+            <router-link class="nav-link" to="/dutru/nvl"><i class="ti-control-record"></i>Nguyên vật
+              liệu</router-link>
+          </li>
+        </ul>
       </li>
       <li v-if="is_CungungGiantiep || is_CungungNVL || is_CungungHCTT">
         <a href="javascript: void(0);">
@@ -34,6 +55,7 @@
           </li>
         </ul>
       </li>
+
       <li v-if="is_Cungung">
         <router-link class="nav-link" to="/muahang">
           <i class="fas fa-store"></i>
@@ -48,8 +70,10 @@
       </li>
       <li v-if="is_CungungNVL || is_Qa">
         <router-link class="nav-link" to="/danhgianhacungcap">
-          <i class="fas fa-truck-moving"></i>
-          <span>Đánh giá nhà cung cấp</span>
+          <!-- <i class="fas fa-truck-moving"></i> -->
+          <i class="fab fa-product-hunt"></i>
+
+          <span>Đánh giá nguyên liệu</span>
         </router-link>
       </li>
       <li v-if="is_admin">

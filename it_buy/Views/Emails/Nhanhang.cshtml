@@ -32,7 +32,7 @@
                                         <tr>
                                             <td style="padding:10px;">@item.stt</td>
                                             <td style="padding:10px;">@item.tenhh</td>
-                                            <td style="padding:10px;">@item.soluong.ToString("#,##0")</td>
+                                            <td style="padding:10px;">@item.soluong.ToString("#,##0.##")</td>
                                             <td style="padding:10px;">@item.dvt</td>
                                             <td style="padding:10px;">@item.note</td>
                                         </tr>
@@ -40,6 +40,8 @@
                                 </tbody>
                             </table>
                             <p>Ngày giao hàng dự kiến: <b>@Model.date.ToString("dd/MM/yyyy")</b></p>
+                            <p>Ghi chú thêm:</p>
+                            <p>@Model.note</p>
                             <p>Đường dẫn:</p>
                             <p style="text-align:center;">
                                 <a href="@Model.link" style="padding: 10px 30px;

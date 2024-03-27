@@ -29,6 +29,12 @@
             </UserDepartmentTreeSelect>
           </div>
         </div>
+        <div class="row">
+          <b class="col-12">Ghi chú:</b>
+          <div class="col-12 mt-2">
+            <textarea v-model="note" class="form-control form-control-sm" rows="10"></textarea>
+          </div>
+        </div>
         <template #footer>
           <Button label="Thông báo" icon="pi pi-check" class="p-button-text" @click="thongbao" size="small"></Button>
         </template>
@@ -54,6 +60,7 @@ const { model, QrNhanhang } = storeToRefs(store_muahang);
 const visibleDialog = ref();
 const minDate = ref(new Date());
 const listuser = ref([]);
+const note = ref();
 const toast = useToast();
 
 const changeNgaygiaohang = async () => {
@@ -65,13 +72,13 @@ const readonly = computed(() => {
   return false;
 });
 const openThongbao = async () => {
-
+  note.value = "";
   listuser.value = await muahangApi.getUserNhanhang(model.value.id);
   visibleDialog.value = true;
 }
 const thongbao = async () => {
   visibleDialog.value = false;
-  var res = await muahangApi.thongbao({ muahang_id: model.value.id, list_user: listuser.value });
+  var res = await muahangApi.thongbao({ muahang_id: model.value.id, list_user: listuser.value, note: note.value });
   if (res.success) {
     toast.add({
       severity: "success",

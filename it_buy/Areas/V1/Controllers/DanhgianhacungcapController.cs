@@ -230,7 +230,7 @@ namespace it_template.Areas.V1.Controllers
             int skip = start != null ? Convert.ToInt32(start) : 0;
             var customerData = _context.DanhgianhacungcapModel.Where(d => d.deleted_at == null);
 
-            customerData = customerData.Where(d => d.created_by == user_id);
+            //customerData = customerData.Where(d => d.created_by == user_id);
 
 
             int recordsTotal = customerData.Count();

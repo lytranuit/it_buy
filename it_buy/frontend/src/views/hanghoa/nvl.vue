@@ -8,9 +8,9 @@
         <Button label="Tạo đề nghị mua hàng" icon="pi pi-plus" class="p-button-success p-button-sm"
           :disabled="!selected || !selected.length" @click="taodenghimuahang()"></Button>
         <div class="d-inline-flex float-right">
-          <!-- <Button label="Chi tiết" class="p-button-primary p-button-sm" @click="chitiet()"
-            v-if="type == 'tonghop'"></Button>-->
-          <Button label="Đánh giá nhà cung cấp" icon="fas fa-truck-moving" class="p-button-warning p-button-sm"
+          <SelectButton v-model="filterTable" :options="['Đã xử lý', 'Chưa xử lý']" aria-labelledby="basic"
+            :pt="{ 'button': 'form-control-sm' }" @change="loadLazyData" />
+          <Button label="Đánh giá nguyên liệu" icon="fab fa-product-hunt" class="p-button-warning p-button-sm ml-2"
             @click="danhgianhacungcap()" :disabled="!selected || selected.length != 1"></Button>
         </div>
       </template>
@@ -150,6 +150,7 @@ import dutruApi from "../../api/dutruApi";
 import Badge from "primevue/badge";
 import Dialog from "primevue/dialog";
 import Button from "primevue/button";
+import SelectButton from "primevue/selectbutton";
 import DataTable from "primevue/datatable";
 import { FilterMatchMode } from "primevue/api";
 import Column from "primevue/column"; ////Datatable
@@ -164,6 +165,7 @@ import muahangApi from "../../api/muahangApi";
 import { useToast } from "primevue/usetoast";
 import PopupAdd from "../../components/danhgianhacungcap/PopupAdd.vue";
 import { useDanhgianhacungcap } from "../../stores/danhgianhacungcap";
+const filterTable = ref();
 const type_id = ref(1);
 const toast = useToast();
 const store_muahang = useMuahang();
@@ -197,38 +199,52 @@ const columns = ref([
 
   {
     id: 4,
+    label: "Nhà sản xuất",
+    data: "nhasx",
+    className: "text-center",
+  },
+
+  {
+    id: 5,
+    label: "Nhà phân phối",
+    data: "nhacc",
+    className: "text-center",
+  },
+
+  {
+    id: 6,
     label: "Mã dự trù",
     data: "list_dutru",
     className: "text-center",
     filter: true,
   },
   {
-    id: 5,
+    id: 7,
     label: "Hạn giao hàng",
     data: "ngayhethan",
     className: "text-center",
   },
 
   {
-    id: 6,
+    id: 8,
     label: "Đề nghị mua hàng",
     data: "list_muahang",
     className: "text-center",
   },
   {
-    id: 7,
+    id: 9,
     label: "Số lượng mua",
     data: "soluong_mua",
     className: "text-center",
   },
   {
-    id: 8,
+    id: 10,
     label: "Còn lại",
     data: "soluong",
     className: "text-center",
   },
   {
-    id: 9,
+    id: 11,
     label: "Thành tiền",
     data: "thanhtien",
     className: "text-center",
@@ -260,7 +276,8 @@ const lazyParams = computed(() => {
     start: first.value,
     length: rows.value,
     filters: data_filters,
-    type_id: type_id.value
+    type_id: type_id.value,
+    filterTable: filterTable.value
   };
 });
 const dt = ref(null);

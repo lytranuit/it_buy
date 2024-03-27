@@ -151,7 +151,6 @@ const dt = ref(null);
 
 ////Form
 const store_supplier = useSupplier();
-const old_key = ref();
 const { model, headerForm, visibleDialog } = storeToRefs(store_supplier);
 ///Control
 const productDialog = ref();

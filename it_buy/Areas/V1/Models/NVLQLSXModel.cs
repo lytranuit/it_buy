@@ -21,5 +21,6 @@ namespace Vue.Models
         public string? mancc { get; set; }
         public string? mansx { get; set; }
         public string? masothietke { get; set; }
+        public string? manhom { get; set; }
     }
 }
