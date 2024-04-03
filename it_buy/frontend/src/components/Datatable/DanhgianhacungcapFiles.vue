@@ -34,8 +34,17 @@
                     <template v-else-if="col.data == 'created_at'">
                         {{ formatDate(slotProps.data[col.data]) }}
                     </template>
+                    <template v-else-if="col.data == 'created_by'">
+                        <div v-if="slotProps.data.list_file[0]?.user_created_by" class="d-flex">
+                            <Avatar :image="slotProps.data.list_file[0]?.user_created_by?.image_url"
+                                :title="slotProps.data.list_file[0]?.user_created_by?.fullName" size="small"
+                                shape="circle" /> <span class="align-self-center ml-2">{{
+            slotProps.data.list_file[0]?.user_created_by?.fullName }}</span>
+                        </div>
+                    </template>
+
                     <template
-                        v-else-if="col.data == 'action' && slotProps.data['is_user_upload'] == true && !model.is_chapnhan">
+                        v-else-if="col.data == 'action' && slotProps.data['is_user_upload'] == true && slotProps.data.list_file[0]?.user_created_by?.id == user.id && !model.is_chapnhan">
                         <a class="p-link text-danger font-16" @click="confirmDeleteDinhkem(slotProps.data)"><i
                                 class="pi pi-trash"></i></a>
                     </template>
@@ -78,6 +87,7 @@ import { onMounted, ref, watch, computed } from 'vue';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Button from 'primevue/button';
+import Avatar from 'primevue/avatar';
 import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
 import { storeToRefs } from 'pinia'
@@ -88,11 +98,14 @@ import { useRoute } from 'vue-router';
 import { formatDate, download } from '../../utilities/util';
 import { useConfirm } from 'primevue/useconfirm';
 import { useToast } from 'primevue/usetoast';
+import { useAuth } from '../../stores/auth';
 
 
 const toast = useToast();
 const confirm = useConfirm();
 const store_danhgianhacungcap = useDanhgianhacungcap();
+const store_auth = useAuth();
+const { user } = storeToRefs(store_auth);
 const submitted = ref(false);
 const modelfile = ref({});
 const visibleDialog = ref();
@@ -114,6 +127,10 @@ const columns = ref([
     {
         label: "Ngày tạo",
         "data": "created_at",
+        "className": "text-center"
+    }, {
+        label: "Người tạo",
+        "data": "created_by",
         "className": "text-center"
     },
     {

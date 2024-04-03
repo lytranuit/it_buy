@@ -55,6 +55,7 @@ import Dialog from 'primevue/dialog';
 import UserDepartmentTreeSelect from '../TreeSelect/UserDepartmentTreeSelect.vue';
 import FormMuahangNhanhangVue from "../Datatable/FormMuahangNhanhang.vue";
 import { useToast } from "primevue/usetoast";
+import { useRoute } from "vue-router";
 const store_muahang = useMuahang();
 const { model, QrNhanhang } = storeToRefs(store_muahang);
 const visibleDialog = ref();
@@ -62,6 +63,7 @@ const minDate = ref(new Date());
 const listuser = ref([]);
 const note = ref();
 const toast = useToast();
+const route = useRoute();
 
 const changeNgaygiaohang = async () => {
   await muahangApi.save(model.value);

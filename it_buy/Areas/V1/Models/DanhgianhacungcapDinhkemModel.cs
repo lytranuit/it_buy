@@ -17,6 +17,9 @@ namespace Vue.Models
         public string? mimeType { get; set; }
 
         public string? created_by { get; set; }
+
+        [ForeignKey("created_by")]
+        public UserModel? user_created_by { get; set; }
         public string note { get; set; }
         [ForeignKey("danhgianhacungcap_id")]
         public DanhgianhacungcapModel? danhgianhacungcap { get; set; }

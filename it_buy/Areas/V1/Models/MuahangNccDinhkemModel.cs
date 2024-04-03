@@ -18,6 +18,8 @@ namespace Vue.Models
 
         public string? created_by { get; set; }
 
+        [ForeignKey("created_by")]
+        public UserModel? user_created_by { get; set; }
         [ForeignKey("muahang_ncc_id")]
         public MuahangNccModel? muahang_ncc { get; set; }
 

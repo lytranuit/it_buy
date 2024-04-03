@@ -38,6 +38,7 @@ const printTrigger = (link) => {
   getMyFrame.contentWindow.print();
 };
 const download = (name) => {
+  if (!name) return name;
   if (
     name.toLowerCase().indexOf(".pdf") != -1 ||
     name.toLowerCase().indexOf(".png") != -1 ||

@@ -50,7 +50,7 @@ namespace it_template.Areas.V1.Controllers
         {
             var data = new List<RawFileDanhgianhacungcap>();
             ///File up
-            var files_up = _context.DanhgianhacungcapDinhkemModel.Where(d => d.danhgianhacungcap_id == id && d.deleted_at == null).ToList();
+            var files_up = _context.DanhgianhacungcapDinhkemModel.Where(d => d.danhgianhacungcap_id == id && d.deleted_at == null).Include(d => d.user_created_by).ToList();
             if (files_up.Count > 0)
             {
                 data.AddRange(files_up.GroupBy(d => new { d.note, d.created_at }).Select(d => new RawFileDanhgianhacungcap

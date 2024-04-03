@@ -35,7 +35,7 @@ namespace it_template.Areas.V1.Controllers
         {
             var data = new List<RawFile>();
             ///Lấy dự trù
-            var dutru = _context.MuahangChitietModel.Where(d => d.muahang_id == id).Include(d => d.dutru_chitiet).ThenInclude(d => d.dutru).Select(d => d.dutru_chitiet.dutru).ToList();
+            var dutru = _context.MuahangChitietModel.Where(d => d.muahang_id == id).Include(d => d.dutru_chitiet).ThenInclude(d => d.dutru).ThenInclude(d => d.user_created_by).Select(d => d.dutru_chitiet.dutru).ToList();
             dutru = dutru.Distinct().ToList();
             foreach (var d in dutru)
             {
@@ -50,6 +50,7 @@ namespace it_template.Areas.V1.Controllers
                             name = d.name,
                             ext = ".pdf",
                             url = d.pdf,
+                            user_created_by = d.user_created_by,
                         }
                     },
                     is_user_upload = false,
@@ -59,7 +60,7 @@ namespace it_template.Areas.V1.Controllers
             }
 
             ///Lấy báo giá
-            var baogia = _context.MuahangNccModel.Where(d => d.muahang_id == id).Include(d => d.dinhkem).Include(d => d.ncc).ToList();
+            var baogia = _context.MuahangNccModel.Where(d => d.muahang_id == id).Include(d => d.dinhkem).ThenInclude(d => d.user_created_by).Include(d => d.ncc).ToList();
             foreach (var d in baogia)
             {
                 var list_file = new List<MuahangDinhkemModel>();
@@ -72,6 +73,7 @@ namespace it_template.Areas.V1.Controllers
                         name = item.name,
                         ext = item.ext,
                         url = item.url,
+                        user_created_by = item.user_created_by
                     });
                 }
                 if (created_at != null)
@@ -88,7 +90,7 @@ namespace it_template.Areas.V1.Controllers
                 }
             }
             ///Lấy đề nghị mua hàng
-            var muahang = _context.MuahangModel.Where(d => d.id == id).FirstOrDefault();
+            var muahang = _context.MuahangModel.Where(d => d.id == id).Include(d => d.user_created_by).FirstOrDefault();
             data.Add(new RawFile()
             {
                 note = "Đề nghị mua hàng mã số " + muahang.code,
@@ -100,6 +102,7 @@ namespace it_template.Areas.V1.Controllers
                             name = muahang.name,
                             ext = ".pdf",
                             url = muahang.pdf,
+                            user_created_by = muahang.user_created_by
                         }
                     },
                 is_user_upload = false,
@@ -117,13 +120,14 @@ namespace it_template.Areas.V1.Controllers
                         name = d.name,
                         ext = d.ext,
                         url = d.url,
+                        user_created_by = d.user_created_by
                     }).ToList(),
                     is_user_upload = false,
                     created_at = uynhiemchi.FirstOrDefault().created_at
                 });
             }
             ///File up
-            var files_up = _context.MuahangDinhkemModel.Where(d => d.muahang_id == id && d.deleted_at == null).ToList();
+            var files_up = _context.MuahangDinhkemModel.Where(d => d.muahang_id == id && d.deleted_at == null).Include(d => d.user_created_by).ToList();
             if (files_up.Count > 0)
             {
                 data.AddRange(files_up.GroupBy(d => new { d.note, d.created_at }).Select(d => new RawFile

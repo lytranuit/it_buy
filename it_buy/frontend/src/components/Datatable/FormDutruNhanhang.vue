@@ -28,22 +28,22 @@
 
                     <template v-else-if="col.data == 'date_nhanhang'">
                         <Calendar v-model="slotProps.data[col.data]" dateFormat="yy-mm-dd" class="date-custom"
-                            :manualInput="false" showIcon :minDate="minDate" :readonly="model.date_finish" />
+                            :manualInput="false" showIcon :minDate="minDate" :readonly="is_readonly" />
                     </template>
 
                     <template v-else-if="col.data == 'soluong_nhanhang'">
-                        <InputNumber v-model="slotProps.data[col.data]" class="p-inputtext-sm"
-                            :readonly="model.date_finish" :maxFractionDigits="2" />
+                        <InputNumber v-model="slotProps.data[col.data]" class="p-inputtext-sm" :readonly="is_readonly"
+                            :maxFractionDigits="2" />
                     </template>
 
                     <template v-else-if="col.data == 'note_nhanhang'">
                         <textarea v-model="slotProps.data[col.data]" class="form-control form-control-sm"
-                            :readonly="model.date_finish"></textarea>
+                            :readonly="is_readonly"></textarea>
                     </template>
 
                     <template v-else-if="col.data == 'status_nhanhang'">
                         <select class="form-control form-control-sm" v-model="slotProps.data[col.data]"
-                            :readonly="model.date_finish" @change="changeNhanhang(slotProps.data)">
+                            :readonly="is_readonly" @change="changeNhanhang(slotProps.data)">
                             <option value="0">Chưa nhận hàng</option>
                             <option value="1">Đã nhận hàng</option>
                             <option value="2">Khiếu nại</option>
@@ -138,10 +138,12 @@ const columns = ref([
     }
 ])
 
-const selectedColumns = computed(() => {
-    return columns.value.filter(col => col.hide != true);
+const is_readonly = computed(() => {
+    if (model.value.date_finish) {
+        return true;
+    }
+    return false;
 });
-
 const changeNhanhang = (row) => {
     if (row.status_nhanhang == 1) {
         row.user_nhanhang_id = user.value.id;
