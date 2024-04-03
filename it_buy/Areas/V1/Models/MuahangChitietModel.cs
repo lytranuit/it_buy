@@ -13,6 +13,7 @@ namespace Vue.Models
         public int muahang_id { get; set; }
         public string? hh_id { get; set; }
         public decimal? soluong { get; set; }
+        public decimal? quidoi { get; set; }
         public decimal? soluong_nhanhang { get; set; }
         public int? status_id { get; set; }
         public string? note { get; set; }
@@ -36,6 +37,7 @@ namespace Vue.Models
         public string? tenhh { get; set; }
         //[NotMapped]
         public string? dvt { get; set; }
+        public string? dvt_dutru { get; set; }
         [NotMapped]
 
         public int? stt { get; set; }

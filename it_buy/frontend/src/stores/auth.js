@@ -32,7 +32,7 @@ export const useAuth = defineStore("auth", () => {
     return in_groups(["Manager Task"]);
   });
   const is_Cungung = computed(() => {
-    return in_departments([14, 29]);
+    return in_departments([14, 29, 30]);
   });
   const is_CungungGiantiep = computed(() => {
     return in_departments([14]);

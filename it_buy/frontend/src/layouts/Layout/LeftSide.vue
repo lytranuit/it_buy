@@ -57,10 +57,25 @@
       </li>
 
       <li v-if="is_Cungung">
-        <router-link class="nav-link" to="/muahang">
+        <a href="javascript: void(0);">
           <i class="fas fa-store"></i>
           <span>Đề nghị mua hàng</span>
-        </router-link>
+          <span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span>
+        </a>
+        <ul class="nav-second-level" aria-expanded="false">
+          <li class="nav-item" v-if="is_CungungGiantiep">
+            <router-link class="nav-link" to="/muahang/giantiep"><i class="ti-control-record"></i>Mua hàng gián
+              tiếp</router-link>
+          </li>
+          <li class="nav-item" v-if="is_CungungHCTT">
+            <router-link class="nav-link" to="/muahang/hoachat"><i class="ti-control-record"></i>Hóa chất, thuốc thử
+              QC</router-link>
+          </li>
+          <li class="nav-item" v-if="is_CungungNVL">
+            <router-link class="nav-link" to="/muahang/nvl"><i class="ti-control-record"></i>Nguyên vật
+              liệu</router-link>
+          </li>
+        </ul>
       </li>
       <li v-if="is_Ketoan">
         <router-link class="nav-link" to="/muahang/thanhtoan">
@@ -68,7 +83,7 @@
           <span>Đề nghị thanh toán</span>
         </router-link>
       </li>
-      <li v-if="is_CungungNVL || is_Qa">
+      <li>
         <router-link class="nav-link" to="/danhgianhacungcap">
           <!-- <i class="fas fa-truck-moving"></i> -->
           <i class="fab fa-product-hunt"></i>

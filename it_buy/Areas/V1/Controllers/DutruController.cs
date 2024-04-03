@@ -211,7 +211,7 @@ namespace it_template.Areas.V1.Controllers
             {
                 var soluong_dutru = item.soluong;
                 var muahang_chitiet = _context.MuahangChitietModel.Where(d => d.dutru_chitiet_id == item.id && d.status_nhanhang == 1).ToList();
-                var soluong_mua = muahang_chitiet.Sum(d => d.soluong);
+                var soluong_mua = muahang_chitiet.Sum(d => d.soluong * d.quidoi);
                 if (soluong_dutru == soluong_mua)
                 {
                     soluong_ht++;
@@ -570,6 +570,7 @@ namespace it_template.Areas.V1.Controllers
             var length = Request.Form["length"].FirstOrDefault();
             int pageSize = length != null ? Convert.ToInt32(length) : 0;
             var name = Request.Form["filters[name]"].FirstOrDefault();
+            var code = Request.Form["filters[code]"].FirstOrDefault();
             var id_text = Request.Form["filters[id]"].FirstOrDefault();
             int id = id_text != null ? Convert.ToInt32(id_text) : 0;
             var type_id_string = Request.Form["type_id"].FirstOrDefault();
@@ -590,6 +591,10 @@ namespace it_template.Areas.V1.Controllers
 
 
             int recordsTotal = customerData.Count();
+            if (code != null && code != "")
+            {
+                customerData = customerData.Where(d => d.code.Contains(code));
+            }
             if (name != null && name != "")
             {
                 customerData = customerData.Where(d => d.name.Contains(name));
@@ -642,7 +647,11 @@ namespace it_template.Areas.V1.Controllers
             var mahh = Request.Form["filters[mahh]"].FirstOrDefault();
             var tenhh = Request.Form["filters[tenhh]"].FirstOrDefault();
             var list_dutru = Request.Form["filters[list_dutru]"].FirstOrDefault();
+            var orderById = Request.Form["orderBy[id]"].FirstOrDefault();
+
             var filterTable = Request.Form["filterTable"].FirstOrDefault();
+            var dutru_id_string = Request.Form["dutru_id"].FirstOrDefault();
+            int dutru_id = dutru_id_string != null ? Convert.ToInt32(dutru_id_string) : 0;
 
             var departments = _context.UserDepartmentModel.Where(d => d.user_id == user_id).Select(d => d.department_id).ToList();
             var is_CungungNVL = departments.Contains(29) == true;
@@ -672,6 +681,10 @@ namespace it_template.Areas.V1.Controllers
             {
                 customerData = customerData.Where(d => d.dutru.type_id == type_id);
             }
+            if (dutru_id != null && dutru_id != 0)
+            {
+                customerData = customerData.Where(d => d.dutru_id == dutru_id);
+            }
 
             int recordsTotal = customerData.Count();
             if (mahh != null && mahh != "")
@@ -686,11 +699,21 @@ namespace it_template.Areas.V1.Controllers
             }
             if (list_dutru != null && list_dutru != "")
             {
-                var listdutru = _context.DutruModel.Where(d => d.code.Contains(list_dutru)).Select(d => d.id).ToList();
+                var list_dt = list_dutru.Split(",").ToList();
+                var listdutru = _context.DutruModel.Where(d => list_dt.Contains(d.code)).Select(d => d.id).ToList();
                 customerData = customerData.Where(d => listdutru.Contains(d.dutru_id));
             }
             int recordsFiltered = customerData.Count();
-            var datapost = customerData.OrderByDescending(d => d.id).Skip(skip).Take(pageSize).ToList();
+
+            if (orderById != null && orderById == "Asc")
+            {
+                customerData = customerData.OrderBy(d => d.id);
+            }
+            else
+            {
+                customerData = customerData.OrderByDescending(d => d.id);
+            }
+            var datapost = customerData.Skip(skip).Take(pageSize).ToList();
             var data = new ArrayList();
             foreach (var record in datapost)
             {
@@ -710,10 +733,10 @@ namespace it_template.Areas.V1.Controllers
                 var list_muahang_ncc_id = record.muahang_chitiet.Select(d => d.muahang.muahang_chonmua_id).ToList();
                 var list_muahang_chitiet_id = record.muahang_chitiet.Select(d => d.id).ToList();
 
-                var thanhtien = _context.MuahangNccChitietModel.Where(d => list_muahang_ncc_id.Contains(d.muahang_ncc_id) && list_muahang_chitiet_id.Contains(d.muahang_chitiet_id)).Sum(d => d.thanhtien);
+                var thanhtien = _context.MuahangNccChitietModel.Where(d => list_muahang_ncc_id.Contains(d.muahang_ncc_id) && list_muahang_chitiet_id.Contains(d.muahang_chitiet_id)).Include(d => d.muahang_ncc).Sum(d => d.thanhtien + (d.thanhtien * d.muahang_ncc.vat / 100));
                 var muahang_chitiet = record.muahang_chitiet.Where(d => d.muahang.status_id != 11).ToList();
                 var soluong_dutru = record.soluong;
-                var soluong_mua = muahang_chitiet.Sum(d => d.soluong);
+                var soluong_mua = muahang_chitiet.Sum(d => d.soluong * d.quidoi);
 
                 var soluong = soluong_mua < soluong_dutru ? soluong_dutru - soluong_mua : 0;
                 data.Add(new

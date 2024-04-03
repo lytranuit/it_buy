@@ -100,7 +100,7 @@
     </table>
     <div class="col-md-12">
       <div class="form-group row">
-        <b class="col-12 col-lg-12 col-form-label">Lý do chọn mua:</b>
+        <b class="col-12 col-lg-12 col-form-label">Lưu ý / Lý do chọn mua:</b>
         <div class="col-12 col-lg-12 pt-1">
           <textarea class="form-control" v-model="model.note_chonmua" :readonly="readonly"></textarea>
         </div>

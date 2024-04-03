@@ -56,8 +56,8 @@ export const useGeneral = defineStore("general", () => {
       delete row.nhasx;
     }
   };
-  async function fetchNhacc() {
-    if (supliers.value.length) return;
+  async function fetchNhacc(cache = true) {
+    if (cache == true && supliers.value.length) return supliers.value;
     return Api.nhacc().then((response) => {
       supliers.value = response;
       return response;

@@ -1,5 +1,9 @@
 <template>
   <div class="row clearfix">
+    <div class="col-12 mb-3">
+      <Breadcrumb :home="{ icon: 'pi pi-home' }" :model="[{ label: 'Dự trù' }, { label: 'Mua hàng gián tiếp' },]">
+      </Breadcrumb>
+    </div>
     <div class="col-12">
       <section class="card card-fluid">
         <div class="card-body" style="overflow: auto; position: relative">
@@ -29,7 +33,14 @@
                 </template>
 
                 <template v-else-if="col.data == 'name'">
-                  {{ slotProps.data[col.data] }}
+                  <div>
+                    <div style="text-wrap: pretty;">
+                      <RouterLink :to="'/dutru/edit/' + slotProps.data.id" class="text-blue">{{ slotProps.data.name }}
+                      </RouterLink>
+                    </div>
+                    <small>Tạo bởi <i>{{ slotProps.data.user_created_by?.fullName }}</i> lúc {{
+        formatDate(slotProps.data.created_at, "YYYY-MM-DD HH:mm") }}</small>
+                  </div>
                 </template>
 
                 <template v-else-if="col.data == 'status_id'">
@@ -46,14 +57,6 @@
                       v-else-if="slotProps.data[col.data] == 4"></Button>
                     <Button label="Không duyệt" class="p-button-danger" size="small"
                       v-else-if="slotProps.data[col.data] == 5"></Button>
-                  </div>
-                </template>
-                <template v-else-if="col.data == 'created_by'">
-                  <div v-if="slotProps.data['user_created_by']" class="d-flex">
-                    <Avatar :image="slotProps.data.user_created_by.image_url"
-                      :title="slotProps.data.user_created_by.fullName" size="small" shape="circle" /> <span
-                      class="align-self-center ml-2">{{
-            slotProps.data.user_created_by.fullName }}</span>
                   </div>
                 </template>
 
@@ -76,8 +79,7 @@
 <script setup>
 import { onMounted, ref, computed, watch } from "vue";
 import dutruApi from "../../api/dutruApi";
-import PopupDutru from "../../components/dutru/PopupDutru.vue";
-import Avatar from "primevue/avatar";
+import Breadcrumb from 'primevue/breadcrumb';
 import Button from "primevue/button";
 import DataTable from "primevue/datatable";
 import { FilterMatchMode } from "primevue/api";
@@ -85,6 +87,7 @@ import Column from "primevue/column"; ////Datatable
 import InputText from "primevue/inputtext";
 import { useConfirm } from "primevue/useconfirm";
 import Loading from "../../components/Loading.vue";
+import { formatDate } from "../../utilities/util";
 const type_id = ref(2);
 const confirm = useConfirm();
 const datatable = ref();
@@ -116,14 +119,6 @@ const columns = ref([
     label: "Trạng thái",
     data: "status_id",
     className: "text-center",
-    filter: false,
-  },
-  {
-    id: 4,
-    label: "Người thực hiện",
-    data: "created_by",
-    className: "text-center",
-    filter: false,
   },
 ]);
 const filters = ref({

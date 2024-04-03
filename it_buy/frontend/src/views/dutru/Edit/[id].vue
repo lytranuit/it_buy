@@ -73,6 +73,9 @@
                           <div class="col-12 col-lg-12 pt-1">
                             <FormDutruChitiet></FormDutruChitiet>
                           </div>
+                          <div class="col-12 col-lg-12 pt-4" v-if="is_Cungung">
+                            <FormDutruChitiet2></FormDutruChitiet2>
+                          </div>
                         </div>
                       </div>
                       <div class="col-md-12 text-center" v-if="model.status_id == 1">
@@ -240,7 +243,10 @@ import FormDutruNhanhang from "../../../components/Datatable/FormDutruNhanhang.v
 import { formatDate } from "../../../utilities/util";
 import Comment from "../../../components/dutru/Comment.vue";
 import DutruFiles from "../../../components/Datatable/DutruFiles.vue";
+import FormDutruChitiet2 from "../../../components/Datatable/FormDutruChitiet2.vue";
 
+const store_auth = useAuth();
+const { is_Cungung } = storeToRefs(store_auth);
 const items = ref([
   {
     label: "Đề nghị mua hàng",

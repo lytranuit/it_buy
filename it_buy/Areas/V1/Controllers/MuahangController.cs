@@ -504,7 +504,7 @@ namespace it_template.Areas.V1.Controllers
                     {
                         var soluong_dutru = item.soluong;
                         var muahang_chitiet = _context.MuahangChitietModel.Where(d => d.dutru_chitiet_id == item.id && d.status_nhanhang == 1).ToList();
-                        var soluong_mua = muahang_chitiet.Sum(d => d.soluong);
+                        var soluong_mua = muahang_chitiet.Sum(d => d.soluong * d.quidoi);
                         if (soluong_dutru == soluong_mua)
                         {
                             soluong_ht++;
@@ -803,13 +803,18 @@ namespace it_template.Areas.V1.Controllers
         [HttpPost]
         public async Task<JsonResult> Table()
         {
+            System.Security.Claims.ClaimsPrincipal currentUser = this.User;
+            var user_id = UserManager.GetUserId(currentUser);
             var draw = Request.Form["draw"].FirstOrDefault();
             var start = Request.Form["start"].FirstOrDefault();
             var length = Request.Form["length"].FirstOrDefault();
             int pageSize = length != null ? Convert.ToInt32(length) : 0;
+            var code = Request.Form["filters[code]"].FirstOrDefault();
             var name = Request.Form["filters[name]"].FirstOrDefault();
             var id_text = Request.Form["filters[id]"].FirstOrDefault();
             int id = id_text != null ? Convert.ToInt32(id_text) : 0;
+            var type_id_string = Request.Form["type_id"].FirstOrDefault();
+            int type_id = type_id_string != null ? Convert.ToInt32(type_id_string) : 0;
             var type = Request.Form["type"].FirstOrDefault();
             //var tenhh = Request.Form["filters[tenhh]"].FirstOrDefault();
             int skip = start != null ? Convert.ToInt32(start) : 0;
@@ -817,10 +822,21 @@ namespace it_template.Areas.V1.Controllers
             if (type == "thanhtoan")
             {
                 customerData = customerData.Where(d => d.is_dathang == true && (d.loaithanhtoan == "tra_truoc" || (d.loaithanhtoan == "tra_sau" && d.is_nhanhang == true)));
-
+            }
+            if (type_id != null && type_id != 0)
+            {
+                customerData = customerData.Where(d => d.type_id == type_id);
+            }
+            else
+            {
+                customerData = customerData.Where(d => d.created_by == user_id);
             }
             int recordsTotal = customerData.Count();
 
+            if (code != null && code != "")
+            {
+                customerData = customerData.Where(d => d.code.Contains(code));
+            }
             if (name != null && name != "")
             {
                 customerData = customerData.Where(d => d.name.Contains(name));
@@ -853,7 +869,8 @@ namespace it_template.Areas.V1.Controllers
                     user_created_by = record.user_created_by,
                     is_dathang = record.is_dathang,
                     date_finish = record.date_finish,
-                    tonggiatri = tonggiatri
+                    tonggiatri = tonggiatri,
+                    created_at = record.created_at
                 };
                 data.Add(data1);
             }
@@ -864,6 +881,8 @@ namespace it_template.Areas.V1.Controllers
         [HttpPost]
         public async Task<JsonResult> xuatpdf(int id)
         {
+            System.Security.Claims.ClaimsPrincipal currentUser = this.User;
+            var user_id = UserManager.GetUserId(currentUser);
             var now = DateTime.Now;
             var raw = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
             {
@@ -871,7 +890,12 @@ namespace it_template.Areas.V1.Controllers
                 {"thang",now.ToString("MM") },
                 {"nam",now.ToString("yyyy") },
             };
-
+            var bophan = "P. HR&GA";
+            if (user_id == "28dc61a5-001d-4c1f-9325-9b9318dc3c59")
+            {
+                bophan = "Cung ứng";
+            }
+            raw.Add("bophan", bophan);
             var RawDetails = new List<RawMuahangDetails>();
             var data = _context.MuahangModel.Where(d => d.id == id)
                 .Include(d => d.nccs).ThenInclude(d => d.ncc).FirstOrDefault();
@@ -884,6 +908,10 @@ namespace it_template.Areas.V1.Controllers
                 {
                     var ncc_chon = muahang_chonmua;
                     raw.Add("tonggiatri", ncc_chon.tonggiatri.Value.ToString("#,##0.##"));
+                    raw.Add("thanhtien", ncc_chon.thanhtien.Value.ToString("#,##0.##"));
+                    raw.Add("phigiahang", ncc_chon.phigiaohang.Value.ToString("#,##0.##"));
+                    raw.Add("tienvat", ncc_chon.tienvat.Value.ToString("#,##0.##"));
+                    raw.Add("vat", ncc_chon.vat.Value.ToString());
                     var stt = 1;
                     foreach (var item in ncc_chon.chitiet)
                     {
@@ -950,7 +978,14 @@ namespace it_template.Areas.V1.Controllers
             //Creates Document instance
             Spire.Doc.Document document = new Spire.Doc.Document();
             //Loads the word document
-            document.LoadFromFile(_configuration["Source:Path_Private"] + "/buy/templates/denghimuahang.docx", Spire.Doc.FileFormat.Docx);
+            if (data.type_id == 1)
+            {
+                document.LoadFromFile(_configuration["Source:Path_Private"] + "/buy/templates/denghimuahangnvl.docx", Spire.Doc.FileFormat.Docx);
+            }
+            else
+            {
+                document.LoadFromFile(_configuration["Source:Path_Private"] + "/buy/templates/denghimuahang.docx", Spire.Doc.FileFormat.Docx);
+            }
 
 
 
@@ -993,8 +1028,6 @@ namespace it_template.Areas.V1.Controllers
 
 
             ///UPLOAD ESIGN
-            System.Security.Claims.ClaimsPrincipal currentUser = this.User;
-            var user_id = UserManager.GetUserId(currentUser);
             var user = await UserManager.GetUserAsync(currentUser);
             ///Document
             var DocumentModel = new DocumentModel()

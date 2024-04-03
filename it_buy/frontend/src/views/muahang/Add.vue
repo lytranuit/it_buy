@@ -67,7 +67,7 @@ const messageError = ref();
 const store = useAuth();
 const { model, datatable, list_add } = storeToRefs(storeMuahang);
 onMounted(() => {
-  console.log(datatable.value)
+  // console.log(datatable.value)
   model.value = {};
   if (!datatable.value.length) {
     router.push("/muahang");
@@ -97,6 +97,7 @@ const submit = () => {
     alert("Chưa nhập nguyên liệu!");
     return false;
   }
+  model.value.type_id = list_add.value[0].type_id;
   model.value.list_add = list_add.value;
   // console.log(model.value);
 

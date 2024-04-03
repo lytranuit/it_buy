@@ -1,5 +1,9 @@
 <template>
   <div class="row clearfix">
+    <div class="col-12 mb-3">
+      <Breadcrumb :home="{ icon: 'pi pi-home' }" :model="[{ label: 'Dự trù' }, { label: 'Dự trù của tôi' },]">
+      </Breadcrumb>
+    </div>
     <div class="col-12">
       <h5 class="card-header drag-handle">
         <PopupDutru></PopupDutru>
@@ -30,9 +34,15 @@
                     {{ slotProps.data[col.data] }}
                   </RouterLink>
                 </template>
-
                 <template v-else-if="col.data == 'name'">
-                  {{ slotProps.data[col.data] }}
+                  <div>
+                    <div style="text-wrap: pretty;">
+                      <RouterLink :to="'/dutru/edit/' + slotProps.data.id" class="text-blue">{{ slotProps.data.name }}
+                      </RouterLink>
+                    </div>
+                    <small>Tạo bởi <i>{{ slotProps.data.user_created_by?.fullName }}</i> lúc {{
+        formatDate(slotProps.data.created_at, "YYYY-MM-DD HH:mm") }}</small>
+                  </div>
                 </template>
 
                 <template v-else-if="col.data == 'status_id'">
@@ -57,15 +67,6 @@
                     <span v-if="slotProps.data[col.data] == 1">Nguyên vật liệu</span>
                     <span v-else-if="slotProps.data[col.data] == 2">Mua hàng gián tiếp</span>
                     <span v-else-if="slotProps.data[col.data] == 3">Hóa chất, thuốc thử QC</span>
-                  </div>
-                </template>
-
-                <template v-else-if="col.data == 'created_by'">
-                  <div v-if="slotProps.data['user_created_by']" class="d-flex">
-                    <Avatar :image="slotProps.data.user_created_by.image_url"
-                      :title="slotProps.data.user_created_by.fullName" size="small" shape="circle" /> <span
-                      class="align-self-center ml-2">{{
-            slotProps.data.user_created_by.fullName }}</span>
                   </div>
                 </template>
 
@@ -96,7 +97,7 @@
 import { onMounted, ref, computed, watch } from "vue";
 import dutruApi from "../../api/dutruApi";
 import PopupDutru from "../../components/dutru/PopupDutru.vue";
-import Avatar from "primevue/avatar";
+import Breadcrumb from 'primevue/breadcrumb';
 import Button from "primevue/button";
 import DataTable from "primevue/datatable";
 import { FilterMatchMode } from "primevue/api";
@@ -104,6 +105,7 @@ import Column from "primevue/column"; ////Datatable
 import InputText from "primevue/inputtext";
 import { useConfirm } from "primevue/useconfirm";
 import Loading from "../../components/Loading.vue";
+import { formatDate } from "../../utilities/util";
 const confirm = useConfirm();
 const datatable = ref();
 const columns = ref([
@@ -143,14 +145,7 @@ const columns = ref([
     data: "type_id",
     className: "text-center",
     filter: false,
-  },
-  {
-    id: 5,
-    label: "Người thực hiện",
-    data: "created_by",
-    className: "text-center",
-    filter: false,
-  },
+  }
 ]);
 const filters = ref({
   id: { value: null, matchMode: FilterMatchMode.CONTAINS },

@@ -73,7 +73,7 @@
             </div>
           </div>
           <div class="row mt-5" v-if="!model.is_chapnhan">
-            <div class="col-12 text-center">
+            <div class="col-12 text-center" v-if="is_CungungNVL">
               <Button label="Thông báo" icon="far fa-paper-plane" size="small" class="mr-2"
                 @click="openThongbao"></Button>
               <Button label="Lưu lại" icon="pi pi-check" size="small" severity="success" @click="save"></Button>
@@ -143,7 +143,7 @@ import UserDepartmentTreeSelect from "../../../components/TreeSelect/UserDepartm
 
 const confirm = useConfirm();
 const store_auth = useAuth();
-const { is_LeadQa, user } = storeToRefs(store_auth);
+const { is_LeadQa, user, is_CungungNVL } = storeToRefs(store_auth);
 const toast = useToast();
 const minDate = new Date();
 const route = useRoute();

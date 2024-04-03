@@ -32,7 +32,14 @@
                 </template>
 
                 <template v-else-if="col.data == 'name'">
-                  {{ slotProps.data[col.data] }}
+                  <div>
+                    <div style="text-wrap: pretty;">
+                      <RouterLink :to="'/muahang/edit/' + slotProps.data.id" class="text-blue">{{ slotProps.data.name }}
+                      </RouterLink>
+                    </div>
+                    <small>Tạo bởi <i>{{ slotProps.data.user_created_by?.fullName }}</i> lúc {{
+            formatDate(slotProps.data.created_at, "YYYY-MM-DD HH:mm") }}</small>
+                  </div>
                 </template>
 
 
@@ -65,19 +72,8 @@
 
                   </div>
                 </template>
-
-                <template v-else-if="col.data == 'created_by'">
-                  <div v-if="slotProps.data['user_created_by']" class="d-flex">
-                    <Avatar :image="slotProps.data.user_created_by.image_url"
-                      :title="slotProps.data.user_created_by.fullName" size="small" shape="circle" /> <span
-                      class="align-self-center ml-2">{{
-            slotProps.data.user_created_by.fullName }}</span>
-                  </div>
-                </template>
-
                 <div v-else v-html="slotProps.data[col.data]"></div>
               </template>
-
               <template #filter="{ filterModel, filterCallback }" v-if="col.filter == true">
                 <InputText type="text" v-model="filterModel.value" @keydown.enter="filterCallback()"
                   class="p-column-filter" />
@@ -111,7 +107,7 @@ import InputText from "primevue/inputtext";
 import ConfirmDialog from "primevue/confirmdialog";
 import { useConfirm } from "primevue/useconfirm";
 import Loading from "../../components/Loading.vue";
-import { formatPrice } from "../../utilities/util";
+import { formatDate, formatPrice } from "../../utilities/util";
 const confirm = useConfirm();
 const datatable = ref();
 const columns = ref([
@@ -142,14 +138,6 @@ const columns = ref([
     label: "Trạng thái",
     data: "status_id",
     className: "text-center",
-    filter: true,
-  },
-  {
-    id: 4,
-    label: "Người thực hiện",
-    data: "created_by",
-    className: "text-center",
-    filter: true,
   },
   {
     id: 5,

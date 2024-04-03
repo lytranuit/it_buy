@@ -1,12 +1,14 @@
 <template>
   <div class="row clearfix">
+
+    <div class="col-12 mb-3">
+      <Breadcrumb :home="{ icon: 'pi pi-home' }" :model="[{ label: 'Đề nghị thanh toán' }]"></Breadcrumb>
+    </div>
     <div class="col-12">
-      <h5 class="card-header drag-handle">
-      </h5>
       <section class="card card-fluid">
         <div class="card-body" style="overflow: auto; position: relative">
           <DataTable class="p-datatable-customers" showGridlines :value="datatable" :lazy="true" ref="dt"
-            scrollHeight="70vh" :paginator="true" :rowsPerPageOptions="[10, 50, 100]" :rows="rows"
+            scrollHeight="70vh" :paginator="true" :rowsPerPageOptions="[10, 20, 50, 100]" :rows="rows"
             :totalRecords="totalRecords" @page="onPage($event)" :rowHover="true" :loading="loading"
             responsiveLayout="scroll" :resizableColumns="true" columnResizeMode="expand" v-model:filters="filters"
             filterDisplay="menu">
@@ -30,11 +32,16 @@
                     {{ slotProps.data[col.data] }}
                   </RouterLink>
                 </template>
-
                 <template v-else-if="col.data == 'name'">
-                  {{ slotProps.data[col.data] }}
+                  <div>
+                    <div style="text-wrap: pretty;">
+                      <RouterLink :to="'/muahang/edit/' + slotProps.data.id" class="text-blue">{{ slotProps.data.name }}
+                      </RouterLink>
+                    </div>
+                    <small>Tạo bởi <i>{{ slotProps.data.user_created_by?.fullName }}</i> lúc {{
+        formatDate(slotProps.data.created_at, "YYYY-MM-DD HH:mm") }}</small>
+                  </div>
                 </template>
-
                 <template v-else-if="col.data == 'tonggiatri'">
                   {{ formatPrice(slotProps.data[col.data], 0) }} VNĐ
                 </template>
@@ -64,16 +71,6 @@
 
                   </div>
                 </template>
-
-                <template v-else-if="col.data == 'created_by'">
-                  <div v-if="slotProps.data['user_created_by']" class="d-flex">
-                    <Avatar :image="slotProps.data.user_created_by.image_url"
-                      :title="slotProps.data.user_created_by.fullName" size="small" shape="circle" /> <span
-                      class="align-self-center ml-2">{{
-            slotProps.data.user_created_by.fullName }}</span>
-                  </div>
-                </template>
-
                 <div v-else v-html="slotProps.data[col.data]"></div>
               </template>
 
@@ -94,7 +91,7 @@
 <script setup>
 import { onMounted, ref, computed, watch } from "vue";
 import muahangApi from "../../api/muahangApi";
-import Avatar from "primevue/avatar";
+import Breadcrumb from 'primevue/breadcrumb';
 import Button from "primevue/button";
 import DataTable from "primevue/datatable";
 import { FilterMatchMode } from "primevue/api";
@@ -103,7 +100,7 @@ import InputText from "primevue/inputtext";
 import ConfirmDialog from "primevue/confirmdialog";
 import { useConfirm } from "primevue/useconfirm";
 import Loading from "../../components/Loading.vue";
-import { formatPrice } from "../../utilities/util";
+import { formatDate, formatPrice } from "../../utilities/util";
 const confirm = useConfirm();
 const datatable = ref();
 const columns = ref([
@@ -134,14 +131,6 @@ const columns = ref([
     label: "Trạng thái",
     data: "status_id",
     className: "text-center",
-    filter: true,
-  },
-  {
-    id: 4,
-    label: "Người thực hiện",
-    data: "created_by",
-    className: "text-center",
-    filter: true,
   },
   {
     id: 4,
@@ -160,7 +149,7 @@ const loading = ref(true);
 const showing = ref([]);
 const column_cache = "columns_thanhtoan"; ////
 const first = ref(0);
-const rows = ref(10);
+const rows = ref(20);
 const draw = ref(0);
 const selected = ref();
 const selectedColumns = computed(() => {

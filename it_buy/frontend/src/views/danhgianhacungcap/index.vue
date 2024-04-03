@@ -2,7 +2,8 @@
   <div class="row clearfix">
     <div class="col-12">
       <h5 class="card-header drag-handle">
-        <Button label="Tạo mới" icon="pi pi-plus" class="p-button-success p-button-sm mr-2" @click="openNew"></Button>
+        <Button label="Tạo mới" icon="pi pi-plus" class="p-button-success p-button-sm mr-2" @click="openNew"
+          v-if="is_CungungNVL"></Button>
 
       </h5>
       <section class="card card-fluid">
@@ -35,9 +36,9 @@
                 <template v-else-if="col.data == 'mancc'">
                   {{ slotProps.data.nhacungcap.mancc }} - {{ slotProps.data.nhacungcap.tenncc }}
                 </template>
-                
+
                 <template v-else-if="col.data == 'mansx'">
-                  {{ slotProps.data.nhasanxuat.mansx}} - {{ slotProps.data.nhasanxuat.tennsx }}
+                  {{ slotProps.data.nhasanxuat.mansx }} - {{ slotProps.data.nhasanxuat.tennsx }}
                 </template>
                 <template v-else-if="col.data == 'status_id'">
                   <div class="text-center">
@@ -54,7 +55,7 @@
                     <Avatar :image="slotProps.data.user_created_by.image_url"
                       :title="slotProps.data.user_created_by.fullName" size="small" shape="circle" /> <span
                       class="align-self-center ml-2">{{
-          slotProps.data.user_created_by.fullName }}</span>
+            slotProps.data.user_created_by.fullName }}</span>
                   </div>
                 </template>
 
@@ -69,8 +70,8 @@
             <Column style="width: 1rem">
 
               <template #body="slotProps">
-                <a class="p-link text-danger font-16" @click="confirmDelete(slotProps.data['id'])"><i
-                    class="pi pi-trash"></i></a>
+                <a class="p-link text-danger font-16" @click="confirmDelete(slotProps.data['id'])"
+                  v-if="slotProps.data['created_by'] == user.id"><i class="pi pi-trash"></i></a>
               </template>
             </Column>
           </DataTable>
@@ -96,8 +97,11 @@ import Loading from "../../components/Loading.vue";
 import PopupAdd from "../../components/danhgianhacungcap/PopupAdd.vue";
 import { useDanhgianhacungcap } from "../../stores/danhgianhacungcap";
 import { storeToRefs } from "pinia";
+import { useAuth } from "../../stores/auth";
 const store_danhgianhacungcap = useDanhgianhacungcap();
 const { waiting, model, headerForm, visibleDialog } = storeToRefs(store_danhgianhacungcap);
+const store = useAuth();
+const { is_CungungNVL, is_Qa, user } = storeToRefs(store);
 const confirm = useConfirm();
 const datatable = ref();
 const columns = ref([

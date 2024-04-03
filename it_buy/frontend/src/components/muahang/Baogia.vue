@@ -70,16 +70,62 @@
           <div class="col-md-12 mb-2">
             <FormMuahangChitietNcc :index="key"></FormMuahangChitietNcc>
           </div>
-          <div class="col-md-9">
 
-          </div>
-          <div class="col-md-3">
-            <div class="row">
-              <b class="col">Tổng giá trị:</b>
-              <span class="col text-right">{{ formatPrice(item.tonggiatri, 0) }} VND</span>
+          <div class="row col-12 mt-2">
+            <div class="col-md-8">
+
+            </div>
+
+            <div class="col-md-4">
+              <div class="row">
+                <b class="col">Thành tiền:</b>
+                <span class="col text-right">{{ formatPrice(item.thanhtien, 0) }} VND</span>
+              </div>
             </div>
           </div>
 
+          <div class="row col-12 mt-2">
+            <div class="col-md-8">
+
+            </div>
+
+            <div class="col-md-4">
+              <div class="row">
+                <b class="col">VAT <input type="number" v-model="item.vat" class="form-control form-control-sm"
+                    style="width: 60px;display: inline-block;" @change="changetien(key)" />%:
+                </b>
+                <span class="col text-right">{{ formatPrice(item.tienvat, 0) }} VND</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="row col-12 mt-2">
+            <div class="col-md-8">
+
+            </div>
+
+            <div class="col-md-4">
+              <div class="row">
+                <b class="col">Phí giao hàng:</b>
+                <span class="col text-right">
+                  <InputNumber v-model="item.phigiaohang" class="p-inputtext-sm" suffix=" VND"
+                    @update:modelValue="changetien(key)" :readonly="readonly" :maxFractionDigits="2" />
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="row col-12 mt-2">
+            <div class="col-md-8">
+
+            </div>
+
+            <div class="col-md-4">
+              <div class="row">
+                <b class="col">Tổng giá trị:</b>
+                <span class="col text-right">{{ formatPrice(item.tonggiatri, 0) }} VND</span>
+              </div>
+            </div>
+          </div>
           <div class="col-12" v-if="readonly == false">
             <b class="">Đính kèm:</b>
             <div class="custom-file mt-2">
@@ -120,6 +166,7 @@ import Divider from 'primevue/divider';
 import Button from 'primevue/button';
 import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
+import InputNumber from 'primevue/inputnumber';
 import { useToast } from "primevue/usetoast";
 import { useGeneral } from "../../stores/general";
 import PopupAdd from "../supplier/PopupAdd.vue";
@@ -128,6 +175,8 @@ import FormMuahangChitietNcc from '../Datatable/FormMuahangChitietNcc.vue';
 import { useSupplier } from "../../stores/supplier";
 import { rand } from "../../utilities/rand";
 import { formatPrice } from "../../utilities/util";
+import { useConfirm } from "primevue/useconfirm";
+const confirm = useConfirm();
 const toast = useToast();
 const store_muahang = useMuahang();
 const store_general = useGeneral();
@@ -151,7 +200,7 @@ const fileChange = (e) => {
   label.text(e.target.files.length + " Files");
 }
 const addNewNhacc = () => {
-
+  store_general.fetchNhacc(false);
 }
 const addNCC = () => {
   if (!nccmodel.value) {
@@ -178,16 +227,35 @@ const addNCC = () => {
   ncc.baohanh = "";
   ncc.thanhtoan = "";
   ncc.dapung = true;
+  ncc.vat = 0;
+  ncc.tienvat = 0;
+  ncc.phigiaohang = 0;
+  ncc.thanhtien = 0;
   ncc.tonggiatri = 0;
   ncc.chonmua = false;
   nccs.value.push(ncc);
   active.value = nccs.value.length - 1;
   nccmodel.value = null;
 }
+
+const changetien = (index) => {
+  var ncc = nccs.value[index];
+  var tienvat = ncc.thanhtien > 0 ? Math.round((ncc.thanhtien * ncc.vat) / 100) : 0;
+  ncc.tienvat = tienvat;
+  var tonggiatri = ncc.thanhtien + ncc.tienvat + ncc.phigiaohang;
+  ncc.tonggiatri = tonggiatri;
+}
 const removeNCC = (ncc) => {
   // console.log(ncc);
-  nccs.value = nccs.value.filter((item) => {
-    return ![ncc].includes(item)
+  confirm.require({
+    message: 'Bạn có chắc muốn xóa?',
+    header: 'Xác nhận',
+    icon: 'pi pi-exclamation-triangle',
+    accept: () => {
+      nccs.value = nccs.value.filter((item) => {
+        return ![ncc].includes(item)
+      });
+    }
   });
 }
 

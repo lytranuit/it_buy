@@ -23,7 +23,7 @@
                                 <template v-if="col.data == 'name'">
                                     <div style="font-size: 12px;">
                                         <div>
-                                            <RouterLink :to="'/dutru/edit/' + slotProps.data.id" class="text-blue">[{{
+                                            <RouterLink :to="'/muahang/edit/' + slotProps.data.id" class="text-blue">[{{
                         slotProps.data.code }}] {{ slotProps.data.name }}</RouterLink>
                                         </div>
                                         <div>Tạo bởi <i>{{ slotProps.data.user_created_by?.fullName }}</i> lúc {{

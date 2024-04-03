@@ -1,9 +1,14 @@
 <template>
   <div id="TableDutruChitiet">
-    <DataTable class="p-datatable-customers" showGridlines :value="datatable1" :lazy="true" ref="dt" scrollHeight="70vh"
-      v-model:selection="selected" :paginator="true" :rowsPerPageOptions="[10, 50, 100]" :rows="rows"
-      :totalRecords="totalRecords" @page="onPage($event)" :rowHover="true" :loading="loading" responsiveLayout="scroll"
-      :resizableColumns="true" columnResizeMode="expand" v-model:filters="filters" filterDisplay="menu">
+    <div class="mb-3">
+      <Breadcrumb :home="{ icon: 'pi pi-home' }" :model="[{ label: 'Hàng hóa' }, { label: 'Nguyên vật liệu' },]">
+      </Breadcrumb>
+    </div>
+    <DataTable size="small" class="p-datatable-customers" showGridlines :value="datatable1" :lazy="true" ref="dt"
+      scrollHeight="70vh" v-model:selection="selected" :paginator="true" :rowsPerPageOptions="[10, 20, 50, 100]"
+      :rows="rows" :totalRecords="totalRecords" @page="onPage($event)" :rowHover="true" :loading="loading"
+      responsiveLayout="scroll" :resizableColumns="true" columnResizeMode="expand" v-model:filters="filters"
+      filterDisplay="menu">
       <template #header>
         <Button label="Tạo đề nghị mua hàng" icon="pi pi-plus" class="p-button-success p-button-sm"
           :disabled="!selected || !selected.length" @click="taodenghimuahang()"></Button>
@@ -147,6 +152,7 @@
 <script setup>
 import { onMounted, ref, computed, watch } from "vue";
 import dutruApi from "../../api/dutruApi";
+import Breadcrumb from 'primevue/breadcrumb';
 import Badge from "primevue/badge";
 import Dialog from "primevue/dialog";
 import Button from "primevue/button";
@@ -245,7 +251,7 @@ const columns = ref([
   },
   {
     id: 11,
-    label: "Thành tiền",
+    label: "Tổng tiền",
     data: "thanhtien",
     className: "text-center",
   },
@@ -261,7 +267,7 @@ const loading = ref(true);
 const showing = ref([]);
 const column_cache = "columns_dutru_chitiet"; ////
 const first = ref(0);
-const rows = ref(10);
+const rows = ref(20);
 const draw = ref(0);
 const selectedColumns = computed(() => {
   return columns.value.filter((col) => showing.value.includes(col.id));
@@ -309,11 +315,15 @@ const taodenghimuahang = () => {
     }
   }
   datatable.value = selected.value.map((item, key) => {
+    item.type_id = item.list_dutru[0].type_id
+    item.dvt_dutru = item.dvt;
+    item.quidoi = 1;
+    item.soluong_dutru = item.soluong;
+    item.stt = key + 1;
+    item.ids = rand();
     delete item.list_dutru;
     delete item.list_muahang;
     delete item.id;
-    item.stt = key + 1;
-    item.ids = rand();
     return item;
   });
   router.push("/muahang/add?no_reset=1");

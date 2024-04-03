@@ -21,10 +21,14 @@
                 <template #body="slotProps">
 
                     <template v-if="col.data == 'soluong' && model.status_id == 1">
-                        <InputNumber v-model="slotProps.data[col.data]" class="p-inputtext-sm" :maxFractionDigits="2"/>
+                        <InputNumber v-model="slotProps.data[col.data]" class="p-inputtext-sm" :maxFractionDigits="2" />
                     </template>
                     <template v-else-if="col.data == 'note' && model.status_id == 1">
                         <textarea v-model="slotProps.data[col.data]" class="form-control" />
+                    </template>
+                    <template v-else-if="col.data == 'dvt' && model.status_id == 1">
+                        {{ slotProps.data["dvt"] }} <i class="fas fa-sync-alt" style="cursor: pointer;"
+                            @click="openOp($event, slotProps.data)"></i>
                     </template>
                     <template v-else-if="col.data == 'hh_id'">
                         {{ slotProps.data["mahh"] }}
@@ -35,6 +39,17 @@
                 </template>
             </Column>
         </DataTable>
+        <OverlayPanel ref="op">
+            <div>
+                Qui đổi từ 1
+                <input class="form-control form-control-sm d-inline-block" style="width: 60px"
+                    v-model="editingRow.dvt" />
+                = <input class="form-control form-control-sm d-inline-block" style="width: 60px"
+                    v-model="editingRow.quidoi" />
+                <b>{{ editingRow.dvt_dutru }}</b>
+
+            </div>
+        </OverlayPanel>
     </div>
 </template>
 <script setup>
@@ -46,6 +61,7 @@ import Column from 'primevue/column';
 import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
 import InputNumber from 'primevue/inputnumber';
+import OverlayPanel from 'primevue/overlaypanel';
 import { storeToRefs } from 'pinia'
 
 import { useConfirm } from "primevue/useconfirm";
@@ -56,11 +72,7 @@ import { useGeneral } from '../../stores/general';
 
 const store_muahang = useMuahang();
 const store_general = useGeneral();
-const { datatable, model, list_delete } = storeToRefs(store_muahang);
-const { materials } = storeToRefs(store_general);
-const changeMaterial = store_general.changeMaterial;
-const confirm = useConfirm();
-const solohandung = ref();
+const { datatable, model } = storeToRefs(store_muahang);
 const editingRow = ref();
 
 const loading = ref(false);
@@ -101,38 +113,10 @@ const columns = ref([
 const selectedColumns = computed(() => {
     return columns.value.filter(col => col.hide != true);
 });
-const addRow = () => {
-    let stt = 0;
-    if (datatable.value.length) {
-        stt = datatable.value[datatable.value.length - 1].stt;
-    }
-    stt++;
-    datatable.value.push({ ids: rand(), stt: stt })
-}
-const confirmDeleteSelected = () => {
-    confirm.require({
-        message: 'Bạn có chắc muốn xóa những dòng đã chọn?',
-        header: 'Xác nhận',
-        icon: 'pi pi-exclamation-triangle',
-        accept: () => {
-            datatable.value = datatable.value.filter((item) => {
-                return !selected.value.includes(item)
-            });
-
-            if (!list_delete.value) {
-                list_delete.value = [];
-            }
-            for (var item of selected.value) {
-                if (!item.ids) {
-                    list_delete.value.push(item);
-                }
-            }
-            selected.value = [];
-            // selected
-
-
-        }
-    });
+const op = ref();
+const openOp = (event, row) => {
+    editingRow.value = row;
+    op.value.toggle(event);
 }
 onMounted(() => {
 })

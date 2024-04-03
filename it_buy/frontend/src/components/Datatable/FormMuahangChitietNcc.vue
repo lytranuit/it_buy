@@ -17,7 +17,7 @@
 
                     <template v-else-if="col.data == 'dongia'">
                         <InputNumber v-model="slotProps.data[col.data]" class="p-inputtext-sm" suffix=" VND"
-                            @update:modelValue="changeDongia()" :readonly="readonly" :maxFractionDigits="2"/>
+                            @update:modelValue="changeDongia()" :readonly="readonly" :maxFractionDigits="2" />
                     </template>
 
                     <template v-else-if="col.data == 'thanhtien'">
@@ -101,11 +101,14 @@ const selectedColumns = computed(() => {
 });
 const changeDongia = () => {
     var ncc = nccs.value[props.index];
-    var tonggiatri = 0;
+    var thanhtien = 0;
     for (var item of ncc.chitiet) {
         item.thanhtien = (item.dongia * item.soluong) || 0;
-        tonggiatri += item.thanhtien;
+        thanhtien += item.thanhtien;
     }
+    ncc.thanhtien = thanhtien;
+    ncc.tienvat = ncc.thanhtien > 0 ? Math.round((ncc.thanhtien * ncc.vat) / 100) : 0;
+    var tonggiatri = ncc.thanhtien + ncc.tienvat + ncc.phigiaohang;
     ncc.tonggiatri = tonggiatri;
 }
 const props = defineProps({
