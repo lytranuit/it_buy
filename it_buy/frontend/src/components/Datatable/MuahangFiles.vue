@@ -26,8 +26,9 @@
                     </template>
                     <template v-else-if="col.data == 'file'">
                         <div class="mt-2" v-for="(item, index) in slotProps.data['list_file']">
-                            <a target="_blank" :href="item.url" class="text-blue" :download="item.name">{{ item.name
-                                }}</a>
+                            <a target="_blank" :href="item.url" class="text-blue" :download="download(item.name)">{{
+            item.name
+        }}</a>
                         </div>
                     </template>
                     <template v-else-if="col.data == 'created_at'">
@@ -83,7 +84,7 @@ import { storeToRefs } from 'pinia'
 import { useMuahang } from '../../stores/muahang';
 import muahangApi from '../../api/muahangApi';
 import { useRoute } from 'vue-router';
-import { formatDate } from '../../utilities/util';
+import { download, formatDate } from '../../utilities/util';
 import { useConfirm } from 'primevue/useconfirm';
 import { useToast } from 'primevue/usetoast';
 

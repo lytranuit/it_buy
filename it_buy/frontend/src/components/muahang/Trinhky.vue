@@ -1,7 +1,7 @@
 ﻿<template>
   <div class="row my-5">
     <div class="col-md-12 text-center">
-      <a :href="model.pdf" :download="model.pdf" class="download-icon-link d-inline-flex align-items-center">
+      <a :href="model.pdf" :download="download(model.pdf)" class="download-icon-link d-inline-flex align-items-center">
         <i class="far fa-file text-danger" style="font-size: 40px; margin-right: 10px;"></i>
         {{ model.pdf }}
       </a>
@@ -41,6 +41,7 @@ import { onMounted, ref } from "vue";
 import { useMuahang } from "../../stores/muahang";
 import { storeToRefs } from "pinia";
 import Button from 'primevue/button';
+import { download } from "../../utilities/util";
 const store_muahang = useMuahang();
 const { model } = storeToRefs(store_muahang);
 

@@ -37,4 +37,24 @@ const printTrigger = (link) => {
   getMyFrame.focus();
   getMyFrame.contentWindow.print();
 };
-export { formatSize, formatTime, formatPrice, formatDate, printTrigger };
+const download = (name) => {
+  if (
+    name.toLowerCase().indexOf(".pdf") != -1 ||
+    name.toLowerCase().indexOf(".png") != -1 ||
+    name.toLowerCase().indexOf(".jpg") != -1 ||
+    name.toLowerCase().indexOf(".jpeg") != -1 ||
+    name.toLowerCase().indexOf(".gif") != -1 ||
+    name.toLowerCase().indexOf(".tiff") != -1
+  ) {
+    return null;
+  }
+  return name;
+};
+export {
+  formatSize,
+  formatTime,
+  formatPrice,
+  formatDate,
+  printTrigger,
+  download,
+};

@@ -136,7 +136,7 @@
           </div>
           <div class="col-12 pt-2 list_attachment file-box-content">
             <div class="file-box" v-for="(item1, key1) in item.dinhkem" :key="key1" :data-key="item1.id">
-              <a :href="item1.url" :download="item1.name" class="download-icon-link">
+              <a :href="item1.url" :download="download(item1.name)" class="download-icon-link">
                 <i class="dripicons-download file-download-icon"></i>
               </a>
               <div class="text-center">
@@ -174,7 +174,7 @@ import NccTreeSelect from "../TreeSelect/NccTreeSelect.vue";
 import FormMuahangChitietNcc from '../Datatable/FormMuahangChitietNcc.vue';
 import { useSupplier } from "../../stores/supplier";
 import { rand } from "../../utilities/rand";
-import { formatPrice } from "../../utilities/util";
+import { download, formatPrice } from "../../utilities/util";
 import { useConfirm } from "primevue/useconfirm";
 const confirm = useConfirm();
 const toast = useToast();

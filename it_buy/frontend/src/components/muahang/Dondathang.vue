@@ -37,7 +37,7 @@
     </div>
     <div class="col-md-12 mt-3 file-box-content" v-if="model.dondathang">
       <div class="file-box">
-        <a :href="model.dondathang" :download="model.dondathang" class="download-icon-link">
+        <a :href="model.dondathang" :download="download(model.dondathang)" class="download-icon-link">
           <i class="dripicons-download file-download-icon"></i>
         </a>
         <div class="text-center">
@@ -59,6 +59,7 @@ import { storeToRefs } from "pinia";
 import muahangApi from "../../api/muahangApi";
 import Button from 'primevue/button';
 import { useToast } from "primevue/usetoast";
+import { download } from "../../utilities/util";
 const toast = useToast();
 const store_muahang = useMuahang();
 const { model, waiting } = storeToRefs(store_muahang);

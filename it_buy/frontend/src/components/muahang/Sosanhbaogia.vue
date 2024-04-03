@@ -71,7 +71,7 @@
           <td v-for="(item, key) in nccs" :key="key" class="text-center"
             :class="{ highlight: model.muahang_chonmua_id == item.id }">
             <div class="mb-2" v-for="(item1, key1) in item.dinhkem" :key="key1">
-              <a :href="item1.url" :download="model.name" class="download-icon-link d-inline-flex align-items-center"
+              <a :href="item1.url" :download="download(model.name)" class="download-icon-link d-inline-flex align-items-center"
                 target="_blank">
                 <i class="far fa-file text-danger" style="font-size: 30px; margin-right: 10px;"></i>
                 {{ item1.name }}
@@ -119,7 +119,7 @@ import { storeToRefs } from "pinia";
 import muahangApi from "../../api/muahangApi";
 import Button from 'primevue/button';
 import { useToast } from "primevue/usetoast";
-import { formatPrice } from "../../utilities/util";
+import { download, formatPrice } from "../../utilities/util";
 const toast = useToast();
 const store_muahang = useMuahang();
 const { model, datatable, nccs, waiting } = storeToRefs(store_muahang);

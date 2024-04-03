@@ -13,7 +13,7 @@
       </div>
       <div class="mt-2 list_uynhiemchi file-box-content" v-else>
         <div class="file-box" v-for="(item1, key1) in list_uynhiemchi" :key="key1" :data-key="item1.id">
-          <a :href="item1.url" :download="item1.name" class="download-icon-link">
+          <a :href="item1.url" :download="download(item1.name)" class="download-icon-link">
             <i class="dripicons-download file-download-icon"></i>
           </a>
           <div class="text-center">
@@ -43,6 +43,7 @@ import muahangApi from "../../api/muahangApi";
 import Button from 'primevue/button';
 import { useAuth } from "../../stores/auth";
 import { useToast } from "primevue/usetoast";
+import { download } from "../../utilities/util";
 const toast = useToast();
 const store_muahang = useMuahang();
 const { model, tabviewActive, waiting, list_uynhiemchi } = storeToRefs(store_muahang);

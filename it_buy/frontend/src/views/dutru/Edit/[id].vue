@@ -92,7 +92,7 @@
                   <Panel header="Trình ký" :toggleable="true">
                     <div class="row">
                       <div class="col-md-12 text-center">
-                        <a :href="model.pdf" :download="model.pdf"
+                        <a :href="model.pdf" :download="download(model.pdf)"
                           class="download-icon-link d-inline-flex align-items-center">
                           <i class="far fa-file text-danger" style="font-size: 40px; margin-right: 10px;"></i>
                           {{ model.pdf }}
@@ -240,7 +240,7 @@ import { storeToRefs } from "pinia";
 import { useGeneral } from "../../../stores/general";
 import moment from "moment";
 import FormDutruNhanhang from "../../../components/Datatable/FormDutruNhanhang.vue";
-import { formatDate } from "../../../utilities/util";
+import { download, formatDate } from "../../../utilities/util";
 import Comment from "../../../components/dutru/Comment.vue";
 import DutruFiles from "../../../components/Datatable/DutruFiles.vue";
 import FormDutruChitiet2 from "../../../components/Datatable/FormDutruChitiet2.vue";
