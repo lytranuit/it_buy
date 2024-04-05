@@ -47,6 +47,15 @@ export default {
       })
       .then((res) => res.data);
   },
+  xoachitietdinhkem(params) {
+    return repository
+      .post(`/v1/${resoure}/xoachitietdinhkem`, params, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => res.data);
+  },
   xuatpdf(id) {
     return repository
       .post(

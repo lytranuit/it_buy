@@ -51,6 +51,31 @@
                         <textarea v-model="slotProps.data[col.data]" class="form-control" />
                     </template>
 
+                    <template v-else-if="col.data == 'dinhkem' && model.status_id == 1">
+                        <div class="custom-file mt-2">
+                            <input type="file" class="hinhanh-file-input" :id="'hinhanhFile' + slotProps.data['stt']"
+                                :multiple="true" :data-key="slotProps.data['stt']" @change="fileChange($event)">
+                            <label class="custom-file-label" :for="'hinhanhFile' + slotProps.data['stt']">Choose
+                                file</label>
+                        </div>
+                        <div class="mt-2 dinhkemchitiet" v-for="(item, index) in slotProps.data['dinhkem']"
+                            :key="index">
+                            <a target="_blank" :href="item.url" class="text-blue" :download="download(item.name)">{{
+            item.name
+        }}</a><i class="text-danger fas fa-trash ml-2" style="cursor: pointer;"
+                                @click="xoachitietdinhkem(index, slotProps.data['dinhkem'])"></i>
+                        </div>
+                    </template>
+
+                    <template v-else-if="col.data == 'dinhkem'">
+                        <div class="mt-2 dinhkemchitiet" v-for="(item, index) in slotProps.data['dinhkem']"
+                            :key="index">
+                            <a target="_blank" :href="item.url" class="text-blue" :download="download(item.name)">{{
+            item.name
+        }}</a>
+                        </div>
+                    </template>
+
                     <template v-else-if="col.data == 'tenhh' && model.status_id != 1">
                         {{ label(slotProps.data) }}
                     </template>
@@ -77,21 +102,46 @@ import { storeToRefs } from 'pinia'
 
 import { useConfirm } from "primevue/useconfirm";
 import { rand } from '../../utilities/rand'
-import { formatPrice } from '../../utilities/util'
 import { useDutru } from '../../stores/dutru';
 import { useGeneral } from '../../stores/general';
-import PopupAdd from '../materials/PopupAdd.vue';
 import { useMaterials } from '../../stores/materials';
 import NsxTreeSelect from '../TreeSelect/NsxTreeSelect.vue';
-import AutoComplete from 'primevue/autocomplete';
 import MaterialAutoComplete from '../AutoComplete/MaterialAutoComplete.vue';
-const type_hh = computed(() => {
-    if (model.value.type_id != 1) {
-        // console.log(model.value.type_id)
-        return "HH";
-    }
-    return null;
-});
+import { download } from '../../utilities/util';
+import dutruApi from '../../api/dutruApi';
+import { useToast } from 'primevue/usetoast';
+const toast = useToast();
+const fileChange = (e) => {
+    var parents = $(e.target).parents(".custom-file");
+    var label = $(".custom-file-label", parents);
+    label.text(e.target.files.length + " Files");
+}
+
+const xoachitietdinhkem = (index, item) => {
+    // console.log(item.dinhkem[key1]);
+    confirm.require({
+        message: 'Bạn có chắc muốn xóa?',
+        header: 'Xác nhận',
+        icon: 'pi pi-exclamation-triangle',
+        accept: () => {
+
+            // waiting.value = true;
+            dutruApi.xoachitietdinhkem({ id: item[index].id }).then((response) => {
+                // waiting.value = false;
+                if (response.success) {
+                    toast.add({ severity: 'success', summary: 'Thành công!', detail: 'Xóa đính kèm', life: 3000 });
+                    item.splice(index, 1);
+                }
+
+                // console.log(response)
+            });
+
+
+        }
+    });
+
+}
+
 const label = (row) => {
     return row.mahh ? row.mahh + ' - ' + row.tenhh : row.tenhh;
 }
@@ -100,7 +150,7 @@ const select = (event, row) => {
     var id = event.value.id;
     row.hh_id = "m-" + id
     store_general.changeMaterial(row);
-    console.log(row)
+    // console.log(row)
 }
 const store_dutru = useDutru();
 const store_general = useGeneral();
@@ -198,6 +248,11 @@ const columns = computed(() => {
                 label: "Mô tả",
                 "data": "note",
                 "className": "text-center",
+            },
+            {
+                label: "Hình ảnh",
+                "data": "dinhkem",
+                "className": "text-center",
             }
         ]
     }
@@ -206,19 +261,6 @@ const indexActive = ref();
 const selectedColumns = computed(() => {
     return columns.value.filter(col => col.hide != true);
 });
-const changeNewMaterial = (data) => {
-    store_general.fetchMaterials(false).then((res) => {
-        var row = datatable.value[indexActive.value];
-        row.hh_id = "m-" + data.id;
-        changeMaterial("m-" + data.id, row)
-    });
-}
-const openNew = (index) => {
-    indexActive.value = index;
-    modelMaterial.value = {};
-    headerForm.value = "Tạo mới";
-    visibleDialog.value = true;
-}
 const addRow = () => {
     let stt = 0;
     if (datatable.value.length) {

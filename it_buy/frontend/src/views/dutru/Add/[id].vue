@@ -155,8 +155,19 @@ const submit = () => {
         alert("Chưa nhập nguyên liệu!");
         return false;
     }
-    model.value.list_add = list_add.value
-    dutruApi.save(model.value).then((response) => {
+    model.value.list_add = list_add.value;
+
+    var params = model.value;
+    $(".hinhanh-file-input").each(function (index) {
+        // console.log(this)
+        var files = $(this)[0].files;
+        var key = $(this).data("key");
+        for (var stt = 0; stt < files.length; stt++) {
+            var file = files[stt];
+            params["file_" + key + "_" + stt] = file;
+        }
+    });
+    dutruApi.save(params).then((response) => {
         messageError.value = "";
         if (response.success) {
             toast.add({ severity: 'success', summary: 'Thành công!', detail: 'Tạo dự trù thành công', life: 3000 });

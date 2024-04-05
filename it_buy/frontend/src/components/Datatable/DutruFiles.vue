@@ -42,7 +42,8 @@
             slotProps.data.list_file[0]?.user_created_by?.fullName }}</span>
                         </div>
                     </template>
-                    <template v-else-if="col.data == 'action' && slotProps.data['is_user_upload'] == true && slotProps.data.list_file[0]?.user_created_by?.id == user.id">
+                    <template
+                        v-else-if="col.data == 'action' && slotProps.data['is_user_upload'] == true && slotProps.data.list_file[0]?.user_created_by?.id == user.id">
                         <a class="p-link text-danger font-16" @click="confirmDeleteDinhkem(slotProps.data)"><i
                                 class="pi pi-trash"></i></a>
                     </template>
@@ -172,7 +173,7 @@ const save = () => {
     var params = modelfile.value;
     params.dutru_id = model.value.id;
     var files = $(".file-input")[0].files;
-    for (var stt in files) {
+    for (var stt = 0; stt < files.length; stt++) {
         var file = files[stt];
         params["file_" + stt] = file;
     }

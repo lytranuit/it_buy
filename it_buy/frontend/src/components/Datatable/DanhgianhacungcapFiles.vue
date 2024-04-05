@@ -175,7 +175,7 @@ const save = () => {
     var params = modelfile.value;
     params.danhgianhacungcap_id = model.value.id;
     var files = $(".file-input")[0].files;
-    for (var stt in files) {
+    for (var stt = 0; stt < files.length; stt++) {
         var file = files[stt];
         params["file_" + stt] = file;
     }

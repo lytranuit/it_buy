@@ -570,29 +570,38 @@ namespace it_template.Areas.V1.Controllers
                     var ncc_chon = muahang_chonmua;
                     raw.Add("tonggiatri", ncc_chon.tonggiatri.Value.ToString("#,##0.##"));
                     raw.Add("tggh", data.date.Value.ToString("dd/MM/yyyy"));
+                    raw.Add("thanhtien", ncc_chon.thanhtien.Value.ToString("#,##0.##"));
+                    raw.Add("phigiaohang", ncc_chon.phigiaohang.Value.ToString("#,##0.##"));
+                    raw.Add("tienvat", ncc_chon.tienvat.Value.ToString("#,##0.##"));
+                    raw.Add("vat", ncc_chon.vat.Value.ToString());
                     var stt = 1;
                     foreach (var item in ncc_chon.chitiet)
                     {
-                        var material = _context.MaterialModel.Where(d => item.hh_id == "m-" + d.id).FirstOrDefault();
+                        var material = _context.MaterialModel.Where(d => item.hh_id == "m-" + d.id).Include(d => d.nhasanxuat).FirstOrDefault();
+                        var tieuchuan = "";
+                        var nhasx = "";
                         if (material != null)
                         {
-                            RawDetails.Add(new RawMuahangDetails
-                            {
-                                stt = stt++,
-                                tenhh = item.tenhh,
-                                mahh = item.mahh,
-                                dvt = item.dvt,
-                                soluong = item.soluong.Value.ToString("#,##0.##"),
-                                dongia = item.dongia.Value.ToString("#,##0.##"),
-                                thanhtien = item.thanhtien.Value.ToString("#,##0.##"),
-                                //nhasx = material.nhasx,
-                                tieuchuan = material.tieuchuan,
-                                //note = item.note,
-                                tggh = data.date.Value.ToString("dd/MM/yyyy")
-                                //artwork = material.masothietke,
-                                //date = data.date.Value.ToString("yyyy-MM-dd")
-                            });
+                            nhasx = material.nhasanxuat.tennsx;
+                            tieuchuan = material.tieuchuan;
                         }
+                        RawDetails.Add(new RawMuahangDetails
+                        {
+                            stt = stt++,
+                            tenhh = item.tenhh,
+                            mahh = item.mahh,
+                            dvt = item.dvt,
+                            soluong = item.soluong.Value.ToString("#,##0.##"),
+                            dongia = item.dongia.Value.ToString("#,##0.##"),
+                            thanhtien = item.thanhtien.Value.ToString("#,##0.##"),
+                            nhasx = nhasx,
+                            tieuchuan = tieuchuan,
+                            //note = item.note,
+                            tggh = data.date.Value.ToString("dd/MM/yyyy")
+                            //artwork = material.masothietke,
+                            //date = data.date.Value.ToString("yyyy-MM-dd")
+                        });
+                        //}
                     }
                     ///Nhà cung cấp
                     raw.Add("tenncc", ncc_chon.ncc.tenncc);
@@ -641,7 +650,14 @@ namespace it_template.Areas.V1.Controllers
             //Creates Document instance
             Spire.Doc.Document document = new Spire.Doc.Document();
             //Loads the word document
-            document.LoadFromFile(_configuration["Source:Path_Private"] + "/buy/templates/dondathang.docx", Spire.Doc.FileFormat.Docx);
+            if (data.type_id == 1)
+            {
+                document.LoadFromFile(_configuration["Source:Path_Private"] + "/buy/templates/dondathangnvl.docx", Spire.Doc.FileFormat.Docx);
+            }
+            else
+            {
+                document.LoadFromFile(_configuration["Source:Path_Private"] + "/buy/templates/dondathang.docx", Spire.Doc.FileFormat.Docx);
+            }
 
 
 
@@ -913,7 +929,7 @@ namespace it_template.Areas.V1.Controllers
                     var ncc_chon = muahang_chonmua;
                     raw.Add("tonggiatri", ncc_chon.tonggiatri.Value.ToString("#,##0.##"));
                     raw.Add("thanhtien", ncc_chon.thanhtien.Value.ToString("#,##0.##"));
-                    raw.Add("phigiahang", ncc_chon.phigiaohang.Value.ToString("#,##0.##"));
+                    raw.Add("phigiaohang", ncc_chon.phigiaohang.Value.ToString("#,##0.##"));
                     raw.Add("tienvat", ncc_chon.tienvat.Value.ToString("#,##0.##"));
                     raw.Add("vat", ncc_chon.vat.Value.ToString());
                     var stt = 1;

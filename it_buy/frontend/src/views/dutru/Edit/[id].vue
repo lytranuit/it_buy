@@ -368,14 +368,26 @@ const submit = async () => {
     alert("Chưa nhập nguyên liệu!");
     return false;
   }
-  model.value.list_add = list_add.value
-  model.value.list_update = list_update.value
-  model.value.list_delete = list_delete.value
+  model.value.list_add = list_add.value;
+  model.value.list_update = list_update.value;
+  model.value.list_delete = list_delete.value;
+
+  var params = model.value;
+  $(".hinhanh-file-input").each(function (index) {
+    // console.log(this)
+    var files = $(this)[0].files;
+    var key = $(this).data("key");
+    for (var stt = 0; stt < files.length; stt++) {
+      var file = files[stt];
+      params["file_" + key + "_" + stt] = file;
+    }
+  });
   waiting.value = true;
   var response = await dutruApi.save(model.value);
   waiting.value = false;
   if (response.success) {
     toast.add({ severity: 'success', summary: 'Thành công!', detail: 'Thay đổi thành công', life: 3000 });
+    load_data(model.value.id);
   }
 };
 const xuatpdf = async () => {

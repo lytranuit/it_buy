@@ -43,7 +43,10 @@ namespace it_template.Areas.V1.Controllers
         }
         public JsonResult Get(int id)
         {
-            var data = _context.DutruModel.Where(d => d.id == id).Include(d => d.chitiet).Include(d => d.user_created_by).FirstOrDefault();
+            var data = _context.DutruModel.Where(d => d.id == id)
+                .Include(d => d.chitiet)
+                .ThenInclude(d => d.dinhkem.Where(d => d.deleted_at == null))
+                .Include(d => d.user_created_by).FirstOrDefault();
             if (data != null)
             {
                 var stt = 1;
@@ -121,6 +124,16 @@ namespace it_template.Areas.V1.Controllers
             _context.Update(Model);
             _context.SaveChanges();
             return Json(Model);
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> xoachitietdinhkem(int id)
+        {
+            var Model = _context.DutruChitietDinhkemModel.Where(d => d.id == id).FirstOrDefault();
+            Model.deleted_at = DateTime.Now;
+            _context.Update(Model);
+            _context.SaveChanges();
+            return Json(new { success = true });
         }
         [HttpPost]
 
@@ -285,6 +298,9 @@ namespace it_template.Areas.V1.Controllers
                     _context.SaveChanges();
                 }
 
+
+
+                var list = new List<DutruChitietModel>();
                 if (list_delete != null)
                     _context.RemoveRange(list_delete);
                 if (list_add != null)
@@ -293,18 +309,78 @@ namespace it_template.Areas.V1.Controllers
                     {
                         item.dutru_id = DutruModel_old.id;
                         _context.Add(item);
+                        //_context.SaveChanges();
+                        list.Add(item);
                     }
                 }
                 if (list_update != null)
                 {
                     foreach (var item in list_update)
                     {
+                        item.dinhkem = null;
                         _context.Update(item);
+                        list.Add(item);
                     }
                 }
 
                 _context.SaveChanges();
+                Console.WriteLine(list);
 
+
+                var files = Request.Form.Files;
+
+                var items_attachment = new List<DutruChitietDinhkemModel>();
+                if (files != null && files.Count > 0)
+                {
+
+                    foreach (var file in files)
+                    {
+                        var timeStamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
+                        string name = file.FileName;
+                        string type = file.Name;
+                        string ext = Path.GetExtension(name);
+                        string mimeType = file.ContentType;
+
+                        var list1 = type.Split("_");
+                        var stt = Int32.Parse(list1[1]);
+                        var dutru_chitiet = list.Where(d => d.stt == stt).First();
+                        var dutru_chitiet_id = dutru_chitiet.id;
+                        var dutru_id = dutru_chitiet.dutru_id;
+
+                        //var fileName = Path.GetFileName(name);
+                        var newName = timeStamp + "-" + dutru_chitiet_id + "-" + name;
+
+                        newName = newName.Replace("+", "_");
+                        newName = newName.Replace("%", "_");
+                        var dir = _configuration["Source:Path_Private"] + "\\buy\\dutru\\" + dutru_id;
+                        bool exists = Directory.Exists(dir);
+
+                        if (!exists)
+                            Directory.CreateDirectory(dir);
+
+
+                        var filePath = dir + "\\" + newName;
+
+                        string url = "/private/buy/dutru/" + dutru_id + "/" + newName;
+                        items_attachment.Add(new DutruChitietDinhkemModel
+                        {
+                            ext = ext,
+                            url = url,
+                            name = name,
+                            mimeType = mimeType,
+                            dutru_chitiet_id = dutru_chitiet_id,
+                            created_at = DateTime.Now,
+                            created_by = user_id
+                        });
+
+                        using (var fileSrteam = new FileStream(filePath, FileMode.Create))
+                        {
+                            await file.CopyToAsync(fileSrteam);
+                        }
+                    }
+                    _context.AddRange(items_attachment);
+                    _context.SaveChanges();
+                }
                 return Json(new { success = true, id = DutruModel_old.id });
             }
             catch (Exception ex)
@@ -689,13 +765,11 @@ namespace it_template.Areas.V1.Controllers
             int recordsTotal = customerData.Count();
             if (mahh != null && mahh != "")
             {
-                var listhh = _context.MaterialModel.Where(d => d.mahh.Contains(mahh)).Select(d => "m-" + d.id).ToList();
-                customerData = customerData.Where(d => listhh.Contains(d.hh_id));
+                customerData = customerData.Where(d => d.mahh.Contains(mahh));
             }
             if (tenhh != null && tenhh != "")
             {
-                var listhh = _context.MaterialModel.Where(d => d.tenhh.Contains(tenhh)).Select(d => "m-" + d.id).ToList();
-                customerData = customerData.Where(d => listhh.Contains(d.hh_id));
+                customerData = customerData.Where(d => d.tenhh.Contains(tenhh));
             }
             if (list_dutru != null && list_dutru != "")
             {

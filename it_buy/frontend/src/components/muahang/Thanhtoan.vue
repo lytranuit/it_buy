@@ -15,11 +15,12 @@
         <div class="file-box" v-for="(item1, key1) in list_uynhiemchi" :key="key1" :data-key="item1.id">
           <a :href="item1.url" :download="download(item1.name)" class="download-icon-link">
             <i class="dripicons-download file-download-icon"></i>
+
+            <div class="text-center">
+              <i class="far fa-file-pdf text-danger"></i>
+              <h6 class="text-truncate" :title="item1.name">{{ item1.name }}</h6>
+            </div>
           </a>
-          <div class="text-center">
-            <i class="far fa-file-pdf text-danger"></i>
-            <h6 class="text-truncate" :title="item1.name">{{ item1.name }}</h6>
-          </div>
         </div>
       </div>
     </div>
@@ -65,7 +66,7 @@ const thanhtoan = async () => {
     alert("Chưa upload ủy nhiệm chi!");
     return false;
   }
-  for (var stt in files) {
+  for (var stt = 0; stt < files.length; stt++) {
     var file = files[stt];
     params["file_" + stt] = file;
   }

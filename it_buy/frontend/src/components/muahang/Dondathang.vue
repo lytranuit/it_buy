@@ -26,7 +26,8 @@
       <div class="col-md-12 mt-2">
         <b class="">Địa chỉ giao hàng:</b>
         <div class="mt-2">
-          <textarea v-model="model.diachigiaohang" class="form-control form-control-sm" :readonly="model.is_dathang" ></textarea>
+          <textarea v-model="model.diachigiaohang" class="form-control form-control-sm"
+            :readonly="model.is_dathang"></textarea>
         </div>
       </div>
 
@@ -37,13 +38,14 @@
     </div>
     <div class="col-md-12 mt-3 file-box-content" v-if="model.dondathang">
       <div class="file-box">
-        <a :href="model.dondathang" :download="download(model.dondathang)" class="download-icon-link">
+        <a :href="model.dondathang" :download="download(model.dondathang)" class="download-icon-link" target="_blank">
           <i class="dripicons-download file-download-icon"></i>
+
+          <div class="text-center">
+            <i class="far fa-file-pdf text-danger"></i>
+            <h6 class="text-truncate" title="Đơn đặt hàng">Đơn đặt hàng</h6>
+          </div>
         </a>
-        <div class="text-center">
-          <i class="far fa-file-pdf text-danger"></i>
-          <h6 class="text-truncate" title="Đơn đặt hàng">Đơn đặt hàng</h6>
-        </div>
       </div>
     </div>
     <div class="col-md-12 mt-3" v-if="!model.is_dathang">

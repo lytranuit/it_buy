@@ -34,14 +34,15 @@
               <div class="file-box" v-for="(file, index1) in comment.files">
                 <a :href="file.url" :download="download(file.name)" class="download-icon-link">
                   <i class="dripicons-download file-download-icon"></i>
+
+                  <div class="text-center">
+                    <i class="far fa-file text-danger"></i>
+                    <h6 class="text-truncate" :title="file.name">
+                      {{ file.name }}
+                    </h6>
+                    <small class="text-muted">{{ file.ext }}</small>
+                  </div>
                 </a>
-                <div class="text-center">
-                  <i class="far fa-file text-danger"></i>
-                  <h6 class="text-truncate" :title="file.name">
-                    {{ file.name }}
-                  </h6>
-                  <small class="text-muted">{{ file.ext }}</small>
-                </div>
               </div>
             </div>
           </div>

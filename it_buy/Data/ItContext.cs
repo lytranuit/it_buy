@@ -46,6 +46,7 @@ namespace Vue.Data
         public DbSet<NhacungcapModel> NhacungcapModel { get; set; }
         public DbSet<DutruModel> DutruModel { get; set; }
         public DbSet<DutruChitietModel> DutruChitietModel { get; set; }
+        public DbSet<DutruChitietDinhkemModel> DutruChitietDinhkemModel { get; set; }
         public DbSet<DutruCommentModel> DutruCommentModel { get; set; }
         public DbSet<DutruDinhkemModel> DutruDinhkemModel { get; set; }
         public DbSet<DutruCommentUserModel> DutruCommentUserModel { get; set; }
