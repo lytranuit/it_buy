@@ -47,18 +47,14 @@
 
                 <template v-else-if="col.data == 'status_id'">
                   <div class="text-center">
-                    <Button label="Hoàn thành" class="p-button-success" size="small"
-                      v-if="slotProps.data['date_finish']"></Button>
-                    <Button label="Nháp" class="p-button-secondary" size="small"
-                      v-else-if="slotProps.data[col.data] == 1"></Button>
-                    <Button label="Đang trình ký" class="p-button-warning" size="small"
-                      v-else-if="slotProps.data[col.data] == 2"></Button>
-                    <Button label="Chờ ký duyệt" class="p-button-warning" size="small"
-                      v-else-if="slotProps.data[col.data] == 3"></Button>
-                    <Button label="Đã duyệt" class="p-button-success" size="small"
-                      v-else-if="slotProps.data[col.data] == 4"></Button>
-                    <Button label="Không duyệt" class="p-button-danger" size="small"
-                      v-else-if="slotProps.data[col.data] == 5"></Button>
+                    <Tag value="Hoàn thành" severity="success" size="small" v-if="slotProps.data['date_finish']" />
+                    <Tag value="Nháp" severity="secondary" size="small" v-else-if="slotProps.data[col.data] == 1" />
+                    <Tag value="Đang trình ký" severity="warning" size="small"
+                      v-else-if="slotProps.data[col.data] == 2" />
+                    <Tag value="Chờ ký duyệt" severity="warning" size="small"
+                      v-else-if="slotProps.data[col.data] == 3" />
+                    <Tag value="Đã duyệt" severity="success" size="small" v-else-if="slotProps.data[col.data] == 4" />
+                    <Tag value="Không duyệt" severity="danger" size="small" v-else-if="slotProps.data[col.data] == 5" />
                   </div>
                 </template>
 
@@ -98,7 +94,7 @@ import { onMounted, ref, computed, watch } from "vue";
 import dutruApi from "../../api/dutruApi";
 import PopupDutru from "../../components/dutru/PopupDutru.vue";
 import Breadcrumb from 'primevue/breadcrumb';
-import Button from "primevue/button";
+import Tag from "primevue/tag";
 import DataTable from "primevue/datatable";
 import { FilterMatchMode } from "primevue/api";
 import Column from "primevue/column"; ////Datatable

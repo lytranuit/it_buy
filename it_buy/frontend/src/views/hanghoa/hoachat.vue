@@ -37,17 +37,18 @@
             <div v-for="item of slotProps.data[col.data]" :key="item.id">
               <RouterLink :to="'/muahang/edit/' + item.id" class="text-primary mr-2">{{ item.id }} - {{ item.code }}
               </RouterLink>
-              <Badge value="Hoàn thành" size="small" severity="success" v-if="item['date_finish']" />
-              <Badge value="Chờ nhận hàng & thanh toán" size="small" severity="warning"
-                v-else-if="item['is_dathang']" />
-              <Badge value="Đang thực hiện" size="small" severity="warning" v-else-if="item['status_id'] == 1" />
-              <Badge value="Đang gửi và nhận báo giá" size="small" severity="warning"
-                v-else-if="item['status_id'] == 6" />
-              <Badge value="So sánh giá" size="small" severity="warning" v-else-if="item['status_id'] == 7" />
-              <Badge value="Đang trình ký" size="small" v-else-if="item['status_id'] == 8" />
-              <Badge value="Chờ ký duyệt" size="small" severity="warning" v-else-if="item['status_id'] == 9" />
-              <Badge value="Đã duyệt" size="small" severity="success" v-else-if="item['status_id'] == 10" />
-              <Badge value="Không duyệt" size="small" severity="danger" v-else-if="item['status_id'] == 11" />
+              <Tag value="Hoàn thành" severity="success" v-if="item['date_finish']" />
+              <Tag value="Chờ nhận hàng" severity="info"
+                v-else-if="item['is_dathang'] && ((item['loaithanhtoan'] == 'tra_sau' && !item['is_nhanhang']) || (item['loaithanhtoan'] == 'tra_truoc' && item['is_thanhtoan']))" />
+              <Tag value="Chờ thanh toán" severity="info"
+                v-else-if="item['is_dathang'] && ((item['loaithanhtoan'] == 'tra_truoc' && !item['is_thanhtoan']) || (item['loaithanhtoan'] == 'tra_sau' && item['is_nhanhang']))" />
+              <Tag value="Đang thực hiện" severity="secondary" v-else-if="item['status_id'] == 1" />
+              <Tag value="Đang gửi và nhận báo giá" severity="warning" v-else-if="item['status_id'] == 6" />
+              <Tag value="So sánh giá" severity="warning" v-else-if="item['status_id'] == 7" />
+              <Tag value="Đang trình ký" severity="warning" v-else-if="item['status_id'] == 8" />
+              <Tag value="Chờ ký duyệt" severity="warning" v-else-if="item['status_id'] == 9" />
+              <Tag value="Đã duyệt" v-else-if="item['status_id'] == 10" />
+              <Tag value="Không duyệt" severity="danger" v-else-if="item['status_id'] == 11" />
             </div>
           </template>
 
@@ -150,7 +151,7 @@
 import { onMounted, ref, computed, watch } from "vue";
 import dutruApi from "../../api/dutruApi";
 import Breadcrumb from 'primevue/breadcrumb';
-import Badge from "primevue/badge";
+import Tag from "primevue/tag";
 import Dialog from "primevue/dialog";
 import Button from "primevue/button";
 import DataTable from "primevue/datatable";

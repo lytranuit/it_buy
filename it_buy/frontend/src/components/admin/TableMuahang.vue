@@ -34,8 +34,10 @@
                                     <div class="text-center">
                                         <Tag value="Hoàn thành" severity="success"
                                             v-if="slotProps.data['date_finish']" />
-                                        <Tag value="Chờ nhận hàng & thanh toán" severity="warning"
-                                            v-else-if="slotProps.data['is_dathang']" />
+                                        <Tag value="Chờ nhận hàng" severity="info"
+                                            v-else-if="slotProps.data['is_dathang'] && ((slotProps.data['loaithanhtoan'] == 'tra_sau' && !slotProps.data['is_nhanhang']) || (slotProps.data['loaithanhtoan'] == 'tra_truoc' && slotProps.data['is_thanhtoan']))" />
+                                        <Tag value="Chờ thanh toán" severity="info"
+                                            v-else-if="slotProps.data['is_dathang'] && ((slotProps.data['loaithanhtoan'] == 'tra_truoc' && !slotProps.data['is_thanhtoan']) || (slotProps.data['loaithanhtoan'] == 'tra_sau' && slotProps.data['is_nhanhang']))" />
                                         <Tag value="Đang thực hiện" severity="secondary"
                                             v-else-if="slotProps.data[col.data] == 1" />
                                         <Tag value="Đang gửi và nhận báo giá" severity="warning"

@@ -29,7 +29,7 @@
                 -
                 {{ formatDate(comment.created_at, "HH:mm DD/MM/YYYY") }}</small>
             </h5>
-            <div class="mb-2" style="white-space: pre-wrap" v-html="comment.comment"></div>
+            <div class="mb-2" style="white-space: pre-wrap;word-break: break-word;" v-html="comment.comment"></div>
             <div class="mb-2 attach_file file-box-content">
               <div class="file-box" v-for="(file, index1) in comment.files">
                 <a :href="file.url" :download="download(file.name)" class="download-icon-link">

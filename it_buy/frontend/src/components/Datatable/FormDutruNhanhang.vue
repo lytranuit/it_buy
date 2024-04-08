@@ -28,7 +28,7 @@
 
                     <template v-else-if="col.data == 'date_nhanhang'">
                         <Calendar v-model="slotProps.data[col.data]" dateFormat="yy-mm-dd" class="date-custom"
-                            :manualInput="false" showIcon :minDate="minDate" :readonly="is_readonly" />
+                            :manualInput="false" showIcon :readonly="is_readonly" />
                     </template>
 
                     <template v-else-if="col.data == 'soluong_nhanhang'">

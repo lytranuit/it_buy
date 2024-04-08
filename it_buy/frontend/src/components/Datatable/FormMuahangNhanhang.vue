@@ -27,7 +27,7 @@
                     </template>
                     <template v-else-if="editable == true && col.data == 'date_nhanhang'">
                         <Calendar v-model="slotProps.data[col.data]" dateFormat="yy-mm-dd" class="date-custom"
-                            :manualInput="false" showIcon :minDate="minDate" :readonly="model.date_finish" />
+                            :manualInput="false" showIcon :readonly="model.date_finish" />
                     </template>
 
                     <template v-else-if="editable == true && col.data == 'soluong_nhanhang'">

@@ -93,6 +93,7 @@ const savenhanhang = () => {
       return false;
     }
     delete item.muahang;
+    delete item.muahang_ncc_chitiet;
     items.push(item);
   }
 

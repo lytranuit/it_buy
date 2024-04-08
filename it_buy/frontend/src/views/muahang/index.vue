@@ -48,25 +48,19 @@
                 </template>
                 <template v-else-if="col.data == 'status_id'">
                   <div class="text-center">
-                    <Button label="Hoàn thành" class="p-button-success" size="small"
-                      v-if="slotProps.data['date_finish']"></Button>
-                    <Button label="Chờ nhận hàng & thanh toán" class="p-button-warning" size="small"
-                      v-else-if="slotProps.data['is_dathang']"></Button>
-                    <Button label="Đang thực hiện" class="p-button-secondary" size="small"
-                      v-else-if="slotProps.data[col.data] == 1"></Button>
-                    <Button label="Đang gửi và nhận báo giá" class="p-button-warning" size="small"
-                      v-else-if="slotProps.data[col.data] == 6"></Button>
-                    <Button label="So sánh giá" class="p-button-warning" size="small"
-                      v-else-if="slotProps.data[col.data] == 7"></Button>
-                    <Button label="Đang trình ký" class="p-button-warning" size="small"
-                      v-else-if="slotProps.data[col.data] == 8"></Button>
-                    <Button label="Chờ ký duyệt" class="p-button-warning" size="small"
-                      v-else-if="slotProps.data[col.data] == 9"></Button>
-                    <Button label="Đã duyệt" class="p-button-success" size="small"
-                      v-else-if="slotProps.data[col.data] == 10"></Button>
-                    <Button label="Không duyệt" class="p-button-danger" size="small"
-                      v-else-if="slotProps.data[col.data] == 11"></Button>
-
+                    <Tag value="Hoàn thành" severity="success" v-if="slotProps.data['date_finish']" />
+                    <Tag value="Chờ nhận hàng" severity="info"
+                      v-else-if="slotProps.data['is_dathang'] && ((slotProps.data['loaithanhtoan'] == 'tra_sau' && !slotProps.data['is_nhanhang']) || (slotProps.data['loaithanhtoan'] == 'tra_truoc' && slotProps.data['is_thanhtoan']))" />
+                    <Tag value="Chờ thanh toán" severity="info"
+                      v-else-if="slotProps.data['is_dathang'] && ((slotProps.data['loaithanhtoan'] == 'tra_truoc' && !slotProps.data['is_thanhtoan']) || (slotProps.data['loaithanhtoan'] == 'tra_sau' && slotProps.data['is_nhanhang']))" />
+                    <Tag value="Đang thực hiện" severity="secondary" v-else-if="slotProps.data[col.data] == 1" />
+                    <Tag value="Đang gửi và nhận báo giá" severity="warning"
+                      v-else-if="slotProps.data[col.data] == 6" />
+                    <Tag value="So sánh giá" severity="warning" v-else-if="slotProps.data[col.data] == 7" />
+                    <Tag value="Đang trình ký" severity="warning" v-else-if="slotProps.data[col.data] == 8" />
+                    <Tag value="Chờ ký duyệt" severity="warning" v-else-if="slotProps.data[col.data] == 9" />
+                    <Tag value="Đã duyệt" v-else-if="slotProps.data[col.data] == 10" />
+                    <Tag value="Không duyệt" severity="danger" v-else-if="slotProps.data[col.data] == 11" />
                   </div>
                   <div class="text-center mt-2">
 
@@ -98,7 +92,7 @@
 <script setup>
 import { onMounted, ref, computed, watch } from "vue";
 import muahangApi from "../../api/muahangApi";
-import Avatar from "primevue/avatar";
+import Tag from "primevue/tag";
 import Button from "primevue/button";
 import DataTable from "primevue/datatable";
 import { FilterMatchMode } from "primevue/api";

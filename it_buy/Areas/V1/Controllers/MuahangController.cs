@@ -148,7 +148,7 @@ namespace it_template.Areas.V1.Controllers
             var data = _context.MuahangModel.Where(d => d.id == id)
                 .Include(d => d.user_created_by)
                 .Include(d => d.uynhiemchi)
-                .Include(d => d.chitiet)
+                .Include(d => d.chitiet).ThenInclude(d => d.user_nhanhang)
                 .Include(d => d.nccs).ThenInclude(d => d.chitiet)
                 .Include(d => d.nccs).ThenInclude(d => d.dinhkem.Where(d => d.deleted_at == null))
                 .Include(d => d.nccs).ThenInclude(d => d.ncc).FirstOrDefault();
@@ -465,69 +465,63 @@ namespace it_template.Areas.V1.Controllers
         [HttpPost]
         public async Task<JsonResult> saveNhanhang(int muahang_id, List<MuahangChitietModel> list)
         {
-            try
-            {
-                System.Security.Claims.ClaimsPrincipal currentUser = this.User;
 
-                var user_id = UserManager.GetUserId(currentUser);
-                var user = await UserManager.GetUserAsync(currentUser);
-                var list_dutru_chitiet_id = new List<int>();
-                if (list != null)
+            System.Security.Claims.ClaimsPrincipal currentUser = this.User;
+
+            var user_id = UserManager.GetUserId(currentUser);
+            var user = await UserManager.GetUserAsync(currentUser);
+            var list_dutru_chitiet_id = new List<int>();
+            if (list != null)
+            {
+                foreach (var item in list)
                 {
-                    foreach (var item in list)
-                    {
-                        item.user_nhanhang = null;
-                        list_dutru_chitiet_id.Add(item.dutru_chitiet_id);
-                        _context.Update(item);
-                    }
+                    item.user_nhanhang = null;
+                    list_dutru_chitiet_id.Add(item.dutru_chitiet_id);
+                    _context.Update(item);
                 }
+            }
+            _context.SaveChanges();
+            ////Check nhận hàng mua hàng
+            var muahang = _context.MuahangModel.Where(d => d.id == muahang_id).FirstOrDefault();
+
+            var list_nhanhang = list.Where(d => d.status_nhanhang == 1).Count();
+            if (list_nhanhang == list.Count())
+            {
+                muahang.is_nhanhang = true;
+                //if (muahang.is_thanhtoan == true && muahang.is_nhanhang == true)
+                //{
+                //    muahang.date_finish = DateTime.Now;
+                //    _context.Update(muahang);
+                //}
+                _context.Update(muahang);
                 _context.SaveChanges();
-                ////Check nhận hàng mua hàng
-                var muahang = _context.MuahangModel.Where(d => d.id == muahang_id).FirstOrDefault();
 
-                var list_nhanhang = list.Where(d => d.status_nhanhang == 1).Count();
-                if (list_nhanhang == list.Count())
-                {
-                    muahang.is_nhanhang = true;
-                    //if (muahang.is_thanhtoan == true && muahang.is_nhanhang == true)
-                    //{
-                    //    muahang.date_finish = DateTime.Now;
-                    //    _context.Update(muahang);
-                    //}
-                    _context.Update(muahang);
-                    _context.SaveChanges();
-
-                }
-                //// Check du trù finish
-                var list_dutru_id = _context.DutruChitietModel.Where(d => list_dutru_chitiet_id.Contains(d.id)).Select(d => d.dutru_id).Distinct().ToList();
-                var list_dutru = _context.DutruModel.Where(d => list_dutru_id.Contains(d.id)).Include(d => d.chitiet).ToList();
-                foreach (var dutru in list_dutru)
-                {
-                    var soluong_ht = 0;
-                    foreach (var item in dutru.chitiet)
-                    {
-                        var soluong_dutru = item.soluong;
-                        var muahang_chitiet = _context.MuahangChitietModel.Where(d => d.dutru_chitiet_id == item.id && d.status_nhanhang == 1).ToList();
-                        var soluong_mua = muahang_chitiet.Sum(d => d.soluong * d.quidoi);
-                        if (soluong_dutru == soluong_mua)
-                        {
-                            soluong_ht++;
-                        }
-                    }
-                    if (soluong_ht == dutru.chitiet.Count())
-                    {
-                        dutru.date_finish = DateTime.Now;
-                        _context.Update(dutru);
-                        _context.SaveChanges();
-                    }
-                }
-
-                return Json(new { success = true });
             }
-            catch (Exception ex)
+            //// Check du trù finish
+            var list_dutru_id = _context.DutruChitietModel.Where(d => list_dutru_chitiet_id.Contains(d.id)).Select(d => d.dutru_id).Distinct().ToList();
+            var list_dutru = _context.DutruModel.Where(d => list_dutru_id.Contains(d.id)).Include(d => d.chitiet).ToList();
+            foreach (var dutru in list_dutru)
             {
-                return Json(new { success = false, message = ex.Message });
+                var soluong_ht = 0;
+                foreach (var item in dutru.chitiet)
+                {
+                    var soluong_dutru = item.soluong;
+                    var muahang_chitiet = _context.MuahangChitietModel.Where(d => d.dutru_chitiet_id == item.id && d.status_nhanhang == 1).ToList();
+                    var soluong_mua = muahang_chitiet.Sum(d => d.soluong * d.quidoi);
+                    if (soluong_dutru == soluong_mua)
+                    {
+                        soluong_ht++;
+                    }
+                }
+                if (soluong_ht == dutru.chitiet.Count())
+                {
+                    dutru.date_finish = DateTime.Now;
+                    _context.Update(dutru);
+                    _context.SaveChanges();
+                }
             }
+
+            return Json(new { success = true });
 
         }
         [HttpPost]
@@ -888,6 +882,9 @@ namespace it_template.Areas.V1.Controllers
                     created_by = record.created_by,
                     user_created_by = record.user_created_by,
                     is_dathang = record.is_dathang,
+                    loaithanhtoan = record.loaithanhtoan,
+                    is_nhanhang = record.is_nhanhang,
+                    is_thanhtoan = record.is_thanhtoan,
                     date_finish = record.date_finish,
                     tonggiatri = tonggiatri,
                     created_at = record.created_at
