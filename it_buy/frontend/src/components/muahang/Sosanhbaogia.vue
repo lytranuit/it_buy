@@ -71,8 +71,8 @@
           <td v-for="(item, key) in nccs" :key="key" class="text-center"
             :class="{ highlight: model.muahang_chonmua_id == item.id }">
             <div class="mb-2" v-for="(item1, key1) in item.dinhkem" :key="key1">
-              <a :href="item1.url" :download="download(model.name)" class="download-icon-link d-inline-flex align-items-center"
-                target="_blank">
+              <a :href="item1.url" :download="download(model.name)"
+                class="download-icon-link d-inline-flex align-items-center" target="_blank">
                 <i class="far fa-file text-danger" style="font-size: 30px; margin-right: 10px;"></i>
                 {{ item1.name }}
               </a>
@@ -107,6 +107,8 @@
       </div>
     </div>
     <div class="text-center" v-if="readonly == false">
+      <Button label="Xem trước" icon="pi pi-eye" class="p-button-info p-button-sm mr-2"
+        @click.prevent="view()"></Button>
       <Button label="Xuất PDF và trình ký" icon="pi pi-file" class="p-button-sm mr-2"
         @click.prevent="xuatpdf()"></Button>
     </div>
@@ -126,6 +128,28 @@ const { model, datatable, nccs, waiting } = storeToRefs(store_muahang);
 
 const readonly = ref(false);
 
+const view = async () => {
+  if (!model.value.name) {
+    alert("Chưa nhập tiêu đề!");
+    return false;
+  }
+  if (!model.value.muahang_chonmua_id) {
+    alert("Chưa chọn mua nhà cung cấp nào!");
+    return false;
+  }
+  if (!model.value.note) {
+    alert("Chưa nhập lý do mua hàng!");
+    return false;
+  }
+  await muahangApi.save(model.value);
+  waiting.value = true;
+  muahangApi.xuatpdf(model.value.id, true).then((response) => {
+    waiting.value = false;
+    if (response.success) {
+      window.open(response.link, '_blank').focus();
+    }
+  });
+}
 const xuatpdf = async () => {
   if (!model.value.name) {
     alert("Chưa nhập tiêu đề!");

@@ -368,98 +368,93 @@ namespace it_template.Areas.V1.Controllers
         [HttpPost]
         public async Task<JsonResult> saveNcc(List<MuahangNccModel> nccs)
         {
-            try
+            System.Security.Claims.ClaimsPrincipal currentUser = this.User;
+
+            var user_id = UserManager.GetUserId(currentUser);
+            var user = await UserManager.GetUserAsync(currentUser);
+            var muahang_id = 0;
+            foreach (var item in nccs)
             {
-                System.Security.Claims.ClaimsPrincipal currentUser = this.User;
-
-                var user_id = UserManager.GetUserId(currentUser);
-                var user = await UserManager.GetUserAsync(currentUser);
-                var muahang_id = 0;
-                foreach (var item in nccs)
+                muahang_id = item.muahang_id.Value;
+                //item.chitiet;
+                if (item.id > 0)
                 {
-                    muahang_id = item.muahang_id.Value;
-                    if (item.id > 0)
-                    {
-                        _context.Update(item);
+                    _context.Update(item);
 
-                        _context.SaveChanges();
+                    _context.SaveChanges();
 
-                    }
-                    else
-                    {
-                        _context.Add(item);
-
-                        _context.SaveChanges();
-                    }
                 }
-
-
-                var files = Request.Form.Files;
-
-                var items_attachment = new List<MuahangNccDinhkemModel>();
-                if (files != null && files.Count > 0)
+                else
                 {
+                    _context.Add(item);
 
-                    foreach (var file in files)
-                    {
-                        var timeStamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
-                        string name = file.FileName;
-                        string type = file.Name;
-                        string ext = Path.GetExtension(name);
-                        string mimeType = file.ContentType;
-
-                        var list = type.Split("_");
-                        var key_muahang = Int32.Parse(list[1]);
-                        var muahang_ncc_id = nccs[key_muahang].id;
-                        //var fileName = Path.GetFileName(name);
-                        var newName = timeStamp + "-" + muahang_ncc_id + "-" + name;
-
-                        newName = newName.Replace("+", "_");
-                        newName = newName.Replace("%", "_");
-                        var dir = _configuration["Source:Path_Private"] + "\\buy\\muahang\\" + muahang_id;
-                        bool exists = Directory.Exists(dir);
-
-                        if (!exists)
-                            Directory.CreateDirectory(dir);
-
-
-                        var filePath = dir + "\\" + newName;
-
-                        string url = "/private/buy/muahang/" + muahang_id + "/" + newName;
-                        items_attachment.Add(new MuahangNccDinhkemModel
-                        {
-                            ext = ext,
-                            url = url,
-                            name = name,
-                            mimeType = mimeType,
-                            muahang_ncc_id = muahang_ncc_id,
-                            created_at = DateTime.Now,
-                            created_by = user_id
-                        });
-
-                        using (var fileSrteam = new FileStream(filePath, FileMode.Create))
-                        {
-                            await file.CopyToAsync(fileSrteam);
-                        }
-                    }
-                    _context.AddRange(items_attachment);
                     _context.SaveChanges();
                 }
-
-
-                //_context.SaveChanges();
-                if (muahang_id > 0)
-                {
-                    var muahang = _context.MuahangModel.Where(d => d.id == muahang_id).FirstOrDefault();
-                    muahang.status_id = (int)Status.sosanhgia;
-                    _context.SaveChanges();
-                }
-                return Json(new { success = true });
             }
-            catch (Exception ex)
+
+
+            var files = Request.Form.Files;
+
+            var items_attachment = new List<MuahangNccDinhkemModel>();
+            if (files != null && files.Count > 0)
             {
-                return Json(new { success = false, message = ex.Message });
+
+                foreach (var file in files)
+                {
+                    var timeStamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
+                    string name = file.FileName;
+                    string type = file.Name;
+                    string ext = Path.GetExtension(name);
+                    string mimeType = file.ContentType;
+
+                    var list = type.Split("_");
+                    var key_muahang = Int32.Parse(list[1]);
+                    var muahang_ncc_id = nccs[key_muahang].id;
+                    //var fileName = Path.GetFileName(name);
+                    var newName = timeStamp + "-" + muahang_ncc_id + "-" + name;
+
+                    newName = newName.Replace("+", "_");
+                    newName = newName.Replace("%", "_");
+                    var dir = _configuration["Source:Path_Private"] + "\\buy\\muahang\\" + muahang_id;
+                    bool exists = Directory.Exists(dir);
+
+                    if (!exists)
+                        Directory.CreateDirectory(dir);
+
+
+                    var filePath = dir + "\\" + newName;
+
+                    string url = "/private/buy/muahang/" + muahang_id + "/" + newName;
+                    items_attachment.Add(new MuahangNccDinhkemModel
+                    {
+                        ext = ext,
+                        url = url,
+                        name = name,
+                        mimeType = mimeType,
+                        muahang_ncc_id = muahang_ncc_id,
+                        created_at = DateTime.Now,
+                        created_by = user_id
+                    });
+
+                    using (var fileSrteam = new FileStream(filePath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(fileSrteam);
+                    }
+                }
+                _context.AddRange(items_attachment);
+                _context.SaveChanges();
             }
+
+
+            //_context.SaveChanges();
+            if (muahang_id > 0)
+            {
+                var muahang = _context.MuahangModel.Where(d => d.id == muahang_id).FirstOrDefault();
+                muahang.status_id = (int)Status.sosanhgia;
+                _context.SaveChanges();
+            }
+            return Json(new { success = true });
+
 
         }
         [HttpPost]
@@ -896,7 +891,7 @@ namespace it_template.Areas.V1.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> xuatpdf(int id)
+        public async Task<JsonResult> xuatpdf(int id, bool is_view = false)
         {
             System.Security.Claims.ClaimsPrincipal currentUser = this.User;
             var user_id = UserManager.GetUserId(currentUser);
@@ -1038,121 +1033,129 @@ namespace it_template.Areas.V1.Controllers
                 url_return = url_pdf;
 
             }
-            ////Trình ký
-            data.pdf = url_return;
-            data.status_id = (int)Status.MuahangPDF;
-            //_context.SaveChanges();
+            if (is_view)
+            {
+                return Json(new { success = true, link = url_return });
+            }
+            else
+            {
+
+                ////Trình ký
+                data.pdf = url_return;
+                data.status_id = (int)Status.MuahangPDF;
+                //_context.SaveChanges();
 
 
-            ///UPLOAD ESIGN
-            var user = await UserManager.GetUserAsync(currentUser);
-            ///Document
-            var DocumentModel = new DocumentModel()
-            {
-                name_vi = data.name,
-                description_vi = data.note,
-                priority = 2,
-                status_id = (int)DocumentStatus.Draft,
-                type_id = 73,
-                user_id = user_id,
-                user_next_signature_id = user_id,
-                is_sign_parellel = false,
-                created_at = DateTime.Now,
-            };
-            var count_type = _context.DocumentModel.Where(d => d.type_id == DocumentModel.type_id).Count();
-            var type = _context.DocumentTypeModel.Where(d => d.id == DocumentModel.type_id).Include(d => d.users_receive).FirstOrDefault();
-            DocumentModel.code = type.symbol + "00" + (count_type + 1);
-            _context.Add(DocumentModel);
-            _context.SaveChanges();
-            ///DocumentFile
-            DocumentFileModel DocumentFileModel = new DocumentFileModel
-            {
-                document_id = DocumentModel.id,
-                ext = ".pdf",
-                url = url_return,
-                name = data.name,
-                mimeType = "application/pdf",
-                created_at = DateTime.Now
-            };
-            _context.Add(DocumentFileModel);
-            ////Đính kèm
-            ///Lấy dự trù
-            var list_attachment = new List<DocumentAttachmentModel>();
-            var dutru = _context.MuahangChitietModel.Where(d => d.muahang_id == id).Include(d => d.dutru_chitiet).ThenInclude(d => d.dutru).Select(d => d.dutru_chitiet.dutru).ToList();
-            dutru = dutru.Distinct().ToList();
-            foreach (var d in dutru)
-            {
-                list_attachment.Add(new DocumentAttachmentModel()
+                ///UPLOAD ESIGN
+                var user = await UserManager.GetUserAsync(currentUser);
+                ///Document
+                var DocumentModel = new DocumentModel()
+                {
+                    name_vi = data.name,
+                    description_vi = data.note,
+                    priority = 2,
+                    status_id = (int)DocumentStatus.Draft,
+                    type_id = 73,
+                    user_id = user_id,
+                    user_next_signature_id = user_id,
+                    is_sign_parellel = false,
+                    created_at = DateTime.Now,
+                };
+                var count_type = _context.DocumentModel.Where(d => d.type_id == DocumentModel.type_id).Count();
+                var type = _context.DocumentTypeModel.Where(d => d.id == DocumentModel.type_id).Include(d => d.users_receive).FirstOrDefault();
+                DocumentModel.code = type.symbol + "00" + (count_type + 1);
+                _context.Add(DocumentModel);
+                _context.SaveChanges();
+                ///DocumentFile
+                DocumentFileModel DocumentFileModel = new DocumentFileModel
                 {
                     document_id = DocumentModel.id,
-                    name = "Dự trù " + d.code + "- " + d.name,
                     ext = ".pdf",
+                    url = url_return,
+                    name = data.name,
                     mimeType = "application/pdf",
-                    url = d.pdf,
                     created_at = DateTime.Now
-                });
-            }
-
-            ///Lấy báo giá
-            var baogia = _context.MuahangNccModel.Where(d => d.muahang_id == id).Include(d => d.dinhkem).Include(d => d.ncc).ToList();
-            foreach (var d in baogia)
-            {
-                foreach (var item in d.dinhkem)
+                };
+                _context.Add(DocumentFileModel);
+                ////Đính kèm
+                ///Lấy dự trù
+                var list_attachment = new List<DocumentAttachmentModel>();
+                var dutru = _context.MuahangChitietModel.Where(d => d.muahang_id == id).Include(d => d.dutru_chitiet).ThenInclude(d => d.dutru).Select(d => d.dutru_chitiet.dutru).ToList();
+                dutru = dutru.Distinct().ToList();
+                foreach (var d in dutru)
                 {
                     list_attachment.Add(new DocumentAttachmentModel()
                     {
                         document_id = DocumentModel.id,
-                        name = item.name,
-                        ext = item.ext,
-                        mimeType = item.mimeType,
-                        url = item.url,
-                        created_at = item.created_at
+                        name = "Dự trù " + d.code + "- " + d.name,
+                        ext = ".pdf",
+                        mimeType = "application/pdf",
+                        url = d.pdf,
+                        created_at = DateTime.Now
                     });
                 }
-            }
-            _context.AddRange(list_attachment);
-            ////Signature
-            for (int k = 0; k < 1; ++k)
-            {
-                DocumentSignatureModel DocumentSignatureModel = new DocumentSignatureModel() { document_id = DocumentModel.id, user_id = user_id, stt = k };
-                _context.Add(DocumentSignatureModel);
-            }
-            ////Receive
-            if (type.users_receive.Count() > 0)
-            {
-                foreach (var receive in type.users_receive)
+
+                ///Lấy báo giá
+                var baogia = _context.MuahangNccModel.Where(d => d.muahang_id == id).Include(d => d.dinhkem).Include(d => d.ncc).ToList();
+                foreach (var d in baogia)
                 {
-                    DocumentUserReceiveModel DocumentUserReceiveModel = new DocumentUserReceiveModel() { document_id = DocumentModel.id, user_id = receive.user_id };
-                    _context.Add(DocumentUserReceiveModel);
+                    foreach (var item in d.dinhkem)
+                    {
+                        list_attachment.Add(new DocumentAttachmentModel()
+                        {
+                            document_id = DocumentModel.id,
+                            name = item.name,
+                            ext = item.ext,
+                            mimeType = item.mimeType,
+                            url = item.url,
+                            created_at = item.created_at
+                        });
+                    }
                 }
+                _context.AddRange(list_attachment);
+                ////Signature
+                for (int k = 0; k < 1; ++k)
+                {
+                    DocumentSignatureModel DocumentSignatureModel = new DocumentSignatureModel() { document_id = DocumentModel.id, user_id = user_id, stt = k };
+                    _context.Add(DocumentSignatureModel);
+                }
+                ////Receive
+                if (type.users_receive.Count() > 0)
+                {
+                    foreach (var receive in type.users_receive)
+                    {
+                        DocumentUserReceiveModel DocumentUserReceiveModel = new DocumentUserReceiveModel() { document_id = DocumentModel.id, user_id = receive.user_id };
+                        _context.Add(DocumentUserReceiveModel);
+                    }
+                }
+                /////create event
+                DocumentEventModel DocumentEventModel = new DocumentEventModel
+                {
+                    document_id = DocumentModel.id,
+                    event_content = "<b>" + user.FullName + "</b> tạo hồ sơ mới",
+                    created_at = DateTime.Now,
+                };
+                _context.Add(DocumentEventModel);
+                /////create Related 
+                RelatedEsignModel RelatedEsignModel = new RelatedEsignModel()
+                {
+                    esign_id = DocumentModel.id,
+                    related_id = data.id,
+                    type = "muahang",
+                    created_at = DateTime.Now
+                };
+                _context.Add(RelatedEsignModel);
+
+                //_context.SaveChanges();
+                data.status_id = (int)Status.MuahangEsign;
+                data.activeStep = 1;
+                data.esign_id = DocumentModel.id;
+                data.code = DocumentModel.code;
+
+                _context.SaveChanges();
+
+                return Json(new { success = true });
             }
-            /////create event
-            DocumentEventModel DocumentEventModel = new DocumentEventModel
-            {
-                document_id = DocumentModel.id,
-                event_content = "<b>" + user.FullName + "</b> tạo hồ sơ mới",
-                created_at = DateTime.Now,
-            };
-            _context.Add(DocumentEventModel);
-            /////create Related 
-            RelatedEsignModel RelatedEsignModel = new RelatedEsignModel()
-            {
-                esign_id = DocumentModel.id,
-                related_id = data.id,
-                type = "muahang",
-                created_at = DateTime.Now
-            };
-            _context.Add(RelatedEsignModel);
-
-            //_context.SaveChanges();
-            data.status_id = (int)Status.MuahangEsign;
-            data.activeStep = 1;
-            data.esign_id = DocumentModel.id;
-            data.code = DocumentModel.code;
-
-            _context.SaveChanges();
-
-            return Json(new { success = true });
         }
 
         [HttpPost]

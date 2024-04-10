@@ -298,6 +298,9 @@ const submit1 = () => {
   // console.log(params)
   for (var ncc of params.nccs) {
     delete ncc.ncc;
+    for (var c of ncc.chitiet) {
+      delete c.muahang_chitiet;
+    }
   }
   $(".custom-file-input").each(function (index) {
     // console.log(this)
@@ -312,8 +315,8 @@ const submit1 = () => {
     waiting.value = false;
     if (response.success) {
       toast.add({ severity: 'success', summary: 'Thành công!', detail: 'Thay đổi thành công', life: 3000 });
-      // location.reload();
-      store_muahang.load_data(model.value.id);
+      location.reload();
+      // store_muahang.load_data(model.value.id);
     }
     // console.log(response)
   });

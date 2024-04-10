@@ -56,11 +56,11 @@ export default {
       })
       .then((res) => res.data);
   },
-  xuatpdf(id) {
+  xuatpdf(id, is_view = false) {
     return repository
       .post(
         `/v1/${resoure}/xuatpdf`,
-        { id: id },
+        { id: id, is_view: is_view },
         {
           headers: {
             "Content-Type": "multipart/form-data",

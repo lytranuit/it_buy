@@ -81,6 +81,8 @@
                       <div class="col-md-12 text-center" v-if="model.status_id == 1">
                         <Button label="Lưu lại" icon="pi pi-save" class="p-button-success p-button-sm mr-2"
                           @click.prevent="submit()"></Button>
+                        <Button label="Xem trước" icon="pi pi-eye" class="p-button-info p-button-sm mr-2"
+                          @click.prevent="view()"></Button>
                         <Button label="Xuất PDF và trình ký" icon="pi pi-file" class="p-button-sm mr-2"
                           @click.prevent="xuatpdf()"></Button>
                       </div>
@@ -390,6 +392,15 @@ const submit = async () => {
     load_data(model.value.id);
   }
 };
+const view = async () => {
+  await submit();
+  waiting.value = true;
+  var response = await dutruApi.xuatpdf(model.value.id, true);
+  waiting.value = false;
+  if (response.success) {
+    window.open(response.link, '_blank').focus();
+  }
+}
 const xuatpdf = async () => {
   await submit();
   waiting.value = true;

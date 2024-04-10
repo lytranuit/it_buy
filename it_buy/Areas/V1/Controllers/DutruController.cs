@@ -391,7 +391,7 @@ namespace it_template.Areas.V1.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> xuatpdf(int id)
+        public async Task<JsonResult> xuatpdf(int id, bool is_view = false)
         {
             var RawDetails = new List<RawDetails>();
             var data = _context.DutruModel.Where(d => d.id == id).Include(d => d.chitiet).Include(d => d.bophan).FirstOrDefault();
@@ -528,113 +528,120 @@ namespace it_template.Areas.V1.Controllers
                 url_return = url_pdf;
 
             }
-            ////Trình ký
-            data.pdf = url_return;
-            data.status_id = (int)Status.PDF;
-            //_context.SaveChanges();
-
-
-            ///UPLOAD ESIGN
-            System.Security.Claims.ClaimsPrincipal currentUser = this.User;
-            var user_id = UserManager.GetUserId(currentUser);
-            var user = await UserManager.GetUserAsync(currentUser);
-
-            ///Document
-            var type_id = 72;
-            if (data.type_id == 1)
+            if (is_view)
             {
-                type_id = 78;
+                return Json(new { success = true, link = url_return });
             }
-            else if (data.type_id == 3)
+            else
             {
-                type_id = 79;
-            }
-            var DocumentModel = new DocumentModel()
-            {
-                name_vi = data.name,
-                description_vi = data.note,
-                priority = 2,
-                status_id = (int)DocumentStatus.Draft,
-                type_id = type_id,
-                user_id = user_id,
-                user_next_signature_id = user_id,
-                is_sign_parellel = false,
-                created_at = DateTime.Now,
-            };
-            var count_type = _context.DocumentModel.Where(d => d.type_id == DocumentModel.type_id).Count();
-            var type = _context.DocumentTypeModel.Where(d => d.id == DocumentModel.type_id).Include(d => d.users_receive).FirstOrDefault();
-            DocumentModel.code = type.symbol + "00" + (count_type + 1);
-            _context.Add(DocumentModel);
-            _context.SaveChanges();
-            ///DocumentFile
-            DocumentFileModel DocumentFileModel = new DocumentFileModel
-            {
-                document_id = DocumentModel.id,
-                ext = ".pdf",
-                url = url_return,
-                name = data.name,
-                mimeType = "application/pdf",
-                created_at = DateTime.Now
-            };
-            _context.Add(DocumentFileModel);
-            ////Đính kèm
-            var list_attachment = new List<DocumentAttachmentModel>();
-            var dinhkem = _context.DutruDinhkemModel.Where(d => d.dutru_id == id).ToList();
-            foreach (var d in dinhkem)
-            {
-                list_attachment.Add(new DocumentAttachmentModel()
+                ////Trình ký
+                data.pdf = url_return;
+                data.status_id = (int)Status.PDF;
+                //_context.SaveChanges();
+
+
+                ///UPLOAD ESIGN
+                System.Security.Claims.ClaimsPrincipal currentUser = this.User;
+                var user_id = UserManager.GetUserId(currentUser);
+                var user = await UserManager.GetUserAsync(currentUser);
+
+                ///Document
+                var type_id = 72;
+                if (data.type_id == 1)
+                {
+                    type_id = 78;
+                }
+                else if (data.type_id == 3)
+                {
+                    type_id = 79;
+                }
+                var DocumentModel = new DocumentModel()
+                {
+                    name_vi = data.name,
+                    description_vi = data.note,
+                    priority = 2,
+                    status_id = (int)DocumentStatus.Draft,
+                    type_id = type_id,
+                    user_id = user_id,
+                    user_next_signature_id = user_id,
+                    is_sign_parellel = false,
+                    created_at = DateTime.Now,
+                };
+                var count_type = _context.DocumentModel.Where(d => d.type_id == DocumentModel.type_id).Count();
+                var type = _context.DocumentTypeModel.Where(d => d.id == DocumentModel.type_id).Include(d => d.users_receive).FirstOrDefault();
+                DocumentModel.code = type.symbol + "00" + (count_type + 1);
+                _context.Add(DocumentModel);
+                _context.SaveChanges();
+                ///DocumentFile
+                DocumentFileModel DocumentFileModel = new DocumentFileModel
                 {
                     document_id = DocumentModel.id,
-                    name = d.name,
-                    ext = d.ext,
-                    mimeType = d.mimeType,
-                    url = d.url,
-                    created_at = d.created_at
-                });
-            }
-            _context.AddRange(list_attachment);
-            ////Signature
-            for (int k = 0; k < 1; ++k)
-            {
-                DocumentSignatureModel DocumentSignatureModel = new DocumentSignatureModel() { document_id = DocumentModel.id, user_id = user_id, stt = k };
-                _context.Add(DocumentSignatureModel);
-            }
-            ////Receive
-            if (type.users_receive.Count() > 0)
-            {
-                foreach (var receive in type.users_receive)
+                    ext = ".pdf",
+                    url = url_return,
+                    name = data.name,
+                    mimeType = "application/pdf",
+                    created_at = DateTime.Now
+                };
+                _context.Add(DocumentFileModel);
+                ////Đính kèm
+                var list_attachment = new List<DocumentAttachmentModel>();
+                var dinhkem = _context.DutruDinhkemModel.Where(d => d.dutru_id == id).ToList();
+                foreach (var d in dinhkem)
                 {
-                    DocumentUserReceiveModel DocumentUserReceiveModel = new DocumentUserReceiveModel() { document_id = DocumentModel.id, user_id = receive.user_id };
-                    _context.Add(DocumentUserReceiveModel);
+                    list_attachment.Add(new DocumentAttachmentModel()
+                    {
+                        document_id = DocumentModel.id,
+                        name = d.name,
+                        ext = d.ext,
+                        mimeType = d.mimeType,
+                        url = d.url,
+                        created_at = d.created_at
+                    });
                 }
+                _context.AddRange(list_attachment);
+                ////Signature
+                for (int k = 0; k < 1; ++k)
+                {
+                    DocumentSignatureModel DocumentSignatureModel = new DocumentSignatureModel() { document_id = DocumentModel.id, user_id = user_id, stt = k };
+                    _context.Add(DocumentSignatureModel);
+                }
+                ////Receive
+                if (type.users_receive.Count() > 0)
+                {
+                    foreach (var receive in type.users_receive)
+                    {
+                        DocumentUserReceiveModel DocumentUserReceiveModel = new DocumentUserReceiveModel() { document_id = DocumentModel.id, user_id = receive.user_id };
+                        _context.Add(DocumentUserReceiveModel);
+                    }
+                }
+                /////create event
+                DocumentEventModel DocumentEventModel = new DocumentEventModel
+                {
+                    document_id = DocumentModel.id,
+                    event_content = "<b>" + user.FullName + "</b> tạo hồ sơ mới",
+                    created_at = DateTime.Now,
+                };
+                _context.Add(DocumentEventModel);
+                /////create Related 
+                RelatedEsignModel RelatedEsignModel = new RelatedEsignModel()
+                {
+                    esign_id = DocumentModel.id,
+                    related_id = data.id,
+                    type = "dutru",
+                    created_at = DateTime.Now
+                };
+                _context.Add(RelatedEsignModel);
+
+                //_context.SaveChanges();
+                data.status_id = (int)Status.Esign;
+                data.activeStep = 1;
+                data.esign_id = DocumentModel.id;
+                data.code = DocumentModel.code;
+
+                _context.SaveChanges();
+
+                return Json(new { success = true });
             }
-            /////create event
-            DocumentEventModel DocumentEventModel = new DocumentEventModel
-            {
-                document_id = DocumentModel.id,
-                event_content = "<b>" + user.FullName + "</b> tạo hồ sơ mới",
-                created_at = DateTime.Now,
-            };
-            _context.Add(DocumentEventModel);
-            /////create Related 
-            RelatedEsignModel RelatedEsignModel = new RelatedEsignModel()
-            {
-                esign_id = DocumentModel.id,
-                related_id = data.id,
-                type = "dutru",
-                created_at = DateTime.Now
-            };
-            _context.Add(RelatedEsignModel);
-
-            //_context.SaveChanges();
-            data.status_id = (int)Status.Esign;
-            data.activeStep = 1;
-            data.esign_id = DocumentModel.id;
-            data.code = DocumentModel.code;
-
-            _context.SaveChanges();
-
-            return Json(new { success = true });
         }
         [HttpPost]
         public async Task<JsonResult> Table()

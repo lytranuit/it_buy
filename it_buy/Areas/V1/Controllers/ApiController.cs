@@ -183,6 +183,9 @@ namespace it_template.Areas.V1.Controllers
                     created_by = record.created_by,
                     user_created_by = record.user_created_by,
                     is_dathang = record.is_dathang,
+                    loaithanhtoan = record.loaithanhtoan,
+                    is_nhanhang = record.is_nhanhang,
+                    is_thanhtoan = record.is_thanhtoan,
                     date_finish = record.date_finish,
                     tonggiatri = tonggiatri
                 };
