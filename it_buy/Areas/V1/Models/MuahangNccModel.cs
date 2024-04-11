@@ -22,6 +22,8 @@ namespace Vue.Models
         public decimal? phigiaohang { get; set; }
         public decimal? tienvat { get; set; }
         public int? vat { get; set; }
+        public string? tiente { get; set; } = "VND";
+        public decimal? quidoi { get; set; }
         public List<MuahangNccChitietModel>? chitiet { get; set; }
         public List<MuahangNccDinhkemModel>? dinhkem { get; set; }
 

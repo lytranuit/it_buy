@@ -5,7 +5,7 @@
         <div class="form-group row">
           <b class="col-12 col-lg-12 col-form-label">Tiêu đề:<i class="text-danger">*</i></b>
           <div class="col-12 col-lg-12 pt-1">
-            <input class="form-control" v-model="model.name" required :readonly="readonly">
+            <input class="form-control" v-model="model.name" required :disabled="readonly">
           </div>
         </div>
       </div>
@@ -13,7 +13,7 @@
         <div class="form-group row">
           <b class="col-12 col-lg-12 col-form-label">Lý do mua hàng:<i class="text-danger">*</i></b>
           <div class="col-12 col-lg-12 pt-1">
-            <textarea class="form-control" v-model="model.note" required :readonly="readonly"></textarea>
+            <textarea class="form-control" v-model="model.note" required :disabled="readonly"></textarea>
           </div>
         </div>
       </div>
@@ -28,7 +28,7 @@
                         <b class="col-12 col-lg-12 col-form-label">Ghi chú:</b>
                         <div class="col-12 col-lg-12 pt-1">
                           <textarea class="form-control form-control-sm" v-model="model.note"
-                            :readonly="model.status_id != 1"></textarea>
+                            :disabled="model.status_id != 1"></textarea>
                         </div>
                       </div> -->
       </div>

@@ -27,19 +27,19 @@
             <div class="field col">
               <label for="name">Tên nguyên liệu <span class="text-danger">*</span></label>
               <div>
-                <InputText v-model="model.tenhh" class="form-control form-control-sm" :readonly="model.is_chapnhan" />
+                <InputText v-model="model.tenhh" class="form-control form-control-sm" :disabled="model.is_chapnhan" />
               </div>
             </div>
             <div class="field col">
               <label for="name">ĐVT <span class="text-danger">*</span></label>
               <div>
-                <InputText v-model="model.dvt" class="form-control form-control-sm" :readonly="model.is_chapnhan" />
+                <InputText v-model="model.dvt" class="form-control form-control-sm" :disabled="model.is_chapnhan" />
               </div>
             </div>
             <div class="field col">
               <label for="name">Grade <span class="text-danger">*</span></label>
               <div>
-                <InputText v-model="model.grade" class="form-control form-control-sm" :readonly="model.is_chapnhan" />
+                <InputText v-model="model.grade" class="form-control form-control-sm" :disabled="model.is_chapnhan" />
               </div>
             </div>
           </div>
@@ -47,13 +47,13 @@
             <div class="field col">
               <label for="name">Nhà sản xuất <span class="text-danger">*</span></label>
               <div>
-                <NsxTreeSelect v-model="model.mansx" :readonly="model.is_chapnhan"></NsxTreeSelect>
+                <NsxTreeSelect v-model="model.mansx" :disabled="model.is_chapnhan"></NsxTreeSelect>
               </div>
             </div>
             <div class="field col">
               <label for="name">Nhà phân phối <span class="text-danger">*</span></label>
               <div>
-                <NccTreeSelect v-model="model.mancc" :readonly="model.is_chapnhan"></NccTreeSelect>
+                <NccTreeSelect v-model="model.mancc" :disabled="model.is_chapnhan"></NccTreeSelect>
               </div>
             </div>
           </div>
@@ -62,13 +62,13 @@
               <label for="name">Mã số thiết kế</label>
               <div>
                 <InputText v-model="model.masothietke" class="form-control form-control-sm"
-                  :readonly="model.is_chapnhan" />
+                  :disabled="model.is_chapnhan" />
               </div>
             </div>
             <div class="field col">
               <label for="name">Qui cách</label>
               <div>
-                <InputText v-model="model.quicach" class="form-control form-control-sm" :readonly="model.is_chapnhan" />
+                <InputText v-model="model.quicach" class="form-control form-control-sm" :disabled="model.is_chapnhan" />
               </div>
             </div>
           </div>

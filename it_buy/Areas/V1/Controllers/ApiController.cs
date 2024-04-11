@@ -170,9 +170,11 @@ namespace it_template.Areas.V1.Controllers
             {
                 var chonmua = record.muahang_chonmua;
                 decimal? tonggiatri = null;
+                var tiente = "VND";
                 if (chonmua != null)
                 {
                     tonggiatri = chonmua.tonggiatri;
+                    tiente = chonmua.tiente;
                 }
                 var data1 = new
                 {
@@ -187,7 +189,8 @@ namespace it_template.Areas.V1.Controllers
                     is_nhanhang = record.is_nhanhang,
                     is_thanhtoan = record.is_thanhtoan,
                     date_finish = record.date_finish,
-                    tonggiatri = tonggiatri
+                    tonggiatri = tonggiatri,
+                    tiente = tiente,
                 };
                 data.Add(data1);
             }

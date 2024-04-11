@@ -14,6 +14,7 @@ export const useMuahang = defineStore("muahang", () => {
   const QrNhanhang = ref([]);
   const waiting = ref();
   const list_uynhiemchi = ref([]);
+  const chonmua = ref({});
   const list_add = computed(() => {
     return datatable.value.filter((item) => {
       return item.ids;
@@ -36,15 +37,18 @@ export const useMuahang = defineStore("muahang", () => {
     var chitiet = res.chitiet;
     var list_ncc = res.nccs;
     var user = res.user_created_by;
+    var muahang_chonmua = res.muahang_chonmua;
     res.date = res.date ? moment(res.date).format("YYYY-MM-DD") : null;
     delete res.chitiet;
     delete res.nccs;
     delete res.uynhiemchi;
     delete res.user_created_by;
+    delete res.muahang_chonmua;
     user_created_by.value = user;
     model.value = res;
     datatable.value = chitiet;
     nccs.value = list_ncc;
+    chonmua.value = muahang_chonmua;
     list_uynhiemchi.value = uynhiemchi;
   };
   const getQrNhanhang = async (id) => {
@@ -67,6 +71,7 @@ export const useMuahang = defineStore("muahang", () => {
     tabviewActive,
     QrNhanhang,
     user_created_by,
+    chonmua,
     load_data,
     getQrNhanhang,
     reset,

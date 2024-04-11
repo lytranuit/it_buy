@@ -21,7 +21,7 @@
           </td>
           <td v-for="(item, key1) in nccs" :key="key1" class="text-center"
             :class="{ highlight: model.muahang_chonmua_id == item.id }">
-            {{ formatPrice(item.chitiet[key].thanhtien, 0) }} VNĐ
+            {{ formatPrice(item.chitiet[key].thanhtien, 0) }} {{ item.tiente }}
           </td>
         </tr>
         <tr>
@@ -29,7 +29,7 @@
           <td>--</td>
           <td v-for="(item, key) in nccs" :key="key" class="text-center"
             :class="{ highlight: model.muahang_chonmua_id == item.id }">
-            <b>{{ formatPrice(item.tonggiatri, 0) }} VNĐ</b>
+            <b>{{ formatPrice(item.tonggiatri, 0) }} {{ item.tiente }}</b>
           </td>
         </tr>
         <tr>
@@ -102,7 +102,7 @@
       <div class="form-group row">
         <b class="col-12 col-lg-12 col-form-label">Lưu ý / Lý do chọn mua:</b>
         <div class="col-12 col-lg-12 pt-1">
-          <textarea class="form-control" v-model="model.note_chonmua" :readonly="readonly"></textarea>
+          <textarea class="form-control" v-model="model.note_chonmua" :disabled="readonly"></textarea>
         </div>
       </div>
     </div>

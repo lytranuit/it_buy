@@ -43,7 +43,7 @@
                   </div>
                 </template>
                 <template v-else-if="col.data == 'tonggiatri'">
-                  {{ formatPrice(slotProps.data[col.data], 0) }} VNĐ
+                  {{ formatPrice(slotProps.data[col.data], 0) }} {{ slotProps.data["tiente"] }}
                 </template>
                 <template v-else-if="col.data == 'status_id'">
                   <div class="text-center">

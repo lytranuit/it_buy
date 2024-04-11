@@ -36,7 +36,7 @@
                         <div class="form-group row">
                           <b class="col-12 col-lg-12 col-form-label">Tiêu đề:<i class="text-danger">*</i></b>
                           <div class="col-12 col-lg-12 pt-1">
-                            <input class="form-control" v-model="model.name" required :readonly="model.status_id != 1">
+                            <input class="form-control" v-model="model.name" required :disabled="model.status_id != 1">
                           </div>
                         </div>
                       </div>
@@ -56,7 +56,7 @@
                           <b class="col-12 col-lg-12 col-form-label">Hạn giao hàng:<i class="text-danger">*</i></b>
                           <div class="col-12 col-lg-12 pt-1">
                             <Calendar v-model="model.date" dateFormat="yy-mm-dd" class="date-custom"
-                              :manualInput="false" showIcon :minDate="minDate" :readonly="model.status_id != 1" />
+                              :manualInput="false" showIcon :minDate="minDate" :disabled="model.status_id != 1" />
                           </div>
                         </div>
                       </div>
@@ -65,7 +65,7 @@
                           <b class="col-12 col-lg-12 col-form-label">Lý do mua hàng:<i class="text-danger">*</i></b>
                           <div class="col-12 col-lg-12 pt-1">
                             <textarea class="form-control form-control-sm" v-model="model.note" required
-                              :readonly="model.status_id != 1"></textarea>
+                              :disabled="model.status_id != 1"></textarea>
                           </div>
                         </div>
                         <div class="form-group row">
@@ -168,7 +168,7 @@
                                 <div class="mt-2">
                                   <Calendar :modelValue="formatDate(item.muahang.date)" dateFormat="yy-mm-dd"
                                     class="date-custom" :manualInput="false" showIcon :minDate="minDate"
-                                    :readonly="item.muahang.is_dathang" />
+                                    :disabled="item.muahang.is_dathang" />
                                 </div>
                               </div>
                               <div class="col-md-12 mb-2">

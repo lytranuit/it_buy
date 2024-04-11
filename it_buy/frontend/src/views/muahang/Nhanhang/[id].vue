@@ -11,20 +11,20 @@
               <b class="">Ngày giao hàng dự kiến:</b>
               <div class="mt-2">
                 <Calendar :modelValue="formatDate(model.date)" dateFormat="yy-mm-dd" class="date-custom"
-                  :manualInput="false" showIcon :minDate="minDate" :readonly="true" />
+                  :manualInput="false" showIcon :minDate="minDate" :disabled="true" />
               </div>
             </div>
             <div class="col-md-4 form-group">
               <b class="">Nhà cung cấp:</b>
               <div class="mt-2">
-                <InputText :modelValue="model?.muahang_chonmua?.ncc?.tenncc" :readonly="true" size="small"
+                <InputText :modelValue="model?.muahang_chonmua?.ncc?.tenncc" :disabled="true" size="small"
                   class="form-control"></InputText>
               </div>
             </div>
             <div class="col-md-4 form-group">
               <b class="">Mã đặt hàng:</b>
               <div class="mt-2">
-                <InputText :modelValue="model?.code" :readonly="true" size="small" class="form-control"></InputText>
+                <InputText :modelValue="model?.code" :disabled="true" size="small" class="form-control"></InputText>
               </div>
             </div>
             <div class="col-md-12 mb-2">
@@ -63,19 +63,7 @@ const confirm = useConfirm();
 const toast = useToast();
 const route = useRoute();
 const storeMuahang = useMuahang();
-const { model, waiting, datatable, nccs } = storeToRefs(storeMuahang);
-const load_data = async (id) => {
-  var res = await muahangApi.get(id);
-  var chitiet = res.chitiet;
-  var list_ncc = res.nccs;
-  res.date = res.date ? moment(res.date).format("YYYY-MM-DD") : null;
-  delete res.chitiet;
-  delete res.nccs;
-  delete res.user_created_by;
-  model.value = res;
-  datatable.value = chitiet;
-  nccs.value = list_ncc;
-};
+const { model, waiting, datatable } = storeToRefs(storeMuahang);
 
 const savenhanhang = () => {
   // console.log(list_nhanhang);
@@ -108,6 +96,6 @@ const savenhanhang = () => {
   });
 }
 onMounted(() => {
-  load_data(route.params.id);
+  storeMuahang.load_data(route.params.id);
 });
 </script>

@@ -745,7 +745,7 @@ namespace it_template.Areas.V1.Controllers
             //var tenhh = Request.Form["filters[tenhh]"].FirstOrDefault();
             int skip = start != null ? Convert.ToInt32(start) : 0;
             var customerData = _context.DutruChitietModel
-                .Include(d => d.muahang_chitiet).ThenInclude(d => d.muahang)
+                .Include(d => d.muahang_chitiet).ThenInclude(d => d.muahang).ThenInclude(d => d.muahang_chonmua).ThenInclude(d => d.chitiet)
                 .Include(d => d.dutru).Where(d => d.dutru.status_id == (int)Status.EsignSuccess);
 
             //if (is_CungungNVL && is_CungungGiantiep)
@@ -814,8 +814,11 @@ namespace it_template.Areas.V1.Controllers
                 var list_muahang_ncc_id = record.muahang_chitiet.Select(d => d.muahang.muahang_chonmua_id).ToList();
                 var list_muahang_chitiet_id = record.muahang_chitiet.Select(d => d.id).ToList();
 
-                var thanhtien = _context.MuahangNccChitietModel.Where(d => list_muahang_ncc_id.Contains(d.muahang_ncc_id) && list_muahang_chitiet_id.Contains(d.muahang_chitiet_id)).Include(d => d.muahang_ncc).Sum(d => d.thanhtien + (d.thanhtien * d.muahang_ncc.vat / 100));
-                var muahang_chitiet = record.muahang_chitiet.Where(d => d.muahang.status_id != 11).ToList();
+                var thanhtien1 = _context.MuahangNccChitietModel.Include(d => d.muahang_ncc).ThenInclude(d => d.muahang)
+                    .Where(d => d.muahang_ncc.muahang.deleted_at == null && d.muahang_ncc.muahang.status_id != (int)Status.MuahangEsignError && list_muahang_ncc_id.Contains(d.muahang_ncc_id) && list_muahang_chitiet_id.Contains(d.muahang_chitiet_id))
+                    .ToList();
+                var thanhtien = thanhtien1.Sum(d => (d.thanhtien + (d.thanhtien * d.muahang_ncc.vat / 100)) * d.muahang_ncc.quidoi);
+                var muahang_chitiet = record.muahang_chitiet.Where(d => d.muahang.deleted_at == null && d.muahang.status_id != 11).ToList();
                 var soluong_dutru = record.soluong;
                 var soluong_mua = muahang_chitiet.Sum(d => d.soluong * d.quidoi);
 

@@ -148,6 +148,7 @@ namespace it_template.Areas.V1.Controllers
             var data = _context.MuahangModel.Where(d => d.id == id)
                 .Include(d => d.user_created_by)
                 .Include(d => d.uynhiemchi)
+                .Include(d => d.muahang_chonmua)
                 .Include(d => d.chitiet).ThenInclude(d => d.user_nhanhang)
                 .Include(d => d.nccs).ThenInclude(d => d.chitiet)
                 .Include(d => d.nccs).ThenInclude(d => d.dinhkem.Where(d => d.deleted_at == null))
@@ -220,6 +221,7 @@ namespace it_template.Areas.V1.Controllers
                     soluong = chonmua.soluong,
                     dongia = chonmua.dongia,
                     thanhtien = chonmua.thanhtien,
+                    tiente = muahang.muahang_chonmua.tiente
                 };
                 data.Add(data1);
             }
@@ -563,6 +565,7 @@ namespace it_template.Areas.V1.Controllers
                     raw.Add("phigiaohang", ncc_chon.phigiaohang.Value.ToString("#,##0.##"));
                     raw.Add("tienvat", ncc_chon.tienvat.Value.ToString("#,##0.##"));
                     raw.Add("vat", ncc_chon.vat.Value.ToString());
+                    raw.Add("tiente", ncc_chon.tiente.ToString());
                     var stt = 1;
                     foreach (var item in ncc_chon.chitiet)
                     {
@@ -810,6 +813,18 @@ namespace it_template.Areas.V1.Controllers
             return Json(new { success = true });
         }
         [HttpPost]
+        public async Task<JsonResult> saveQuidoi(int chonmua_id, decimal quidoi)
+        {
+            var chonmua = _context.MuahangNccModel.Where(d=>d.id == chonmua_id).FirstOrDefault();
+            if(chonmua != null)
+            {
+                chonmua.quidoi = quidoi;
+                _context.Update(chonmua);
+                _context.SaveChanges();
+            }
+            return Json(new { success = true });
+        }
+        [HttpPost]
         public async Task<JsonResult> Table()
         {
             System.Security.Claims.ClaimsPrincipal currentUser = this.User;
@@ -864,9 +879,11 @@ namespace it_template.Areas.V1.Controllers
             {
                 var chonmua = record.muahang_chonmua;
                 decimal? tonggiatri = null;
+                var tiente = "VND";
                 if (chonmua != null)
                 {
                     tonggiatri = chonmua.tonggiatri;
+                    tiente = chonmua.tiente;
                 }
                 var data1 = new
                 {
@@ -880,6 +897,7 @@ namespace it_template.Areas.V1.Controllers
                     loaithanhtoan = record.loaithanhtoan,
                     is_nhanhang = record.is_nhanhang,
                     is_thanhtoan = record.is_thanhtoan,
+                    tiente = tiente,
                     date_finish = record.date_finish,
                     tonggiatri = tonggiatri,
                     created_at = record.created_at
@@ -924,6 +942,7 @@ namespace it_template.Areas.V1.Controllers
                     raw.Add("phigiaohang", ncc_chon.phigiaohang.Value.ToString("#,##0.##"));
                     raw.Add("tienvat", ncc_chon.tienvat.Value.ToString("#,##0.##"));
                     raw.Add("vat", ncc_chon.vat.Value.ToString());
+                    raw.Add("tiente", ncc_chon.tiente.ToString());
                     var stt = 1;
                     foreach (var item in ncc_chon.chitiet)
                     {
@@ -937,8 +956,8 @@ namespace it_template.Areas.V1.Controllers
                             mahh = item.mahh,
                             dvt = item.dvt,
                             soluong = item.soluong.Value.ToString("#,##0.##"),
-                            dongia = item.dongia.Value.ToString("#,##0.##") + " VND",
-                            thanhtien = item.thanhtien.Value.ToString("#,##0.##") + " VND",
+                            dongia = item.dongia.Value.ToString("#,##0.##"),
+                            thanhtien = item.thanhtien.Value.ToString("#,##0.##"),
                             //note = item.note,
                             //artwork = material.masothietke,
                             //date = data.date.Value.ToString("yyyy-MM-dd")

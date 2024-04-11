@@ -3,6 +3,18 @@
     <div class="col-md-4 text-center">
       <h3>Kiểm tra thông tin</h3>
       <a href="#" @click.prevent="tabviewActive = 1">-> Files</a>
+      <div v-if="chonmua.tiente != 'VND'">
+        Qui đổi từ 1 <b>{{ chonmua.tiente }}</b>
+        =
+        <template v-if="model.is_dathang == true && !model.is_thanhtoan && is_Ketoan">
+          <input class="form-control form-control-sm d-inline-block" style="width: 60px"
+            v-model="chonmua.quidoi" /><span class="text-danger">*</span>
+        </template>
+        <template v-else>
+          {{ chonmua.quidoi }}
+        </template>
+        <b> VND</b>
+      </div>
     </div>
     <div class="col-md-4">
       <b class="">Ủy nhiệm chi:<span class="text-danger">*</span></b>
@@ -47,12 +59,12 @@ import { useToast } from "primevue/usetoast";
 import { download } from "../../utilities/util";
 const toast = useToast();
 const store_muahang = useMuahang();
-const { model, tabviewActive, waiting, list_uynhiemchi } = storeToRefs(store_muahang);
+const { model, tabviewActive, waiting, list_uynhiemchi, chonmua } = storeToRefs(store_muahang);
 
 const store = useAuth();
 const { is_admin, is_Cungung, is_Ketoan } = storeToRefs(store);
 const emit = defineEmits(["next"]);
-
+const editingRow = ref({});
 const fileChange = (e) => {
   var parents = $(e.target).parents(".custom-file");
   var label = $(".custom-file-label", parents);
@@ -66,6 +78,10 @@ const thanhtoan = async () => {
     alert("Chưa upload ủy nhiệm chi!");
     return false;
   }
+  if (!chonmua.value.quidoi) {
+    alert("Chưa nhập tỉ lệ qui đổi!");
+    return false;
+  }
   for (var stt = 0; stt < files.length; stt++) {
     var file = files[stt];
     params["file_" + stt] = file;
@@ -73,6 +89,7 @@ const thanhtoan = async () => {
   waiting.value = true;
   await muahangApi.saveUynhiemchi(params);
   model.value.is_thanhtoan = true;
+  await muahangApi.saveQuidoi(chonmua.value.id, chonmua.value.quidoi);
   await muahangApi.save(model.value);
   store_muahang.load_data(model.value.id);
   waiting.value = false;

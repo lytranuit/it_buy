@@ -5,7 +5,7 @@
       <b class="">Ngày giao hàng dự kiến:</b>
       <div class="mt-2">
         <Calendar v-model="model.date" dateFormat="yy-mm-dd" class="date-custom" :manualInput="false" showIcon
-          :minDate="minDate" :readonly="readonly" @update:modelValue="changeNgaygiaohang" />
+          :minDate="minDate" :disabled="readonly" @update:modelValue="changeNgaygiaohang" />
       </div>
     </div>
     <div class="col-md-6 form-group row align-items-center">

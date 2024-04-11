@@ -33,37 +33,40 @@
               <div class="col-12 col-lg-12 pt-1">
                 <div class="custom-control custom-switch switch-success" style="height: 36px;;">
                   <input type="checkbox" :id="'dapung_' + key" class="custom-control-input" v-model="item.dapung"
-                    :readonly="readonly">
+                    :disabled="readonly">
                   <label :for="'dapung_' + key" class="custom-control-label"></label>
                 </div>
               </div>
 
             </div>
             <div class="form-group row">
-              <b class="col-12 col-lg-12 col-form-label">Thời gian giao hàng:</b>
+              <b class="col-12 col-lg-12 col-form-label">Tiền tệ:</b>
               <div class="col-12 col-lg-12 pt-1">
-                <input class="form-control form-control-sm" v-model="item.thoigiangiaohang" :readonly="readonly" />
+                {{ item.tiente }} <i class="fas fa-sync-alt" style="cursor: pointer;" @click="openOp($event, item)"
+                  v-if="readonly == false"></i>
               </div>
+
             </div>
-            <!-- ncc.thoigiangiaohang = "";
-                        ncc.baohanh = "";
-                        ncc.thanhtoan = "";
-                        ncc.dapung = true;
-                        ncc.tonggiatri = 0; -->
+
           </div>
           <div class="col-md-6">
 
             <div class="form-group row">
               <b class="col-12 col-lg-12 col-form-label">Chính sách bảo hành:</b>
               <div class="col-12 col-lg-12 pt-1">
-                <input class="form-control form-control-sm" v-model="item.baohanh" :readonly="readonly" />
+                <input class="form-control form-control-sm" v-model="item.baohanh" :disabled="readonly" />
               </div>
             </div>
-
+            <div class="form-group row">
+              <b class="col-12 col-lg-12 col-form-label">Thời gian giao hàng:</b>
+              <div class="col-12 col-lg-12 pt-1">
+                <input class="form-control form-control-sm" v-model="item.thoigiangiaohang" :disabled="readonly" />
+              </div>
+            </div>
             <div class="form-group row">
               <b class="col-12 col-lg-12 col-form-label">Điều kiện thanh toán:</b>
               <div class="col-12 col-lg-12 pt-1">
-                <input class="form-control form-control-sm" v-model="item.thanhtoan" :readonly="readonly" />
+                <input class="form-control form-control-sm" v-model="item.thanhtoan" :disabled="readonly" />
               </div>
             </div>
           </div>
@@ -79,7 +82,7 @@
             <div class="col-md-4">
               <div class="row">
                 <b class="col">Thành tiền:</b>
-                <span class="col text-right">{{ formatPrice(item.thanhtien, 0) }} VND</span>
+                <span class="col text-right">{{ formatPrice(item.thanhtien, 0) }} {{ item.tiente }}</span>
               </div>
             </div>
           </div>
@@ -92,9 +95,9 @@
             <div class="col-md-4">
               <div class="row">
                 <b class="col">VAT <input type="number" v-model="item.vat" class="form-control form-control-sm"
-                    style="width: 60px;display: inline-block;" @change="changetien(key)" />%:
+                    style="width: 60px;display: inline-block;" @change="changetien(key)" :disabled="readonly" />%:
                 </b>
-                <span class="col text-right">{{ formatPrice(item.tienvat, 0) }} VND</span>
+                <span class="col text-right">{{ formatPrice(item.tienvat, 0) }} {{ item.tiente }}</span>
               </div>
             </div>
           </div>
@@ -108,8 +111,8 @@
               <div class="row">
                 <b class="col">Phí giao hàng:</b>
                 <span class="col text-right">
-                  <InputNumber v-model="item.phigiaohang" class="p-inputtext-sm" suffix=" VND"
-                    @update:modelValue="changetien(key)" :readonly="readonly" :maxFractionDigits="2" />
+                  <InputNumber v-model="item.phigiaohang" class="p-inputtext-sm" :suffix="' ' + item.tiente"
+                    @update:modelValue="changetien(key)" :disabled="readonly" :maxFractionDigits="2" />
                 </span>
               </div>
             </div>
@@ -122,7 +125,7 @@
             <div class="col-md-4">
               <div class="row">
                 <b class="col">Tổng giá trị:</b>
-                <span class="col text-right">{{ formatPrice(item.tonggiatri, 0) }} VND</span>
+                <span class="col text-right">{{ formatPrice(item.tonggiatri, 0) }} {{ item.tiente }}</span>
               </div>
             </div>
           </div>
@@ -157,12 +160,22 @@
   <div class="flex py-4 gap-2" v-if="readonly == false">
     <Button label="Lập bảng so sánh báo giá" @click="submit1()" size="small" />
   </div>
+  <OverlayPanel ref="op">
+    <div>
+      Qui đổi tạm tính từ 1
+      <input class="form-control form-control-sm d-inline-block" style="width: 60px" v-model="editingRow.tiente" />
+      = <input class="form-control form-control-sm d-inline-block" style="width: 60px" v-model="editingRow.quidoi" />
+      <b>VND</b>
+
+    </div>
+  </OverlayPanel>
 </template>
 <script setup>
 import { onMounted, ref } from "vue";
 import { useMuahang } from "../../stores/muahang";
 import { storeToRefs } from "pinia";
 import muahangApi from "../../api/muahangApi";
+import OverlayPanel from 'primevue/overlaypanel';
 import Divider from 'primevue/divider';
 import Button from 'primevue/button';
 import TabView from 'primevue/tabview';
@@ -190,6 +203,12 @@ const { model, list_add, list_update, list_delete, datatable, nccs, waiting } = 
 const active = ref();
 const nccmodel = ref();
 
+const editingRow = ref();
+const op = ref();
+const openOp = (event, row) => {
+  editingRow.value = row;
+  op.value.toggle(event);
+}
 const openNew = () => {
   modelNhacc.value = {};
   headerForm.value = "Tạo mới";
@@ -234,6 +253,8 @@ const addNCC = () => {
   ncc.thanhtien = 0;
   ncc.tonggiatri = 0;
   ncc.chonmua = false;
+  ncc.tiente = "VND";
+  ncc.quidoi = 1;
   nccs.value.push(ncc);
   active.value = nccs.value.length - 1;
   nccmodel.value = null;
@@ -298,6 +319,7 @@ const submit1 = () => {
   // console.log(params)
   for (var ncc of params.nccs) {
     delete ncc.ncc;
+    delete ncc.dinhkem;
     for (var c of ncc.chitiet) {
       delete c.muahang_chitiet;
     }

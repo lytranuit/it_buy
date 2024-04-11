@@ -28,22 +28,22 @@
 
                     <template v-else-if="col.data == 'date_nhanhang'">
                         <Calendar v-model="slotProps.data[col.data]" dateFormat="yy-mm-dd" class="date-custom"
-                            :manualInput="false" showIcon :readonly="is_readonly" />
+                            :manualInput="false" showIcon :disabled="is_readonly" />
                     </template>
 
                     <template v-else-if="col.data == 'soluong_nhanhang'">
-                        <InputNumber v-model="slotProps.data[col.data]" class="p-inputtext-sm" :readonly="is_readonly"
+                        <InputNumber v-model="slotProps.data[col.data]" class="p-inputtext-sm" :disabled="is_readonly"
                             :maxFractionDigits="2" />
                     </template>
 
                     <template v-else-if="col.data == 'note_nhanhang'">
                         <textarea v-model="slotProps.data[col.data]" class="form-control form-control-sm"
-                            :readonly="is_readonly"></textarea>
+                            :disabled="is_readonly"></textarea>
                     </template>
 
                     <template v-else-if="col.data == 'status_nhanhang'">
                         <select class="form-control form-control-sm" v-model="slotProps.data[col.data]"
-                            :readonly="is_readonly" @change="changeNhanhang(slotProps.data)">
+                            :disabled="is_readonly" @change="changeNhanhang(slotProps.data)">
                             <option value="0">Chưa nhận hàng</option>
                             <option value="1">Đã nhận hàng</option>
                             <option value="2">Khiếu nại</option>

@@ -16,12 +16,12 @@
                     </template>
 
                     <template v-else-if="col.data == 'dongia'">
-                        <InputNumber v-model="slotProps.data[col.data]" class="p-inputtext-sm" suffix=" VND"
-                            @update:modelValue="changeDongia()" :readonly="readonly" :maxFractionDigits="2" />
+                        <InputNumber v-model="slotProps.data[col.data]" class="p-inputtext-sm" :suffix="' ' + modelncc.tiente"
+                            @update:modelValue="changeDongia()" :disabled="readonly" :maxFractionDigits="2" />
                     </template>
 
                     <template v-else-if="col.data == 'thanhtien'">
-                        {{ formatPrice(slotProps.data[col.data], 0) }} VND
+                        {{ formatPrice(slotProps.data[col.data], 0) }} {{ modelncc.tiente }}
                     </template>
 
                     <template v-else>

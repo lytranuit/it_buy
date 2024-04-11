@@ -69,6 +69,19 @@ export default {
       })
       .then((res) => res.data);
   },
+  saveQuidoi(chonmua_id, quidoi) {
+    return repository
+      .post(
+        `/v1/${resoure}/saveQuidoi`,
+        { chonmua_id: chonmua_id, quidoi: quidoi },
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      )
+      .then((res) => res.data);
+  },
   thongbao(params) {
     return repository
       .post(`/v1/${resoure}/thongbao`, params, {
