@@ -57,7 +57,7 @@
 <script setup>
 import { computed, onMounted, ref } from "vue";
 import Api from "../../api/Api";
-import { formatDate } from "../../utilities/util";
+import { download, formatDate } from "../../utilities/util";
 import { useMuahang } from "../../stores/muahang";
 import { storeToRefs } from "pinia";
 import muahangApi from "../../api/muahangApi";

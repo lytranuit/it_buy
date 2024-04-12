@@ -20,6 +20,15 @@ export default {
       })
       .then((res) => res.data);
   },
+  phancong(params) {
+    return repository
+      .post(`/v1/${resoure}/phancong`, params, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => res.data);
+  },
   thongbaodoima(params) {
     return repository
       .post(`/v1/${resoure}/thongbaodoima`, params, {
@@ -50,6 +59,15 @@ export default {
   xoachitietdinhkem(params) {
     return repository
       .post(`/v1/${resoure}/xoachitietdinhkem`, params, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => res.data);
+  },
+  huychitiet(parmas) {
+    return repository
+      .post(`/v1/${resoure}/huychitiet`, parmas, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

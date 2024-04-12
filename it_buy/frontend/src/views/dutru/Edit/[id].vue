@@ -74,7 +74,7 @@
                             <FormDutruChitiet></FormDutruChitiet>
                           </div>
                           <div class="col-12 col-lg-12 pt-4" v-if="is_Cungung">
-                            <FormDutruChitiet2></FormDutruChitiet2>
+                            <TableHanghoa :dutru_id="route.params.id"></TableHanghoa>
                           </div>
                         </div>
                       </div>
@@ -246,6 +246,7 @@ import { download, formatDate } from "../../../utilities/util";
 import Comment from "../../../components/dutru/Comment.vue";
 import DutruFiles from "../../../components/Datatable/DutruFiles.vue";
 import FormDutruChitiet2 from "../../../components/Datatable/FormDutruChitiet2.vue";
+import TableHanghoa from "../../../components/hanghoa/TableHanghoa.vue";
 
 const store_auth = useAuth();
 const { is_Cungung } = storeToRefs(store_auth);

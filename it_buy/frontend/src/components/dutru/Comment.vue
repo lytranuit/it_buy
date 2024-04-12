@@ -57,7 +57,7 @@
 <script setup>
 import { computed, onMounted, ref } from "vue";
 import Api from "../../api/Api";
-import { formatDate } from "../../utilities/util";
+import { download, formatDate } from "../../utilities/util";
 import { useDutru } from "../../stores/dutru";
 import { storeToRefs } from "pinia";
 import dutruApi from "../../api/dutruApi";

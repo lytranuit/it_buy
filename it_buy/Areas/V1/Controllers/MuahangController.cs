@@ -500,7 +500,8 @@ namespace it_template.Areas.V1.Controllers
             foreach (var dutru in list_dutru)
             {
                 var soluong_ht = 0;
-                foreach (var item in dutru.chitiet)
+                var chitiet = dutru.chitiet.Where(d => d.date_huy == null).ToList();
+                foreach (var item in chitiet)
                 {
                     var soluong_dutru = item.soluong;
                     var muahang_chitiet = _context.MuahangChitietModel.Where(d => d.dutru_chitiet_id == item.id && d.status_nhanhang == 1).ToList();
@@ -510,7 +511,7 @@ namespace it_template.Areas.V1.Controllers
                         soluong_ht++;
                     }
                 }
-                if (soluong_ht == dutru.chitiet.Count())
+                if (soluong_ht == chitiet.Count())
                 {
                     dutru.date_finish = DateTime.Now;
                     _context.Update(dutru);
@@ -550,7 +551,7 @@ namespace it_template.Areas.V1.Controllers
             {
                 {"date",now.ToString("dd/MM/yyyy") },
             };
-
+            var is_nvl_moi = false;
             var RawDetails = new List<RawMuahangDetails>();
             var data = _context.MuahangModel.Where(d => d.id == id).FirstOrDefault();
             if (data != null)
@@ -569,6 +570,9 @@ namespace it_template.Areas.V1.Controllers
                     var stt = 1;
                     foreach (var item in ncc_chon.chitiet)
                     {
+                        if (item.hh_id != null && data.type_id == 1) /// Check có phải mua nguyên liệu mới hay ko?
+                            is_nvl_moi = true;
+
                         var material = _context.MaterialModel.Where(d => item.hh_id == "m-" + d.id).Include(d => d.nhasanxuat).FirstOrDefault();
                         var tieuchuan = "";
                         var nhasx = "";
@@ -642,7 +646,11 @@ namespace it_template.Areas.V1.Controllers
             //Creates Document instance
             Spire.Doc.Document document = new Spire.Doc.Document();
             //Loads the word document
-            if (data.type_id == 1)
+            if (is_nvl_moi == true)
+            {
+                document.LoadFromFile(_configuration["Source:Path_Private"] + "/buy/templates/dondathangnvlmoi.docx", Spire.Doc.FileFormat.Docx);
+            }
+            else if (data.type_id == 1)
             {
                 document.LoadFromFile(_configuration["Source:Path_Private"] + "/buy/templates/dondathangnvl.docx", Spire.Doc.FileFormat.Docx);
             }
@@ -815,8 +823,8 @@ namespace it_template.Areas.V1.Controllers
         [HttpPost]
         public async Task<JsonResult> saveQuidoi(int chonmua_id, decimal quidoi)
         {
-            var chonmua = _context.MuahangNccModel.Where(d=>d.id == chonmua_id).FirstOrDefault();
-            if(chonmua != null)
+            var chonmua = _context.MuahangNccModel.Where(d => d.id == chonmua_id).FirstOrDefault();
+            if (chonmua != null)
             {
                 chonmua.quidoi = quidoi;
                 _context.Update(chonmua);
@@ -825,7 +833,7 @@ namespace it_template.Areas.V1.Controllers
             return Json(new { success = true });
         }
         [HttpPost]
-        public async Task<JsonResult> Table()
+        public async Task<JsonResult> Table(bool filter_thanhtoan)
         {
             System.Security.Claims.ClaimsPrincipal currentUser = this.User;
             var user_id = UserManager.GetUserId(currentUser);
@@ -839,21 +847,17 @@ namespace it_template.Areas.V1.Controllers
             int id = id_text != null ? Convert.ToInt32(id_text) : 0;
             var type_id_string = Request.Form["type_id"].FirstOrDefault();
             int type_id = type_id_string != null ? Convert.ToInt32(type_id_string) : 0;
-            var type = Request.Form["type"].FirstOrDefault();
+            //var filter_thanhtoan = Request.Form["filter_thanhtoan"].FirstOrDefault();
             //var tenhh = Request.Form["filters[tenhh]"].FirstOrDefault();
             int skip = start != null ? Convert.ToInt32(start) : 0;
             var customerData = _context.MuahangModel.Where(d => d.deleted_at == null);
-            if (type == "thanhtoan")
+            if (filter_thanhtoan == true)
             {
                 customerData = customerData.Where(d => d.is_dathang == true && (d.loaithanhtoan == "tra_truoc" || (d.loaithanhtoan == "tra_sau" && d.is_nhanhang == true)));
             }
             if (type_id != null && type_id != 0)
             {
                 customerData = customerData.Where(d => d.type_id == type_id);
-            }
-            else
-            {
-                customerData = customerData.Where(d => d.created_by == user_id);
             }
             int recordsTotal = customerData.Count();
 

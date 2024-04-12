@@ -15,6 +15,13 @@ namespace Vue.Models
         public decimal? soluong { get; set; }
         public int? status_id { get; set; }
         public string? note { get; set; }
+        public string? note_huy { get; set; }
+        public DateTime? date_huy { get; set; }
+        public string? user_id { get; set; }
+
+        [ForeignKey("user_id")]
+        public UserModel? user { get; set; }
+        public string? tags { get; set; }
 
         [ForeignKey("dutru_id")]
         public DutruModel? dutru { get; set; }
@@ -36,6 +43,9 @@ namespace Vue.Models
         [NotMapped]
 
         public int? stt { get; set; }
+        [NotMapped]
+
+        public bool? can_huy { get; set; } = false;
 
     }
 }

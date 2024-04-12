@@ -1,7 +1,8 @@
 <template>
     <div id="TableDutruChitiet">
         <DataTable showGridlines :value="datatable" ref="dt" class="p-datatable-ct" :rowHover="true" :loading="loading"
-            responsiveLayout="scroll" :resizableColumns="true" columnResizeMode="expand" v-model:selection="selected">
+            responsiveLayout="scroll" :resizableColumns="true" columnResizeMode="expand" v-model:selection="selected"
+            :rowClass="rowClass">
             <template #header>
                 <div class="d-inline-flex" style="width:200px" v-if="model.status_id == 1">
                     <Button label="Thêm" icon="pi pi-plus" class="p-button-success p-button-sm mr-2"
@@ -85,32 +86,83 @@
                     </template>
                 </template>
             </Column>
+            <Column header="Hủy" field="action" key="action" v-if="model.status_id == 4">
+                <template #body="slotProps">
+                    <a href="#" class="text-danger" @click="huyitem(slotProps.data)"
+                        v-if="slotProps.data['can_huy'] && user.id == model.created_by"><i class="fas fa-trash"></i>
+                        Hủy</a>
+                    <div v-else-if="slotProps.data['date_huy']">
+                        <div>{{ slotProps.data.note_huy }}</div>
+                        <div class="small">Hủy lúc <i>{{ formatDate(slotProps.data.date_huy, "YYYY-MM-DD HH:mm:ss")
+                                }}</i></div>
+                    </div>
+                </template>
+            </Column>
         </DataTable>
     </div>
+    <Dialog v-model:visible="visible" modal header="Lý do hủy" style="width: 50vw;"
+        :breakpoints="{ '1199px': '75vw', '575px': '95vw' }">
+        <textarea class="form-control form-control-sm" v-model="editRow.note_huy" rows="5"></textarea>
+
+        <div class="d-flex justify-content-center mt-2">
+            <Button type="button" label="Cancel" severity="secondary" @click="visible = false" size="small"
+                class="mr-2"></Button>
+            <Button type="button" label="Save" severity="danger" @click="HuyChitiet" size="small"></Button>
+        </div>
+    </Dialog>
 </template>
 
 <script setup>
 
 import { onMounted, ref, watch, computed } from 'vue';
-import Materials from "../../components/TreeSelect/MaterialTreeSelect.vue"
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Button from 'primevue/button';
-import InputText from 'primevue/inputtext';
+import Dialog from 'primevue/dialog';
 import InputNumber from 'primevue/inputnumber';
 import { storeToRefs } from 'pinia'
 
 import { useConfirm } from "primevue/useconfirm";
 import { rand } from '../../utilities/rand'
+import { useAuth } from '../../stores/auth';
 import { useDutru } from '../../stores/dutru';
 import { useGeneral } from '../../stores/general';
 import { useMaterials } from '../../stores/materials';
 import NsxTreeSelect from '../TreeSelect/NsxTreeSelect.vue';
 import MaterialAutoComplete from '../AutoComplete/MaterialAutoComplete.vue';
-import { download } from '../../utilities/util';
+import { download, formatDate } from '../../utilities/util';
 import dutruApi from '../../api/dutruApi';
 import { useToast } from 'primevue/usetoast';
+const store_auth = useAuth();
+const { user } = storeToRefs(store_auth);
 const toast = useToast();
+const visible = ref();
+const editRow = ref({});
+const huyitem = (item) => {
+    editRow.value = item;
+    visible.value = item;
+    console.log(item);
+}
+const HuyChitiet = () => {
+    if (!editRow.value.note_huy.trim()) {
+        alert("Chưa nhập lý do hủy!");
+        return false;
+    }
+    dutruApi.huychitiet({ id: editRow.value.id, note_huy: editRow.value.note_huy.trim() }).then((response) => {
+        // waiting.value = false;
+        if (response.success) {
+            toast.add({ severity: 'success', summary: 'Thành công!', detail: 'Hủy dòng', life: 3000 });
+            location.reload();
+        }
+
+        // console.log(response)
+    });
+}
+
+const rowClass = (data) => {
+    return { 'bg-gray': data.date_huy ? true: false };
+};
+
 const fileChange = (e) => {
     var parents = $(e.target).parents(".custom-file");
     var label = $(".custom-file-label", parents);
@@ -306,7 +358,19 @@ onMounted(async () => {
     min-width: 300px;
 }
 
-.tenhh {
+.tenhh,
+.dinhkem {
     min-width: 300px;
+    word-wrap: break-word;
+    white-space: break-spaces;
+}
+
+.note {
+    word-wrap: break-word;
+    white-space: pre-line;
+}
+
+tr.bg-gray {
+    background-color: rgb(229 229 229) !important;
 }
 </style>
