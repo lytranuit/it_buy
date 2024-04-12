@@ -1084,9 +1084,11 @@ namespace it_template.Areas.V1.Controllers
                     is_sign_parellel = false,
                     created_at = DateTime.Now,
                 };
-                var count_type = _context.DocumentModel.Where(d => d.type_id == DocumentModel.type_id).Count();
+
+                var date_now = DateTime.Now;
+                var count_type_in_day = _context.DocumentModel.Where(d => d.type_id == DocumentModel.type_id && d.created_at.Value.DayOfYear == date_now.DayOfYear).Count();
                 var type = _context.DocumentTypeModel.Where(d => d.id == DocumentModel.type_id).Include(d => d.users_receive).FirstOrDefault();
-                DocumentModel.code = type.symbol + "00" + (count_type + 1);
+                DocumentModel.code = type.symbol + date_now.ToString("ddMMyy") + (count_type_in_day < 9 ? "0" : "") + (count_type_in_day + 1);
                 _context.Add(DocumentModel);
                 _context.SaveChanges();
                 ///DocumentFile

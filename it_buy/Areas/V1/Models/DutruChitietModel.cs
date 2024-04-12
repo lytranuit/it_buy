@@ -23,6 +23,13 @@ namespace Vue.Models
         public UserModel? user { get; set; }
         public string? tags { get; set; }
 
+        public List<string> tags_list
+        {
+            get
+            {
+                return tags != null ? tags.Split(",").ToList() : new List<string>();
+            }
+        }
         [ForeignKey("dutru_id")]
         public DutruModel? dutru { get; set; }
         public List<MuahangChitietModel> muahang_chitiet { get; set; }
