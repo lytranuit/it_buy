@@ -9,7 +9,7 @@
                     </div>
                 </div>
                 <div class="mt-2">
-                    <DataTable class="p-datatable-customers" showGridlines :value="datatable" :lazy="true" ref="dt"
+                    <DataTable class="dt-responsive-table" showGridlines :value="datatable" :lazy="true" ref="dt"
                         :paginator="true" :rowsPerPageOptions="[10, 50, 100]" :rows="rows" :totalRecords="totalRecords"
                         @page="onPage($event)" :rowHover="true" responsiveLayout="scroll" :resizableColumns="true"
                         columnResizeMode="expand" v-model:filters="filters" filterDisplay="menu">
@@ -20,42 +20,48 @@
                             :showFilterMatchModes="false" :class="col.data" :className="col.className">
 
                             <template #body="slotProps">
-                                <template v-if="col.data == 'name'">
-                                    <div style="font-size: 12px;">
-                                        <div style="text-wrap: pretty;">
-                                            <RouterLink :to="'/dutru/edit/' + slotProps.data.id" class="text-blue">[{{
+                                <span class="ui-column-title">{{ col.label }}</span>
+                                <div class="ui-column-data">
+                                    <template v-if="col.data == 'name'">
+                                        <div style="font-size: 12px;">
+                                            <div style="text-wrap: pretty;">
+                                                <RouterLink :to="'/dutru/edit/' + slotProps.data.id" class="text-blue">
+                                                    [{{
                         slotProps.data.code }}] {{ slotProps.data.name }}</RouterLink>
-                                        </div>
-                                        <div>Tạo bởi <i>{{ slotProps.data.user_created_by?.fullName }}</i> lúc {{
+                                            </div>
+                                            <div>Tạo bởi <i>{{ slotProps.data.user_created_by?.fullName }}</i> lúc {{
                         formatDate(slotProps.data.created_at, "YYYY-MM-DD HH:mm") }}</div>
-                                    </div>
-                                </template>
-                                <template v-else-if="col.data == 'status_id'">
-                                    <div class="text-center">
-                                        <Tag value="Hoàn thành" v-if="slotProps.data['date_finish']" severity="success">
-                                        </Tag>
-                                        <Tag value="Nháp" v-else-if="slotProps.data[col.data] == 1"
-                                            severity="secondary"></Tag>
-                                        <Tag value="Đang trình ký" v-else-if="slotProps.data[col.data] == 2"
-                                            severity="warning"></Tag>
-                                        <Tag value="Chờ ký duyệt" v-else-if="slotProps.data[col.data] == 3"
-                                            severity="warning"></Tag>
-                                        <Tag value="Đã duyệt" v-else-if="slotProps.data[col.data] == 4"></Tag>
-                                        <Tag value="Không duyệt" v-else-if="slotProps.data[col.data] == 5"
-                                            severity="danger"></Tag>
-                                    </div>
-                                </template>
-                                <template v-else-if="col.data == 'type_id'">
-                                    <div class="text-center">
-                                        <Tag value="Nguyên vật liệu" v-if="slotProps.data[col.data] == 1"></Tag>
-                                        <Tag value="Khác" v-else-if="slotProps.data[col.data] == 2"></Tag>
-                                        <Tag value="Hóa chất,thuốc thử QC" v-else-if="slotProps.data[col.data] == 3">
-                                        </Tag>
-                                    </div>
-                                </template>
-                                <template v-else>
-                                    {{ slotProps.data[col.data] }}
-                                </template>
+                                        </div>
+                                    </template>
+                                    <template v-else-if="col.data == 'status_id'">
+                                        <div class="text-center">
+                                            <Tag value="Hoàn thành" v-if="slotProps.data['date_finish']"
+                                                severity="success">
+                                            </Tag>
+                                            <Tag value="Nháp" v-else-if="slotProps.data[col.data] == 1"
+                                                severity="secondary"></Tag>
+                                            <Tag value="Đang trình ký" v-else-if="slotProps.data[col.data] == 2"
+                                                severity="warning"></Tag>
+                                            <Tag value="Chờ ký duyệt" v-else-if="slotProps.data[col.data] == 3"
+                                                severity="warning"></Tag>
+                                            <Tag value="Đã duyệt" v-else-if="slotProps.data[col.data] == 4"></Tag>
+                                            <Tag value="Không duyệt" v-else-if="slotProps.data[col.data] == 5"
+                                                severity="danger"></Tag>
+                                        </div>
+                                    </template>
+                                    <template v-else-if="col.data == 'type_id'">
+                                        <div class="text-center">
+                                            <Tag value="Nguyên vật liệu" v-if="slotProps.data[col.data] == 1"></Tag>
+                                            <Tag value="Khác" v-else-if="slotProps.data[col.data] == 2"></Tag>
+                                            <Tag value="Hóa chất,thuốc thử QC"
+                                                v-else-if="slotProps.data[col.data] == 3">
+                                            </Tag>
+                                        </div>
+                                    </template>
+                                    <template v-else>
+                                        {{ slotProps.data[col.data] }}
+                                    </template>
+                                </div>
                             </template>
                         </Column>
                     </DataTable>
