@@ -1,10 +1,10 @@
 <template>
   <div id="TableDutruChitiet">
     <div class="mb-3">
-      <Breadcrumb :home="{ icon: 'pi pi-home' }" :model="[{ label: 'Hàng hóa' }, { label: 'Hóa chất, thuốc thử QC' },]">
+      <Breadcrumb :home="{ icon: 'pi pi-home' }" :model="[{ label: 'Hàng hóa' }]">
       </Breadcrumb>
     </div>
-    <TableHanghoa :type="3"></TableHanghoa>
+    <TableHanghoa></TableHanghoa>
   </div>
 </template>
 

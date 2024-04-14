@@ -80,7 +80,7 @@ namespace it_template.Areas.V1.Controllers
                 {
                     var file = new RawFile()
                     {
-                        note = "Báo giá của " + d.ncc.tenncc,
+                        note = "Báo giá của " + d.ncc?.tenncc,
                         list_file = list_file,
                         is_user_upload = false,
                         created_at = created_at
@@ -220,7 +220,7 @@ namespace it_template.Areas.V1.Controllers
                     tenhh = chonmua.tenhh,
                     soluong = chonmua.soluong,
                     dongia = chonmua.dongia,
-                    thanhtien = chonmua.thanhtien,
+                    thanhtien = chonmua.thanhtien_vat,
                     tiente = muahang.muahang_chonmua.tiente
                 };
                 data.Add(data1);
@@ -563,6 +563,7 @@ namespace it_template.Areas.V1.Controllers
                     raw.Add("tonggiatri", ncc_chon.tonggiatri.Value.ToString("#,##0.##"));
                     raw.Add("tggh", data.date.Value.ToString("dd/MM/yyyy"));
                     raw.Add("thanhtien", ncc_chon.thanhtien.Value.ToString("#,##0.##"));
+                    raw.Add("thanhtien_vat", ncc_chon.thanhtien_vat.Value.ToString("#,##0.##"));
                     raw.Add("phigiaohang", ncc_chon.phigiaohang.Value.ToString("#,##0.##"));
                     raw.Add("tienvat", ncc_chon.tienvat.Value.ToString("#,##0.##"));
                     raw.Add("vat", ncc_chon.vat.Value.ToString());
@@ -592,6 +593,7 @@ namespace it_template.Areas.V1.Controllers
                             thanhtien = item.thanhtien.Value.ToString("#,##0.##"),
                             nhasx = nhasx,
                             tieuchuan = tieuchuan,
+                            vat = item.vat,
                             //note = item.note,
                             tggh = data.date.Value.ToString("dd/MM/yyyy")
                             //artwork = material.masothietke,
@@ -943,6 +945,7 @@ namespace it_template.Areas.V1.Controllers
                     var ncc_chon = muahang_chonmua;
                     raw.Add("tonggiatri", ncc_chon.tonggiatri.Value.ToString("#,##0.##"));
                     raw.Add("thanhtien", ncc_chon.thanhtien.Value.ToString("#,##0.##"));
+                    raw.Add("thanhtien_vat", ncc_chon.thanhtien_vat.Value.ToString("#,##0.##"));
                     raw.Add("phigiaohang", ncc_chon.phigiaohang.Value.ToString("#,##0.##"));
                     raw.Add("tienvat", ncc_chon.tienvat.Value.ToString("#,##0.##"));
                     raw.Add("vat", ncc_chon.vat.Value.ToString());
@@ -962,6 +965,7 @@ namespace it_template.Areas.V1.Controllers
                             soluong = item.soluong.Value.ToString("#,##0.##"),
                             dongia = item.dongia.Value.ToString("#,##0.##"),
                             thanhtien = item.thanhtien.Value.ToString("#,##0.##"),
+                            vat = item.vat
                             //note = item.note,
                             //artwork = material.masothietke,
                             //date = data.date.Value.ToString("yyyy-MM-dd")
@@ -1413,6 +1417,27 @@ namespace it_template.Areas.V1.Controllers
             });
         }
 
+        public async Task<JsonResult> updatethanhtien()
+        {
+            var muahang_ncc = _context.MuahangNccModel.Include(d => d.chitiet).ToList();
+            foreach (var item in muahang_ncc)
+            {
+                var vat = item.vat;
+                var chitiet = item.chitiet;
+                item.thanhtien_vat = item.thanhtien + (item.thanhtien * vat / 100);
+                _context.Update(item);
+                _context.SaveChanges();
+                foreach (var item2 in chitiet)
+                {
+                    item2.vat = vat;
+                    item2.thanhtien_vat = item2.thanhtien + (item2.thanhtien * vat / 100);
+                    _context.Update(item2);
+                    _context.SaveChanges();
+                }
+            }
+            return Json(muahang_ncc);
+
+        }
         private void CopyValues<T>(T target, T source)
         {
             Type t = typeof(T);
@@ -1460,6 +1485,7 @@ namespace it_template.Areas.V1.Controllers
             public string? nhasx { get; set; }
             public string? tggh { get; set; }
             public string? tieuchuan { get; set; }
+            public int? vat { get; set; }
         }
         public class RawFile
         {

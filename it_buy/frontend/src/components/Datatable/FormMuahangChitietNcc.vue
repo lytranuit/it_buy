@@ -8,7 +8,7 @@
                 <div class='text-center'>Không có dữ liệu.</div>
             </template>
             <Column v-for="(col, index) in selectedColumns" :field="col.data" :header="col.label" :key="col.data"
-                :showFilterMatchModes="false">
+                :showFilterMatchModes="false" :className="col.className">
 
                 <template #body="slotProps">
                     <template v-if="col.data == 'hh_id'">
@@ -16,11 +16,17 @@
                     </template>
 
                     <template v-else-if="col.data == 'dongia'">
-                        <InputNumber v-model="slotProps.data[col.data]" class="p-inputtext-sm" :suffix="' ' + modelncc.tiente"
-                            @update:modelValue="changeDongia()" :disabled="readonly" :maxFractionDigits="2" />
+                        <InputNumber v-model="slotProps.data[col.data]" class="p-inputtext-sm"
+                            :suffix="' ' + modelncc.tiente" @update:modelValue="changeDongia()" :disabled="readonly"
+                            :maxFractionDigits="2" />
+                    </template>
+                    <template v-else-if="col.data == 'vat'">
+                        <InputNumber v-model="slotProps.data[col.data]" class="p-inputtext-sm" :suffix="'%'"
+                            inputStyle="width: 50px;" @update:modelValue="changeDongia()" :disabled="readonly"
+                            :maxFractionDigits="0" />
                     </template>
 
-                    <template v-else-if="col.data == 'thanhtien'">
+                    <template v-else-if="col.data == 'thanhtien' || col.data == 'thanhtien_vat'">
                         {{ formatPrice(slotProps.data[col.data], 0) }} {{ modelncc.tiente }}
                     </template>
 
@@ -60,38 +66,48 @@ const modelncc = computed(() => {
 });
 const columns = ref([
     {
-        label: "STT(*)",
+        label: "STT",
         data: "stt",
         className: "text-center",
     },
     {
-        label: "Mã(*)",
+        label: "Mã",
         "data": "hh_id",
         "className": "text-center",
     },
     {
-        label: "Tên(*)",
+        label: "Tên",
         "data": "tenhh",
         "className": "text-center"
     },
     {
-        label: "ĐVT(*)",
+        label: "ĐVT",
         "data": "dvt",
         "className": "text-center",
     },
     {
-        label: "Số lượng(*)",
+        label: "Số lượng",
         "data": "soluong",
         "className": "text-center"
     },
     {
-        label: "Đơn giá(*)",
+        label: "Đơn giá",
         "data": "dongia",
         "className": "text-center"
     },
     {
-        label: "Thành tiền(*)",
+        label: "VAT",
+        "data": "vat",
+        "className": "text-center"
+    },
+    {
+        label: "Thành tiền (Chưa vat)",
         "data": "thanhtien",
+        "className": "text-center"
+    },
+    {
+        label: "Thành tiền",
+        "data": "thanhtien_vat",
         "className": "text-center"
     }
 ])
@@ -102,12 +118,21 @@ const selectedColumns = computed(() => {
 const changeDongia = () => {
     var ncc = nccs.value[props.index];
     var thanhtien = 0;
+    var thanhtien_vat = 0;
+    var tienvat = 0;
     for (var item of ncc.chitiet) {
+        item.dongia_vat = item.dongia + ((item.dongia * item.vat) / 100);
+
         item.thanhtien = (item.dongia * item.soluong) || 0;
+        item.thanhtien_vat = (item.dongia_vat * item.soluong) || 0;
+        item.tienvat = item.thanhtien_vat - item.thanhtien;
         thanhtien += item.thanhtien;
+        thanhtien_vat += item.thanhtien_vat;
+        tienvat += item.tienvat;
     }
     ncc.thanhtien = thanhtien;
-    ncc.tienvat = ncc.thanhtien > 0 ? Math.round((ncc.thanhtien * ncc.vat) / 100) : 0;
+    ncc.thanhtien_vat = thanhtien_vat;
+    ncc.tienvat = tienvat;
     var tonggiatri = ncc.thanhtien + ncc.tienvat + ncc.phigiaohang;
     ncc.tonggiatri = tonggiatri;
 }

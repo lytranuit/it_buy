@@ -10,72 +10,22 @@
       <li>
         <router-link class="nav-link" to="/dutru">
           <i class="ti-briefcase"></i>
-          <span>Dự trù của tôi</span>
+          <span>Dự trù</span>
         </router-link>
       </li>
       <li v-if="is_CungungGiantiep || is_CungungNVL || is_CungungHCTT">
-        <a href="javascript: void(0);">
-          <i class="fas fa-shopping-bag"></i>
-          <span>Tổng hợp dự trù</span>
-          <span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span>
-        </a>
-        <ul class="nav-second-level" aria-expanded="false">
-          <li class="nav-item" v-if="is_CungungGiantiep">
-            <router-link class="nav-link" to="/dutru/giantiep"><i class="ti-control-record"></i>Mua hàng gián
-              tiếp</router-link>
-          </li>
-          <li class="nav-item" v-if="is_CungungHCTT">
-            <router-link class="nav-link" to="/dutru/hoachat"><i class="ti-control-record"></i>Hóa chất, thuốc thử
-              QC</router-link>
-          </li>
-          <li class="nav-item" v-if="is_CungungNVL">
-            <router-link class="nav-link" to="/dutru/nvl"><i class="ti-control-record"></i>Nguyên vật
-              liệu</router-link>
-          </li>
-        </ul>
-      </li>
-      <li v-if="is_CungungGiantiep || is_CungungNVL || is_CungungHCTT">
-        <a href="javascript: void(0);">
+        <router-link class="nav-link" to="/hanghoa">
           <i class="fab fa-product-hunt"></i>
-          <span>Tổng hợp hàng hóa dự trù</span>
-          <span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span>
-        </a>
-        <ul class="nav-second-level" aria-expanded="false">
-          <li class="nav-item" v-if="is_CungungGiantiep">
-            <router-link class="nav-link" to="/hanghoa/giantiep"><i class="ti-control-record"></i>Mua hàng gián
-              tiếp</router-link>
-          </li>
-          <li class="nav-item" v-if="is_CungungHCTT">
-            <router-link class="nav-link" to="/hanghoa/hoachat"><i class="ti-control-record"></i>Hóa chất, thuốc thử
-              QC</router-link>
-          </li>
-          <li class="nav-item" v-if="is_CungungNVL">
-            <router-link class="nav-link" to="/hanghoa/nvl"><i class="ti-control-record"></i>Nguyên vật
-              liệu</router-link>
-          </li>
-        </ul>
+          <span>Tổng hợp hàng hóa</span>
+        </router-link>
       </li>
 
       <li v-if="is_Cungung">
-        <a href="javascript: void(0);">
+        <router-link class="nav-link" to="/muahang">
           <i class="fas fa-store"></i>
           <span>Đề nghị mua hàng</span>
-          <span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span>
-        </a>
-        <ul class="nav-second-level" aria-expanded="false">
-          <li class="nav-item" v-if="is_CungungGiantiep">
-            <router-link class="nav-link" to="/muahang/giantiep"><i class="ti-control-record"></i>Mua hàng gián
-              tiếp</router-link>
-          </li>
-          <li class="nav-item" v-if="is_CungungHCTT">
-            <router-link class="nav-link" to="/muahang/hoachat"><i class="ti-control-record"></i>Hóa chất, thuốc thử
-              QC</router-link>
-          </li>
-          <li class="nav-item" v-if="is_CungungNVL">
-            <router-link class="nav-link" to="/muahang/nvl"><i class="ti-control-record"></i>Nguyên vật
-              liệu</router-link>
-          </li>
-        </ul>
+        </router-link>
+
       </li>
       <li v-if="is_Ketoan">
         <router-link class="nav-link" to="/muahang/thanhtoan">

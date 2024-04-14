@@ -4,10 +4,21 @@
     @page="onPage($event)" :rowHover="true" :loading="loading" responsiveLayout="scroll" :resizableColumns="true"
     columnResizeMode="expand" v-model:filters="filters" filterDisplay="menu">
     <template #header>
-      <div style="width: 200px">
-        <TreeSelect :options="columns" v-model="showing" multiple :limit="0"
-          :limitText="(count) => 'Hiển thị: ' + count + ' cột'">
-        </TreeSelect>
+      <div class="d-flex align-items-center">
+        <div style="width: 200px">
+          <TreeSelect :options="columns" v-model="showing" multiple :limit="0"
+            :limitText="(count) => 'Hiển thị: ' + count + ' cột'">
+          </TreeSelect>
+        </div>
+        <div class="ml-auto">
+          <SelectButton v-model="filterTable" :options="list_filterTable" aria-labelledby="basic"
+            :pt="{ 'button': 'form-control-sm' }" @change="loadLazyData" optionValue="value" :allowEmpty="false">
+            <template #option="slotProps">
+              {{ slotProps.option.label }}
+            </template>
+          </SelectButton>
+        </div>
+
       </div>
     </template>
 
@@ -65,10 +76,9 @@
       </template>
     </Column>
     <Column style="width: 1rem">
-
       <template #body="slotProps">
-        <a class="p-link text-danger font-16" @click="confirmDelete(slotProps.data['id'])"><i
-            class="pi pi-trash"></i></a>
+        <a class="p-link text-danger font-16" @click="confirmDelete(slotProps.data['id'])"
+          v-if="slotProps.data.created_by == user.id"><i class="pi pi-trash"></i></a>
       </template>
     </Column>
   </DataTable>
@@ -87,10 +97,16 @@ import ConfirmDialog from "primevue/confirmdialog";
 import { useConfirm } from "primevue/useconfirm";
 import Loading from "../../components/Loading.vue";
 import { formatDate, formatPrice } from "../../utilities/util";
+import { useAuth } from "../../stores/auth";
+import { storeToRefs } from "pinia";
+import SelectButton from "primevue/selectbutton";
+const store = useAuth();
+const { is_admin, is_Cungung, is_Ketoan, is_CungungNVL, is_Qa, is_CungungGiantiep, is_CungungHCTT, user } = storeToRefs(store);
 const props = defineProps({
-  type: Number,
   filter_thanhtoan: Boolean
 })
+const list_filterTable = ref([]);
+const filterTable = ref();
 const confirm = useConfirm();
 const datatable = ref();
 const columns = ref([
@@ -153,7 +169,7 @@ const lazyParams = computed(() => {
     draw: draw.value,
     start: first.value,
     length: rows.value,
-    type_id: props.type,
+    type_id: filterTable.value,
     filter_thanhtoan: props.filter_thanhtoan,
     filters: data_filters
   };
@@ -198,8 +214,30 @@ onMounted(() => {
   } else {
     showing.value = JSON.parse(cache);
   }
+  fill();
   loadLazyData();
 });
+const fill = () => {
+  if (props.filter_thanhtoan > 0)
+    return;
+  if (is_CungungGiantiep.value) {
+    list_filterTable.value.push({ label: "Mua hàng gián tiếp", value: 2 });
+
+    // { label: "Nguyên vật liệu", value: 1 },
+    // { label: "Hóa chất,thuốc thử QC", value: 3 },
+  }
+
+  if (is_CungungHCTT.value) {
+    list_filterTable.value.push({ label: "Hóa chất,thuốc thử QC", value: 3 });
+  }
+  if (is_CungungNVL.value) {
+    list_filterTable.value.push({ label: "Nguyên vật liệu", value: 1 });
+  }
+
+  if (list_filterTable.value.length > 0) {
+    filterTable.value = list_filterTable.value[0].value;
+  }
+}
 const waiting = ref();
 watch(filters, async (newa, old) => {
   first.value = 0;

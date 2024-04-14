@@ -169,6 +169,15 @@ namespace it_template.Areas.V1.Controllers
             return Json(new { success = true });
         }
         [HttpPost]
+        public async Task<JsonResult> tag(int id, List<string>? list_tag)
+        {
+            var Model = _context.DutruChitietModel.Where(d => d.id == id).FirstOrDefault();
+            Model.tags = list_tag != null ? string.Join(",", list_tag) : null;
+            _context.Update(Model);
+            _context.SaveChanges();
+            return Json(new { success = true });
+        }
+        [HttpPost]
 
         public async Task<JsonResult> SaveDinhkem(string note, int dutru_id)
         {
@@ -691,17 +700,24 @@ namespace it_template.Areas.V1.Controllers
             var code = Request.Form["filters[code]"].FirstOrDefault();
             var id_text = Request.Form["filters[id]"].FirstOrDefault();
             int id = id_text != null ? Convert.ToInt32(id_text) : 0;
+            var department_id_string = Request.Form["department_id"].FirstOrDefault();
+            int department_id = department_id_string != null ? Convert.ToInt32(department_id_string) : 0;
             var type_id_string = Request.Form["type_id"].FirstOrDefault();
             int type_id = type_id_string != null ? Convert.ToInt32(type_id_string) : 0;
             //var tenhh = Request.Form["filters[tenhh]"].FirstOrDefault();
             int skip = start != null ? Convert.ToInt32(start) : 0;
             var customerData = _context.DutruModel.Where(d => d.deleted_at == null);
 
-            if (type_id != null && type_id != 0)
+            if (type_id > 0)
             {
                 customerData = customerData.Where(d => d.type_id == type_id);
             }
-            else
+            if (department_id > 0)
+            {
+                customerData = customerData.Where(d => d.bophan_id == department_id);
+            }
+
+            if (department_id == 0 && type_id == 0)
             {
                 customerData = customerData.Where(d => d.created_by == user_id);
             }
@@ -765,6 +781,7 @@ namespace it_template.Areas.V1.Controllers
             var mahh = Request.Form["filters[mahh]"].FirstOrDefault();
             var tenhh = Request.Form["filters[tenhh]"].FirstOrDefault();
             var filter_user_id = Request.Form["filters[user_id]"].FirstOrDefault();
+            var filter_tags = Request.Form["filters[tags]"].FirstOrDefault();
             var list_dutru = Request.Form["filters[list_dutru]"].FirstOrDefault();
             var orderById = Request.Form["orderBy[id]"].FirstOrDefault();
 
@@ -782,7 +799,7 @@ namespace it_template.Areas.V1.Controllers
             int skip = start != null ? Convert.ToInt32(start) : 0;
             var customerData = _context.DutruChitietModel
                 .Include(d => d.user)
-                .Include(d => d.muahang_chitiet).ThenInclude(d => d.muahang).ThenInclude(d => d.muahang_chonmua).ThenInclude(d => d.chitiet)
+                .Include(d => d.muahang_chitiet).ThenInclude(d=>d.muahang)
                 .Include(d => d.dutru).Where(d => d.dutru.status_id == (int)Status.EsignSuccess && d.date_huy == null);
 
             //if (is_CungungNVL && is_CungungGiantiep)
@@ -818,6 +835,10 @@ namespace it_template.Areas.V1.Controllers
             if (filter_user_id != null && filter_user_id != "")
             {
                 customerData = customerData.Where(d => d.user_id == filter_user_id);
+            }
+            if (filter_tags != null && filter_tags != "")
+            {
+                customerData = customerData.Where(d => d.tags.Contains(filter_tags));
             }
             if (list_dutru != null && list_dutru != "")
             {
@@ -858,7 +879,7 @@ namespace it_template.Areas.V1.Controllers
                 var thanhtien1 = _context.MuahangNccChitietModel.Include(d => d.muahang_ncc).ThenInclude(d => d.muahang)
                     .Where(d => d.muahang_ncc.muahang.deleted_at == null && d.muahang_ncc.muahang.status_id != (int)Status.MuahangEsignError && list_muahang_ncc_id.Contains(d.muahang_ncc_id) && list_muahang_chitiet_id.Contains(d.muahang_chitiet_id))
                     .ToList();
-                var thanhtien = thanhtien1.Sum(d => (d.thanhtien + (d.thanhtien * d.muahang_ncc.vat / 100)) * d.muahang_ncc.quidoi);
+                var thanhtien = thanhtien1.Sum(d => d.thanhtien_vat * d.muahang_ncc.quidoi);
                 var muahang_chitiet = record.muahang_chitiet.Where(d => d.muahang.deleted_at == null && d.muahang.status_id != 11).ToList();
                 var soluong_dutru = record.soluong;
                 var soluong_mua = muahang_chitiet.Sum(d => d.soluong * d.quidoi);
@@ -880,6 +901,7 @@ namespace it_template.Areas.V1.Controllers
                     dvt = record.dvt,
                     soluong = soluong,
                     user = record.user,
+                    list_tag = record.list_tag,
                     dutru_chitiet_id = record.id,
                     list_dutru = new List<DutruModel>() { dutru },
                     list_muahang = muahang_chitiet.Select(d => d.muahang).ToList(),
@@ -887,7 +909,11 @@ namespace it_template.Areas.V1.Controllers
             }
 
             var jsonData = new { draw = draw, recordsFiltered = recordsFiltered, recordsTotal = recordsTotal, data = data };
-            return Json(jsonData);
+            return Json(jsonData, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            });
         }
         [HttpPost]
         public async Task<IActionResult> AddComment(DutruCommentModel CommentModel, List<string> users_related)

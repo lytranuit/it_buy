@@ -6,11 +6,27 @@
     responsiveLayout="scroll" :resizableColumns="true" columnResizeMode="expand" v-model:filters="filters"
     filterDisplay="menu" contextMenu v-model:contextMenuSelection="selectedItem" @rowContextmenu="onRowContextMenu">
     <template #header>
-      <Button label="Tạo đề nghị mua hàng" icon="pi pi-plus" class="p-button-success p-button-sm"
-        :disabled="!selected || !selected.length" @click="taodenghimuahang()"></Button>
+      <div class="d-flex align-items-center">
+        <Button label="Tạo đề nghị mua hàng" icon="pi pi-plus" class="p-button-success p-button-sm"
+          :disabled="!selected || !selected.length" @click="taodenghimuahang()"></Button>
+
+        <div class="ml-auto">
+          <SelectButton v-model="filterTable1" :options="['Đã xử lý', 'Chưa xử lý']" aria-labelledby="basic"
+            :pt="{ 'button': 'form-control-sm' }" @change="loadLazyData" />
+        </div>
+        <div class="ml-3" v-if="!dutru_id">
+
+
+          <SelectButton v-model="filterTable" :options="list_filterTable" aria-labelledby="basic"
+            :pt="{ 'button': 'form-control-sm' }" @change="loadLazyData" optionValue="value" :allowEmpty="false">
+            <template #option="slotProps">
+              {{ slotProps.option.label }}
+            </template>
+          </SelectButton>
+        </div>
+      </div>
+
       <div class="d-inline-flex float-right">
-        <SelectButton v-model="filterTable" :options="['Đã xử lý', 'Chưa xử lý']" aria-labelledby="basic"
-          :pt="{ 'button': 'form-control-sm' }" @change="loadLazyData" />
 
         <!-- <Button label="Chi tiết" class="p-button-primary p-button-sm" @click="chitiet()"
             v-if="type == 'tonghop'"></Button>
@@ -80,7 +96,9 @@
 
         <template v-else-if="col.data == 'tenhh'">
           <div style="word-break: break-all;white-space: pre-line;">{{ slotProps.data[col.data] }}</div>
-          <div v-if="slotProps.data.user" class="small">Phân công cho <i>{{ slotProps.data.user.fullName }}</i></div>
+          <div v-if="slotProps.data.user" class="small">Phân công cho <i>{{ slotProps.data.user.fullName }}</i>
+            <Tag severity="secondary" :value="tag" v-for="tag in slotProps.data.list_tag" class="ml-2"></Tag>
+          </div>
 
         </template>
         <template v-else>
@@ -99,6 +117,10 @@
             <div class="col-12">
               <b>Phân cho:</b>
               <UserTreeSelect v-model="customFilter.user_id"></UserTreeSelect>
+            </div>
+            <div class="col-12">
+              <b>Tags:</b>
+              <InputText type="text" v-model="customFilter.tags" class="p-column-filter" />
             </div>
           </div>
 
@@ -119,6 +141,18 @@
     <UserTreeSelect v-model="selectedItem.user_id"></UserTreeSelect>
     <div class="d-flex justify-content-center mt-2">
       <Button type="button" label="Lưu lại" severity="success" @click="phancong" size="small"></Button>
+    </div>
+  </Dialog>
+
+  <Dialog v-model:visible="visibleTag" header="Tag" :modal="true" style="width: 50vw;"
+    :breakpoints="{ '1199px': '75vw', '575px': '95vw' }">
+    <div class="row">
+      <div class="col-12">
+        <Chips v-model="selectedItem.list_tag" class="d-inline-block w-100" />
+      </div>
+    </div>
+    <div class="d-flex justify-content-center mt-2">
+      <Button type="button" label="Lưu lại" severity="success" @click="tag" size="small"></Button>
     </div>
   </Dialog>
   <Dialog v-model:visible="visibleDialog" header="Đổi mã hàng hóa" :modal="true" style="width: 75vw;"
@@ -181,6 +215,7 @@
 <script setup>
 import { onMounted, ref, computed, watch } from "vue";
 import dutruApi from "../../api/dutruApi";
+import Chips from 'primevue/chips';
 import Tag from "primevue/tag";
 import Dialog from "primevue/dialog";
 import Button from "primevue/button";
@@ -202,6 +237,13 @@ import { change } from "@syncfusion/ej2-grids";
 import { useToast } from "primevue/usetoast";
 import Loading from "../Loading.vue";
 import UserTreeSelect from "../../components/TreeSelect/UserTreeSelect.vue";
+import { useAuth } from "../../stores/auth";
+
+const store = useAuth();
+const { is_admin, is_Cungung, is_Ketoan, is_CungungNVL, is_Qa, is_CungungGiantiep, is_CungungHCTT, user } = storeToRefs(store);
+
+const list_filterTable = ref([]);
+const filterTable1 = ref();
 const customClearFilter = (col, callback) => {
   // console.log(col);
   if (col == "tenhh")
@@ -291,7 +333,8 @@ const filters = ref({
   list_dutru: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
 const customFilter = ref({
-  user_id: null
+  user_id: null,
+  tags: null
 });
 const totalRecords = ref(0);
 const loading = ref(true);
@@ -316,9 +359,9 @@ const lazyParams = computed(() => {
     start: first.value,
     length: rows.value,
     filters: data_filters,
-    type_id: props.type,
+    type_id: filterTable.value,
     dutru_id: props.dutru_id,
-    filterTable: filterTable.value
+    filterTable: filterTable1.value
   };
 });
 const dt = ref(null);
@@ -366,10 +409,12 @@ const taodenghimuahang = () => {
 }
 
 const visiblePhancong = ref();
+const visibleTag = ref();
 const cm = ref();
 const selectedItem = ref();
 const menuModel = ref([
   { label: 'Phân công', icon: 'pi pi-fw pi-user', command: () => openPhancong() },
+  { label: 'Tags', icon: 'pi pi-fw pi-tag', command: () => openTag() },
 ]);
 const onRowContextMenu = (event) => {
   cm.value.show(event.originalEvent);
@@ -379,6 +424,9 @@ const openPhancong = () => {
     selected.value = [];
   selected.value.push(selectedItem.value);
   visiblePhancong.value = true;
+}
+const openTag = () => {
+  visibleTag.value = true;
 }
 const phancong = () => {
 
@@ -398,6 +446,24 @@ const phancong = () => {
       severity: "success",
       summary: "Thành công",
       detail: "Phân công cho người dùng",
+      life: 3000,
+    });
+    loadLazyData();
+  });
+}
+
+const tag = () => {
+  console.log(selectedItem.value);
+  if (!selectedItem.value.list_tag) {
+    alert("Chưa nhập tag");
+    return false;
+  }
+  dutruApi.tag({ id: selectedItem.value.id, list_tag: selectedItem.value.list_tag }).then((response) => {
+    visibleTag.value = false;
+
+    toast.add({
+      severity: "success",
+      summary: "Thành công",
       life: 3000,
     });
     loadLazyData();
@@ -456,8 +522,30 @@ onMounted(() => {
   } else {
     showing.value = JSON.parse(cache);
   }
+  fill();
   loadLazyData();
 });
+const fill = () => {
+  if (props.dutru_id > 0)
+    return;
+  if (is_CungungGiantiep.value) {
+    list_filterTable.value.push({ label: "Mua hàng gián tiếp", value: 2 });
+
+    // { label: "Nguyên vật liệu", value: 1 },
+    // { label: "Hóa chất,thuốc thử QC", value: 3 },
+  }
+
+  if (is_CungungHCTT.value) {
+    list_filterTable.value.push({ label: "Hóa chất,thuốc thử QC", value: 3 });
+  }
+  if (is_CungungNVL.value) {
+    list_filterTable.value.push({ label: "Nguyên vật liệu", value: 1 });
+  }
+
+  if (list_filterTable.value.length > 0) {
+    filterTable.value = list_filterTable.value[0].value;
+  }
+}
 const waiting = ref();
 watch(filters, async (newa, old) => {
   first.value = 0;

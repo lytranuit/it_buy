@@ -29,6 +29,15 @@ export default {
       })
       .then((res) => res.data);
   },
+  tag(params) {
+    return repository
+      .post(`/v1/${resoure}/tag`, params, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => res.data);
+  },
   thongbaodoima(params) {
     return repository
       .post(`/v1/${resoure}/thongbaodoima`, params, {

@@ -7,7 +7,7 @@
           <th>Số lượng</th>
           <th v-for="(item, key) in nccs" :key="key" class="text-center"
             :class="{ highlight: model.muahang_chonmua_id == item.id }">
-            {{ item.ncc.tenncc }}
+            {{ item.ncc?.tenncc }}
           </th>
         </tr>
       </thead>
@@ -21,7 +21,7 @@
           </td>
           <td v-for="(item, key1) in nccs" :key="key1" class="text-center"
             :class="{ highlight: model.muahang_chonmua_id == item.id }">
-            {{ formatPrice(item.chitiet[key].thanhtien, 0) }} {{ item.tiente }}
+            {{ formatPrice(item.chitiet[key].thanhtien_vat, 0) }} {{ item.tiente }}
           </td>
         </tr>
         <tr>

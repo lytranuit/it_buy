@@ -18,6 +18,7 @@ namespace Vue.Models
         public string? baohanh { get; set; }
         public string? thanhtoan { get; set; }
         public decimal? thanhtien { get; set; }
+        public decimal? thanhtien_vat { get; set; }
         public decimal? tonggiatri { get; set; }
         public decimal? phigiaohang { get; set; }
         public decimal? tienvat { get; set; }

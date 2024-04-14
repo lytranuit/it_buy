@@ -19,7 +19,7 @@
     <TabView v-model:activeIndex="active">
       <TabPanel v-for="(item, key) in nccs" :key="key">
         <template #header>
-          {{ item.ncc.tenncc }}
+          {{ item.ncc?.tenncc }}
         </template>
         <div class="row m-0">
           <div class="col-12 text-right" v-if="readonly == false">
@@ -81,7 +81,7 @@
 
             <div class="col-md-4">
               <div class="row">
-                <b class="col">Thành tiền:</b>
+                <b class="col">Thành tiền (Chưa VAT):</b>
                 <span class="col text-right">{{ formatPrice(item.thanhtien, 0) }} {{ item.tiente }}</span>
               </div>
             </div>
@@ -94,10 +94,21 @@
 
             <div class="col-md-4">
               <div class="row">
-                <b class="col">VAT <input type="number" v-model="item.vat" class="form-control form-control-sm"
-                    style="width: 60px;display: inline-block;" @change="changetien(key)" :disabled="readonly" />%:
-                </b>
+                <b class="col">Tiền VAT:</b>
                 <span class="col text-right">{{ formatPrice(item.tienvat, 0) }} {{ item.tiente }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="row col-12 mt-2">
+            <div class="col-md-8">
+
+            </div>
+
+            <div class="col-md-4">
+              <div class="row">
+                <b class="col">Thành tiền:</b>
+                <span class="col text-right">{{ formatPrice(item.thanhtien_vat, 0) }} {{ item.tiente }}</span>
               </div>
             </div>
           </div>
@@ -235,6 +246,8 @@ const addNCC = () => {
     obj.muahang_chitiet_id = obj.id
     obj.dongia = 0;
     obj.thanhtien = 0;
+    obj.thanhtien_vat = 0;
+    obj.vat = 0;
     delete obj.id;
     chitiet.push(obj);
   }
@@ -247,10 +260,10 @@ const addNCC = () => {
   ncc.baohanh = "";
   ncc.thanhtoan = "";
   ncc.dapung = true;
-  ncc.vat = 0;
   ncc.tienvat = 0;
   ncc.phigiaohang = 0;
   ncc.thanhtien = 0;
+  ncc.thanhtien_vat = 0;
   ncc.tonggiatri = 0;
   ncc.chonmua = false;
   ncc.tiente = "VND";
@@ -262,8 +275,6 @@ const addNCC = () => {
 
 const changetien = (index) => {
   var ncc = nccs.value[index];
-  var tienvat = ncc.thanhtien > 0 ? Math.round((ncc.thanhtien * ncc.vat) / 100) : 0;
-  ncc.tienvat = tienvat;
   var tonggiatri = ncc.thanhtien + ncc.tienvat + ncc.phigiaohang;
   ncc.tonggiatri = tonggiatri;
 }

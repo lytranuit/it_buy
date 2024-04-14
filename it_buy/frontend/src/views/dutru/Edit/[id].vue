@@ -294,32 +294,32 @@ const muahangActive = (muahang) => {
   }
   return ret;
 }
-const load_data = (id) => {
-  dutruApi.get(id).then((res) => {
-    var chitiet = res.chitiet;
-    var user = res.user_created_by;
-    res.date = moment(res.date).format("YYYY-MM-DD");
-    delete res.chitiet;
-    delete res.user_created_by;
-    user_created_by.value = user;
-    model.value = res;
-    datatable.value = chitiet;
-    if ([2, 3, 5].indexOf(model.value.status_id) != -1) {
-      activeStep.value = 1;
-    } else if ([4].indexOf(model.value.status_id) != -1) {
-      activeStep.value = 2;
-    }
-    if (model.value.date_finish) {
-      activeStep.value = 3;
-    }
-  });
-  dutruApi.getNhanhang(id).then((res) => {
-    list_nhanhang.value = res;
-    // console.log(res);
-  });
-  dutruApi.getMuahang(id).then((res) => {
-    list_muahang.value = res;
-  });
+const load_data = async (id) => {
+  waiting.value = true;
+
+  var all = [dutruApi.get(id), dutruApi.getNhanhang(id), dutruApi.getMuahang(id)];
+  var response = await Promise.all(all);
+
+  var chitiet = response[0].chitiet;
+  var user = response[0].user_created_by;
+  response[0].date = moment(response[0].date).format("YYYY-MM-DD");
+  delete response[0].chitiet;
+  delete response[0].user_created_by;
+  user_created_by.value = user;
+  model.value = response[0];
+  datatable.value = chitiet;
+  if ([2, 3, 5].indexOf(model.value.status_id) != -1) {
+    activeStep.value = 1;
+  } else if ([4].indexOf(model.value.status_id) != -1) {
+    activeStep.value = 2;
+  }
+  if (model.value.date_finish) {
+    activeStep.value = 3;
+  }
+  list_nhanhang.value = response[1];
+  list_muahang.value = response[2];
+
+  waiting.value = false;
 }
 onMounted(() => {
   load_data(route.params.id)

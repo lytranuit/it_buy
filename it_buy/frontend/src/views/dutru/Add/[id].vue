@@ -4,12 +4,6 @@
             <form method="POST" id="form">
                 <AlertError :message="messageError" v-if="messageError" />
                 <section class="card card-fluid">
-                    <div class="card-header">
-                        <div class="d-inline-block w-100">
-                            <Button label="Tạo mới" icon="pi pi-plus" class="p-button-success p-button-sm mr-2"
-                                @click.prevent="submit()"></Button>
-                        </div>
-                    </div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6">
@@ -55,6 +49,10 @@
                                         <FormDutruChitiet></FormDutruChitiet>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="col-md-12 text-center">
+                                <Button label="Lưu lại" icon="pi pi-save" class="p-button-success p-button-sm mr-2"
+                                    @click.prevent="submit()"></Button>
                             </div>
                         </div>
                     </div>

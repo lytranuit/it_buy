@@ -19,6 +19,9 @@ export default {
   departments() {
     return repository.get(`/v1/${resoure}/departments`).then((res) => res.data);
   },
+  departmentsofuser() {
+    return repository.get(`/v1/${resoure}/departmentsofuser`).then((res) => res.data);
+  },
   HomeBadge() {
     return repository.get(`/v1/${resoure}/HomeBadge`).then((res) => res.data);
   },

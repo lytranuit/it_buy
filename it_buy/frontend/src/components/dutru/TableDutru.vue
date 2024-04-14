@@ -1,59 +1,96 @@
 ﻿<template>
-  <DataTable class="p-datatable-customers" showGridlines :value="datatable" :lazy="true" ref="dt" scrollHeight="70vh"
-    v-model:selection="selectedProducts" :paginator="true" :rowsPerPageOptions="[10, 50, 100]" :rows="rows"
-    :totalRecords="totalRecords" @page="onPage($event)" :rowHover="true" :loading="loading" responsiveLayout="scroll"
-    :resizableColumns="true" columnResizeMode="expand" v-model:filters="filters" filterDisplay="menu">
-    <template #header>
-      <div style="width: 200px">
-        <TreeSelect :options="columns" v-model="showing" multiple :limit="0"
-          :limitText="(count) => 'Hiển thị: ' + count + ' cột'">
-        </TreeSelect>
+  <section class="card card-fluid">
+    <div class="card-body" style="overflow: auto; position: relative">
+      <div class="card-header d-flex align-items-center">
+        <PopupDutru></PopupDutru>
+        <div class="ml-auto d-flex align-items-center">
+          <span>Bộ phận:</span>
+          <div style="width: 200px;margin-left: 10px;">
+            <DepartmentOfUserTreeSelect v-model="department_id" @update:model-value="loadLazyData">
+            </DepartmentOfUserTreeSelect>
+          </div>
+
+        </div>
       </div>
-    </template>
+      <div class="card-body">
+        <DataTable class="p-datatable-customers" showGridlines :value="datatable" :lazy="true" ref="dt"
+          scrollHeight="70vh" v-model:selection="selectedProducts" :paginator="true" :rowsPerPageOptions="[10, 50, 100]"
+          :rows="rows" :totalRecords="totalRecords" @page="onPage($event)" :rowHover="true" :loading="loading"
+          responsiveLayout="scroll" :resizableColumns="true" columnResizeMode="expand" v-model:filters="filters"
+          filterDisplay="menu">
+          <template #header>
+            <div class="d-flex align-items-center">
+              <div style="width: 200px">
+                <TreeSelect :options="columns" v-model="showing" multiple :limit="0"
+                  :limitText="(count) => 'Hiển thị: ' + count + ' cột'">
+                </TreeSelect>
+              </div>
+              <div class="ml-auto">
+                <SelectButton v-model="filterTable" :options="list_filterTable" aria-labelledby="basic"
+                  :pt="{ 'button': 'form-control-sm' }" @change="loadLazyData" optionValue="value" :allowEmpty="false">
+                  <template #option="slotProps">
+                    {{ slotProps.option.label }}
+                  </template>
+                </SelectButton>
+              </div>
 
-    <template #empty> Không có dữ liệu. </template>
-    <Column v-for="col of selectedColumns" :field="col.data" :header="col.label" :key="col.data"
-      :showFilterMatchModes="false">
-
-      <template #body="slotProps">
-        <template v-if="col.data == 'id'">
-          <RouterLink :to="'/dutru/edit/' + slotProps.data[col.data]">
-            <i class="fas fa-pencil-alt mr-2"></i>
-            {{ slotProps.data[col.data] }}
-          </RouterLink>
-        </template>
-
-        <template v-else-if="col.data == 'name'">
-          <div>
-            <div style="text-wrap: pretty;">
-              <RouterLink :to="'/dutru/edit/' + slotProps.data.id" class="text-blue">{{ slotProps.data.name }}
-              </RouterLink>
             </div>
-            <small>Tạo bởi <i>{{ slotProps.data.user_created_by?.fullName }}</i> lúc {{
-    formatDate(slotProps.data.created_at, "YYYY-MM-DD HH:mm") }}</small>
-          </div>
-        </template>
 
-        <template v-else-if="col.data == 'status_id'">
-          <div class="text-center">
-            <Tag value="Hoàn thành" severity="success" size="small" v-if="slotProps.data['date_finish']" />
-            <Tag value="Nháp" severity="secondary" size="small" v-else-if="slotProps.data[col.data] == 1" />
-            <Tag value="Đang trình ký" severity="warning" size="small" v-else-if="slotProps.data[col.data] == 2" />
-            <Tag value="Chờ ký duyệt" severity="warning" size="small" v-else-if="slotProps.data[col.data] == 3" />
-            <Tag value="Đã duyệt" severity="success" size="small" v-else-if="slotProps.data[col.data] == 4" />
-            <Tag value="Không duyệt" severity="danger" size="small" v-else-if="slotProps.data[col.data] == 5" />
-          </div>
-        </template>
+          </template>
 
-        <div v-else v-html="slotProps.data[col.data]"></div>
-      </template>
+          <template #empty> Không có dữ liệu. </template>
+          <Column v-for="col of selectedColumns" :field="col.data" :header="col.label" :key="col.data"
+            :showFilterMatchModes="false">
 
-      <template #filter="{ filterModel, filterCallback }" v-if="col.filter == true">
-        <InputText type="text" v-model="filterModel.value" @keydown.enter="filterCallback()" class="p-column-filter" />
-      </template>
-    </Column>
-  </DataTable>
+            <template #body="slotProps">
+              <template v-if="col.data == 'id'">
+                <RouterLink :to="'/dutru/edit/' + slotProps.data[col.data]">
+                  <i class="fas fa-pencil-alt mr-2"></i>
+                  {{ slotProps.data[col.data] }}
+                </RouterLink>
+              </template>
 
+              <template v-else-if="col.data == 'name'">
+                <div>
+                  <div style="text-wrap: pretty;">
+                    <RouterLink :to="'/dutru/edit/' + slotProps.data.id" class="text-blue">{{ slotProps.data.name }}
+                    </RouterLink>
+                  </div>
+                  <small>Tạo bởi <i>{{ slotProps.data.user_created_by?.fullName }}</i> lúc {{
+              formatDate(slotProps.data.created_at, "YYYY-MM-DD HH:mm") }}</small>
+                </div>
+              </template>
+
+              <template v-else-if="col.data == 'status_id'">
+                <div class="text-center">
+                  <Tag value="Hoàn thành" severity="success" size="small" v-if="slotProps.data['date_finish']" />
+                  <Tag value="Nháp" severity="secondary" size="small" v-else-if="slotProps.data[col.data] == 1" />
+                  <Tag value="Đang trình ký" severity="warning" size="small"
+                    v-else-if="slotProps.data[col.data] == 2" />
+                  <Tag value="Chờ ký duyệt" severity="warning" size="small" v-else-if="slotProps.data[col.data] == 3" />
+                  <Tag value="Đã duyệt" severity="success" size="small" v-else-if="slotProps.data[col.data] == 4" />
+                  <Tag value="Không duyệt" severity="danger" size="small" v-else-if="slotProps.data[col.data] == 5" />
+                </div>
+              </template>
+
+              <div v-else v-html="slotProps.data[col.data]"></div>
+            </template>
+
+            <template #filter="{ filterModel, filterCallback }" v-if="col.filter == true">
+              <InputText type="text" v-model="filterModel.value" @keydown.enter="filterCallback()"
+                class="p-column-filter" />
+            </template>
+          </Column>
+          <Column style="width: 1rem">
+            <template #body="slotProps">
+              <a class="p-link text-danger font-16" @click="confirmDelete(slotProps.data['id'])"
+                v-if="slotProps.data.created_by == user.id"><i class="pi pi-trash"></i></a>
+            </template>
+          </Column>
+        </DataTable>
+      </div>
+    </div>
+  </section>
   <Loading :waiting="waiting"></Loading>
 </template>
 <script setup>
@@ -67,11 +104,21 @@ import InputText from "primevue/inputtext";
 import { useConfirm } from "primevue/useconfirm";
 import Loading from "../../components/Loading.vue";
 import { formatDate } from "../../utilities/util";
-const props = defineProps({
-  type: Number
-})
+import SelectButton from "primevue/selectbutton";
+import { useAuth } from "../../stores/auth";
+import { storeToRefs } from "pinia";
+import PopupDutru from "./PopupDutru.vue";
+import DepartmentOfUserTreeSelect from "../TreeSelect/DepartmentOfUserTreeSelect.vue";
+const store = useAuth();
+const { is_admin, is_Cungung, is_Ketoan, is_CungungNVL, is_Qa, is_CungungGiantiep, is_CungungHCTT, user } = storeToRefs(store);
+// const props = defineProps({
+//   type: Number
+// })
 const confirm = useConfirm();
 const datatable = ref();
+const department_id = ref();
+const list_filterTable = ref([{ 'label': "Của tôi", value: null }]);
+const filterTable = ref();
 const columns = ref([
   {
     id: 0,
@@ -128,7 +175,8 @@ const lazyParams = computed(() => {
     start: first.value,
     length: rows.value,
     filters: data_filters,
-    type_id: props.type
+    type_id: filterTable.value,
+    department_id: department_id.value
   };
 });
 const dt = ref(null);
@@ -171,8 +219,28 @@ onMounted(() => {
   } else {
     showing.value = JSON.parse(cache);
   }
+  fill();
   loadLazyData();
 });
+const fill = () => {
+  if (is_CungungGiantiep.value) {
+    list_filterTable.value.push({ label: "Mua hàng gián tiếp", value: 2 });
+
+    // { label: "Nguyên vật liệu", value: 1 },
+    // { label: "Hóa chất,thuốc thử QC", value: 3 },
+  }
+
+  if (is_CungungHCTT.value) {
+    list_filterTable.value.push({ label: "Hóa chất,thuốc thử QC", value: 3 });
+  }
+  if (is_CungungNVL.value) {
+    list_filterTable.value.push({ label: "Nguyên vật liệu", value: 1 });
+  }
+
+  if (list_filterTable.value.length > 0) {
+    filterTable.value = list_filterTable.value[0].value;
+  }
+}
 const waiting = ref();
 watch(filters, async (newa, old) => {
   first.value = 0;

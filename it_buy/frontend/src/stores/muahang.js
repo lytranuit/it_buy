@@ -32,6 +32,7 @@ export const useMuahang = defineStore("muahang", () => {
     return true;
   };
   const load_data = async (id) => {
+    waiting.value = true;
     var res = await muahangApi.get(id);
     var uynhiemchi = res.uynhiemchi;
     var chitiet = res.chitiet;
@@ -50,6 +51,9 @@ export const useMuahang = defineStore("muahang", () => {
     nccs.value = list_ncc;
     chonmua.value = muahang_chonmua;
     list_uynhiemchi.value = uynhiemchi;
+
+    
+    waiting.value = false;
   };
   const getQrNhanhang = async (id) => {
     var res = await muahangApi.QrNhanhang(id);

@@ -16,6 +16,8 @@ namespace Vue.Models
         public decimal? soluong { get; set; }
         public decimal? dongia { get; set; }
         public decimal? thanhtien { get; set; }
+        public decimal? thanhtien_vat { get; set; }
+        public int? vat { get; set; }
 
 
         [ForeignKey("muahang_ncc_id")]

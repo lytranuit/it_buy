@@ -65,6 +65,17 @@ namespace it_template.Areas.V1.Controllers
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             });
         }
+        public async Task<JsonResult> departmentsofuser()
+        {
+            System.Security.Claims.ClaimsPrincipal currentUser = this.User;
+            var user_id = UserManager.GetUserId(currentUser);
+            var list_department = _context.UserDepartmentModel.Where(d => d.user_id == user_id).Select(d => d.department_id).ToList();
+            var departments = _context.DepartmentModel.Where(d => d.deleted_at == null && d.parent == 0 && list_department.Contains(d.id)).ToList();
+            return Json(departments, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            });
+        }
         public async Task<JsonResult> departments()
         {
             var All = GetChild(0);
@@ -288,9 +299,9 @@ namespace it_template.Areas.V1.Controllers
                     sort = group.Key.Year.ToString(),
                     label = group.Key.Year.ToString(),
                     data = group.Sum(d => d.muahang_chonmua.tonggiatri),
-                    data_nvl = group.Sum(d => d.muahang_chonmua.chitiet.Where(e => e.muahang_chitiet.dutru_chitiet.dutru.type_id == 1).Select(e => e.thanhtien).Sum()),
-                    data_hoachat = group.Sum(d => d.muahang_chonmua.chitiet.Where(e => e.muahang_chitiet.dutru_chitiet.dutru.type_id == 3).Select(e => e.thanhtien).Sum()),
-                    data_giantiep = group.Sum(d => d.muahang_chonmua.chitiet.Where(e => e.muahang_chitiet.dutru_chitiet.dutru.type_id == 2).Select(e => e.thanhtien).Sum()),
+                    data_nvl = group.Sum(d => d.muahang_chonmua.chitiet.Where(e => e.muahang_chitiet.dutru_chitiet.dutru.type_id == 1).Select(e => e.thanhtien_vat).Sum()),
+                    data_hoachat = group.Sum(d => d.muahang_chonmua.chitiet.Where(e => e.muahang_chitiet.dutru_chitiet.dutru.type_id == 3).Select(e => e.thanhtien_vat).Sum()),
+                    data_giantiep = group.Sum(d => d.muahang_chonmua.chitiet.Where(e => e.muahang_chitiet.dutru_chitiet.dutru.type_id == 2).Select(e => e.thanhtien_vat).Sum()),
                     group = group.ToList()
                 }).OrderBy(d => d.sort).ToList();
 
@@ -302,9 +313,9 @@ namespace it_template.Areas.V1.Controllers
                     sort = group.Key.year + "-" + group.Key.month.ToString("d2"),
                     label = group.Key.month.ToString("d2") + "/" + group.Key.year,
                     data = group.Sum(d => d.muahang_chonmua.tonggiatri),
-                    data_nvl = group.Sum(d => d.muahang_chonmua.chitiet.Where(e => e.muahang_chitiet.dutru_chitiet.dutru.type_id == 1).Select(e => e.thanhtien).Sum()),
-                    data_hoachat = group.Sum(d => d.muahang_chonmua.chitiet.Where(e => e.muahang_chitiet.dutru_chitiet.dutru.type_id == 3).Select(e => e.thanhtien).Sum()),
-                    data_giantiep = group.Sum(d => d.muahang_chonmua.chitiet.Where(e => e.muahang_chitiet.dutru_chitiet.dutru.type_id == 2).Select(e => e.thanhtien).Sum()),
+                    data_nvl = group.Sum(d => d.muahang_chonmua.chitiet.Where(e => e.muahang_chitiet.dutru_chitiet.dutru.type_id == 1).Select(e => e.thanhtien_vat).Sum()),
+                    data_hoachat = group.Sum(d => d.muahang_chonmua.chitiet.Where(e => e.muahang_chitiet.dutru_chitiet.dutru.type_id == 3).Select(e => e.thanhtien_vat).Sum()),
+                    data_giantiep = group.Sum(d => d.muahang_chonmua.chitiet.Where(e => e.muahang_chitiet.dutru_chitiet.dutru.type_id == 2).Select(e => e.thanhtien_vat).Sum()),
                     group = group.ToList()
                 }).OrderBy(d => d.sort).ToList();
             }
@@ -324,9 +335,9 @@ namespace it_template.Areas.V1.Controllers
                     sort = group.Key.date.ToString("yyyy-MM-dd"),
                     label = group.Key.date.ToString("yyyy-MM-dd"),
                     data = group.Sum(d => d.muahang_chonmua.tonggiatri),
-                    data_nvl = group.Sum(d => d.muahang_chonmua.chitiet.Where(e => e.muahang_chitiet.dutru_chitiet.dutru.type_id == 1).Select(e => e.thanhtien).Sum()),
-                    data_hoachat = group.Sum(d => d.muahang_chonmua.chitiet.Where(e => e.muahang_chitiet.dutru_chitiet.dutru.type_id == 3).Select(e => e.thanhtien).Sum()),
-                    data_giantiep = group.Sum(d => d.muahang_chonmua.chitiet.Where(e => e.muahang_chitiet.dutru_chitiet.dutru.type_id == 2).Select(e => e.thanhtien).Sum()),
+                    data_nvl = group.Sum(d => d.muahang_chonmua.chitiet.Where(e => e.muahang_chitiet.dutru_chitiet.dutru.type_id == 1).Select(e => e.thanhtien_vat).Sum()),
+                    data_hoachat = group.Sum(d => d.muahang_chonmua.chitiet.Where(e => e.muahang_chitiet.dutru_chitiet.dutru.type_id == 3).Select(e => e.thanhtien_vat).Sum()),
+                    data_giantiep = group.Sum(d => d.muahang_chonmua.chitiet.Where(e => e.muahang_chitiet.dutru_chitiet.dutru.type_id == 2).Select(e => e.thanhtien_vat).Sum()),
                     group = group.ToList()
                 }).OrderBy(d => d.sort).ToList();
             }
@@ -387,7 +398,7 @@ namespace it_template.Areas.V1.Controllers
                     if (dutru.type_id == 2)
                     {
                         var bophan = dutru.bophan;
-                        var thanhtien = e.thanhtien;
+                        var thanhtien = e.thanhtien_vat;
                         listbophan.Add(new Chartbophan()
                         {
                             bophan = bophan,

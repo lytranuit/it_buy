@@ -23,7 +23,7 @@ namespace Vue.Models
         public UserModel? user { get; set; }
         public string? tags { get; set; }
 
-        public List<string> tags_list
+        public List<string> list_tag
         {
             get
             {
