@@ -201,6 +201,7 @@ namespace it_template.Areas.V1.Controllers
                     is_thanhtoan = record.is_thanhtoan,
                     date_finish = record.date_finish,
                     tonggiatri = tonggiatri,
+                    created_at = record.created_at,
                     tiente = tiente,
                 };
                 data.Add(data1);

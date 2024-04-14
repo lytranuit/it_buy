@@ -708,10 +708,20 @@ namespace it_template.Areas.V1.Controllers
             int skip = start != null ? Convert.ToInt32(start) : 0;
             var customerData = _context.DutruModel.Where(d => d.deleted_at == null);
 
-            if (type_id > 0)
+            if (type_id == 100)
+            {
+                //Phan cho toi
+                var list_dutru_1 = _context.DutruChitietModel.Where(d => d.user_id == user_id).Select(d => d.dutru_id).ToList();
+                customerData = customerData.Where(d => list_dutru_1.Contains(d.id));
+            }
+            else if (type_id > 0)
             {
                 customerData = customerData.Where(d => d.type_id == type_id);
             }
+
+
+
+
             if (department_id > 0)
             {
                 customerData = customerData.Where(d => d.bophan_id == department_id);
@@ -799,7 +809,7 @@ namespace it_template.Areas.V1.Controllers
             int skip = start != null ? Convert.ToInt32(start) : 0;
             var customerData = _context.DutruChitietModel
                 .Include(d => d.user)
-                .Include(d => d.muahang_chitiet).ThenInclude(d=>d.muahang)
+                .Include(d => d.muahang_chitiet).ThenInclude(d => d.muahang)
                 .Include(d => d.dutru).Where(d => d.dutru.status_id == (int)Status.EsignSuccess && d.date_huy == null);
 
             //if (is_CungungNVL && is_CungungGiantiep)

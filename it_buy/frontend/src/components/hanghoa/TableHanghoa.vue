@@ -96,7 +96,7 @@
 
         <template v-else-if="col.data == 'tenhh'">
           <div style="word-break: break-all;white-space: pre-line;">{{ slotProps.data[col.data] }}</div>
-          <div v-if="slotProps.data.user" class="small">Phân công cho <i>{{ slotProps.data.user.fullName }}</i>
+          <div v-if="slotProps.data.user" class="small">Phân công cho <i>{{ slotProps.data.user.FullName }}</i>
             <Tag severity="secondary" :value="tag" v-for="tag in slotProps.data.list_tag" class="ml-2"></Tag>
           </div>
 

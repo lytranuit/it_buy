@@ -117,7 +117,7 @@ const { is_admin, is_Cungung, is_Ketoan, is_CungungNVL, is_Qa, is_CungungGiantie
 const confirm = useConfirm();
 const datatable = ref();
 const department_id = ref();
-const list_filterTable = ref([{ 'label': "Của tôi", value: null }]);
+const list_filterTable = ref([{ 'label': "Tôi tạo", value: null }]);
 const filterTable = ref();
 const columns = ref([
   {
@@ -223,6 +223,10 @@ onMounted(() => {
   loadLazyData();
 });
 const fill = () => {
+
+  if (is_Cungung.value) {
+    list_filterTable.value.push({ label: "Phân công cho tôi", value: 100 });
+  }
   if (is_CungungGiantiep.value) {
     list_filterTable.value.push({ label: "Mua hàng gián tiếp", value: 2 });
 
