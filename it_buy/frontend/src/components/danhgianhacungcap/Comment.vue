@@ -24,7 +24,7 @@
           <img class="mr-3 rounded-circle" :src="comment.user.image_url" width="50" alt="" />
           <div class="media-body border-bottom" style="display: grid">
             <h5 class="mt-0 mb-1" style="font-size: 14px;">
-              {{ comment.user.fullName }}
+              {{ comment.user.FullName }}
               <small class="text-muted">
                 -
                 {{ formatDate(comment.created_at, "HH:mm DD/MM/YYYY") }}</small>

@@ -12,7 +12,7 @@
           </div>
           <div class="flex-m"><span class=""><span class="">ID</span>: <span class="font-weight-bold">{{ model.id
                 }}</span></span><span class="mx-2">|</span>
-            <div class=""><span class="">Người tạo</span>: <span class="font-weight-bold">{{ user_created_by.fullName
+            <div class=""><span class="">Người tạo</span>: <span class="font-weight-bold">{{ user_created_by.FullName
                 }}</span></div><span class="mx-2">|</span>
             <div class=""><span class=""> Ngày tạo: </span><span class="font-weight-bold">{{
                   formatDate(model.created_at) }}</span></div>
@@ -87,7 +87,7 @@
         <div class="card-body">
           <DanhgianhacungcapFiles></DanhgianhacungcapFiles>
           <div class="text-center mt-3">
-            <Message :closable="false" v-if="model.is_chapnhan" severity="success">{{ model?.user_chapnhan?.fullName }}
+            <Message :closable="false" v-if="model.is_chapnhan" severity="success">{{ model?.user_chapnhan?.FullName }}
               đã chấp nhận vào lúc {{ formatDate(model.date_chapnhan, "YYYY-MM-DD HH:mm:ss") }}</Message>
             <Button label="Chấp nhân" severity="success" size="small" icon="pi pi-check" v-else-if="is_LeadQa"
               @click="chapnhan"></Button>

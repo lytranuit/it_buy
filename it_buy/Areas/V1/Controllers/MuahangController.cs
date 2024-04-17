@@ -12,6 +12,7 @@ using System.Drawing.Imaging;
 using System.Net.WebSockets;
 using System.Reflection;
 using System.Security.Policy;
+using System.Text.Json.Serialization;
 using Vue.Data;
 using Vue.Models;
 using Vue.Services;
@@ -141,7 +142,11 @@ namespace it_template.Areas.V1.Controllers
 
             ///Sort
             data = data.OrderBy(d => d.created_at).ToList();
-            return Json(data);
+            return Json(data, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            });
         }
         public JsonResult Get(int id)
         {
@@ -188,7 +193,11 @@ namespace it_template.Areas.V1.Controllers
                     }
                 }
             }
-            return Json(data);
+            return Json(data, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            });
         }
         public JsonResult GetUserNhanhang(int muahang_id)
         {
@@ -199,7 +208,11 @@ namespace it_template.Areas.V1.Controllers
                 data.Add(d.created_by);
             }
             data = data.Distinct().ToList();
-            return Json(data);
+            return Json(data, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            });
         }
         public JsonResult getHistory(string hh_id)
         {
@@ -225,7 +238,11 @@ namespace it_template.Areas.V1.Controllers
                 };
                 data.Add(data1);
             }
-            return Json(new { to = to, data = data });
+            return Json(new { to = to, data = data }, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            });
         }
 
         public async Task<JsonResult> QrNhanhang(int muahang_id)
@@ -257,6 +274,10 @@ namespace it_template.Areas.V1.Controllers
             {
                 success = true,
                 list = ret
+            }, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
             });
         }
         [HttpPost]
@@ -291,7 +312,11 @@ namespace it_template.Areas.V1.Controllers
             _context.RemoveRange(Model1);
 
             _context.SaveChanges();
-            return Json(Model);
+            return Json(Model, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            });
         }
 
         [HttpPost]
@@ -551,7 +576,7 @@ namespace it_template.Areas.V1.Controllers
             {
                 {"date",now.ToString("dd/MM/yyyy") },
             };
-            var is_nvl_moi = false;
+            bool? is_vat = false;
             var RawDetails = new List<RawMuahangDetails>();
             var data = _context.MuahangModel.Where(d => d.id == id).FirstOrDefault();
             if (data != null)
@@ -560,19 +585,19 @@ namespace it_template.Areas.V1.Controllers
                 if (muahang_chonmua != null)
                 {
                     var ncc_chon = muahang_chonmua;
-                    raw.Add("tonggiatri", ncc_chon.tonggiatri.Value.ToString("#,##0.##"));
+                    is_vat = ncc_chon.is_vat;
+                    raw.Add("tonggiatri", ncc_chon.tonggiatri.Value.ToString("#,##0"));
                     raw.Add("tggh", data.date.Value.ToString("dd/MM/yyyy"));
-                    raw.Add("thanhtien", ncc_chon.thanhtien.Value.ToString("#,##0.##"));
-                    raw.Add("thanhtien_vat", ncc_chon.thanhtien_vat.Value.ToString("#,##0.##"));
-                    raw.Add("phigiaohang", ncc_chon.phigiaohang.Value.ToString("#,##0.##"));
-                    raw.Add("tienvat", ncc_chon.tienvat.Value.ToString("#,##0.##"));
-                    raw.Add("vat", ncc_chon.vat.Value.ToString());
+                    raw.Add("thanhtien", ncc_chon.thanhtien.Value.ToString("#,##0"));
+                    raw.Add("thanhtien_vat", ncc_chon.thanhtien_vat.Value.ToString("#,##0"));
+                    raw.Add("phigiaohang", ncc_chon.phigiaohang.Value.ToString("#,##0"));
+                    raw.Add("tienvat", ncc_chon.tienvat.Value.ToString("#,##0"));
+                    //raw.Add("vat", ncc_chon.vat.Value.ToString());
                     raw.Add("tiente", ncc_chon.tiente.ToString());
                     var stt = 1;
                     foreach (var item in ncc_chon.chitiet)
                     {
-                        if (item.hh_id != null && data.type_id == 1) /// Check có phải mua nguyên liệu mới hay ko?
-                            is_nvl_moi = true;
+
 
                         var material = _context.MaterialModel.Where(d => item.hh_id == "m-" + d.id).Include(d => d.nhasanxuat).FirstOrDefault();
                         var tieuchuan = "";
@@ -590,7 +615,7 @@ namespace it_template.Areas.V1.Controllers
                             dvt = item.dvt,
                             soluong = item.soluong.Value.ToString("#,##0.##"),
                             dongia = item.dongia.Value.ToString("#,##0.##"),
-                            thanhtien = item.thanhtien.Value.ToString("#,##0.##"),
+                            thanhtien = item.thanhtien.Value.ToString("#,##0"),
                             nhasx = nhasx,
                             tieuchuan = tieuchuan,
                             vat = item.vat,
@@ -648,17 +673,21 @@ namespace it_template.Areas.V1.Controllers
             //Creates Document instance
             Spire.Doc.Document document = new Spire.Doc.Document();
             //Loads the word document
-            if (is_nvl_moi == true)
-            {
-                document.LoadFromFile(_configuration["Source:Path_Private"] + "/buy/templates/dondathangnvlmoi.docx", Spire.Doc.FileFormat.Docx);
-            }
-            else if (data.type_id == 1)
+            if (data.type_id == 1 && is_vat == false)
             {
                 document.LoadFromFile(_configuration["Source:Path_Private"] + "/buy/templates/dondathangnvl.docx", Spire.Doc.FileFormat.Docx);
             }
-            else
+            else if (data.type_id == 1 && is_vat == true)
+            {
+                document.LoadFromFile(_configuration["Source:Path_Private"] + "/buy/templates/dondathangnvl_vat.docx", Spire.Doc.FileFormat.Docx);
+            }
+            else if (is_vat == false)
             {
                 document.LoadFromFile(_configuration["Source:Path_Private"] + "/buy/templates/dondathang.docx", Spire.Doc.FileFormat.Docx);
+            }
+            else
+            {
+                document.LoadFromFile(_configuration["Source:Path_Private"] + "/buy/templates/dondathang_vat.docx", Spire.Doc.FileFormat.Docx);
             }
 
 
@@ -911,7 +940,11 @@ namespace it_template.Areas.V1.Controllers
                 data.Add(data1);
             }
             var jsonData = new { draw = draw, recordsFiltered = recordsFiltered, recordsTotal = recordsTotal, data = data };
-            return Json(jsonData);
+            return Json(jsonData, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            });
         }
 
         [HttpPost]
@@ -920,6 +953,9 @@ namespace it_template.Areas.V1.Controllers
             System.Security.Claims.ClaimsPrincipal currentUser = this.User;
             var user_id = UserManager.GetUserId(currentUser);
             var now = DateTime.Now;
+
+            var is_nvl_moi = false;
+            bool? is_vat = false;
             var raw = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
             {
                 {"ngay",now.ToString("dd") },
@@ -942,17 +978,20 @@ namespace it_template.Areas.V1.Controllers
                 var muahang_chonmua = _context.MuahangNccModel.Where(d => d.id == data.muahang_chonmua_id).Include(d => d.chitiet).FirstOrDefault();
                 if (muahang_chonmua != null)
                 {
+                    is_vat = muahang_chonmua.is_vat;
                     var ncc_chon = muahang_chonmua;
-                    raw.Add("tonggiatri", ncc_chon.tonggiatri.Value.ToString("#,##0.##"));
-                    raw.Add("thanhtien", ncc_chon.thanhtien.Value.ToString("#,##0.##"));
-                    raw.Add("thanhtien_vat", ncc_chon.thanhtien_vat.Value.ToString("#,##0.##"));
-                    raw.Add("phigiaohang", ncc_chon.phigiaohang.Value.ToString("#,##0.##"));
-                    raw.Add("tienvat", ncc_chon.tienvat.Value.ToString("#,##0.##"));
-                    raw.Add("vat", ncc_chon.vat.Value.ToString());
+                    raw.Add("tonggiatri", ncc_chon.tonggiatri.Value.ToString("#,##0"));
+                    raw.Add("thanhtien", ncc_chon.thanhtien.Value.ToString("#,##0"));
+                    raw.Add("thanhtien_vat", ncc_chon.thanhtien_vat.Value.ToString("#,##0"));
+                    raw.Add("phigiaohang", ncc_chon.phigiaohang.Value.ToString("#,##0"));
+                    raw.Add("tienvat", ncc_chon.tienvat.Value.ToString("#,##0"));
+                    //raw.Add("vat", ncc_chon.vat.Value.ToString());
                     raw.Add("tiente", ncc_chon.tiente.ToString());
                     var stt = 1;
                     foreach (var item in ncc_chon.chitiet)
                     {
+                        if (item.hh_id != null && data.type_id == 1) /// Check có phải mua nguyên liệu mới hay ko?
+                            is_nvl_moi = true;
                         //var material = _context.MaterialModel.Where(d => item.hh_id == "m-" + d.id).FirstOrDefault();
                         //if (material != null)
                         //{
@@ -964,7 +1003,7 @@ namespace it_template.Areas.V1.Controllers
                             dvt = item.dvt,
                             soluong = item.soluong.Value.ToString("#,##0.##"),
                             dongia = item.dongia.Value.ToString("#,##0.##"),
-                            thanhtien = item.thanhtien.Value.ToString("#,##0.##"),
+                            thanhtien = item.thanhtien.Value.ToString("#,##0"),
                             vat = item.vat
                             //note = item.note,
                             //artwork = material.masothietke,
@@ -981,7 +1020,7 @@ namespace it_template.Areas.V1.Controllers
                         ncc.chonmua = true;
                     }
                     raw.Add("bang_ncc_ten_" + key, ncc.ncc.tenncc);
-                    raw.Add("bang_ncc_tong_" + key, ncc.tonggiatri.Value.ToString("#,##0.##"));
+                    raw.Add("bang_ncc_tong_" + key, ncc.tonggiatri.Value.ToString("#,##0"));
                     raw.Add("bang_ncc_dap_ung_" + key, ncc.dapung == true ? "X" : "");
                     raw.Add("bang_ncc_time_delivery_" + key, ncc.thoigiangiaohang);
                     raw.Add("bang_ncc_policy_" + key, ncc.baohanh);
@@ -1017,13 +1056,29 @@ namespace it_template.Areas.V1.Controllers
             //Creates Document instance
             Spire.Doc.Document document = new Spire.Doc.Document();
             //Loads the word document
-            if (data.type_id == 1)
+            if (is_nvl_moi == true && is_vat == false)
+            {
+                document.LoadFromFile(_configuration["Source:Path_Private"] + "/buy/templates/denghimuahangnvlmoi.docx", Spire.Doc.FileFormat.Docx);
+            }
+            else if (data.type_id == 1 && is_vat == false)
             {
                 document.LoadFromFile(_configuration["Source:Path_Private"] + "/buy/templates/denghimuahangnvl.docx", Spire.Doc.FileFormat.Docx);
             }
-            else
+            else if (is_nvl_moi == true && is_vat == true)
+            {
+                document.LoadFromFile(_configuration["Source:Path_Private"] + "/buy/templates/denghimuahangnvlmoi_vat.docx", Spire.Doc.FileFormat.Docx);
+            }
+            else if (data.type_id == 1 && is_vat == true)
+            {
+                document.LoadFromFile(_configuration["Source:Path_Private"] + "/buy/templates/denghimuahangnvl_vat.docx", Spire.Doc.FileFormat.Docx);
+            }
+            else if (is_vat == false)
             {
                 document.LoadFromFile(_configuration["Source:Path_Private"] + "/buy/templates/denghimuahang.docx", Spire.Doc.FileFormat.Docx);
+            }
+            else
+            {
+                document.LoadFromFile(_configuration["Source:Path_Private"] + "/buy/templates/denghimuahang_vat.docx", Spire.Doc.FileFormat.Docx);
             }
 
 
@@ -1312,6 +1367,10 @@ namespace it_template.Areas.V1.Controllers
             {
                 success = 1,
                 comment = CommentModel
+            }, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
             });
         }
 
@@ -1330,7 +1389,11 @@ namespace it_template.Areas.V1.Controllers
             //string current_user_id = UserManager.GetUserId(currentUser); // Get user id:
 
 
-            return Json(new { success = 1, comments });
+            return Json(new { success = 1, comments }, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            });
         }
         [HttpPost]
         public async Task<IActionResult> thongbao(int muahang_id, List<string> list_user, string note)
@@ -1435,7 +1498,11 @@ namespace it_template.Areas.V1.Controllers
                     _context.SaveChanges();
                 }
             }
-            return Json(muahang_ncc);
+            return Json(muahang_ncc, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            });
 
         }
         private void CopyValues<T>(T target, T source)

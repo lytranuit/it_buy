@@ -154,6 +154,10 @@ namespace it_template.Areas.V1.Controllers
                         id = user.Id,
                         token = token,
                         vaild_to = find.vaild_to.Value.ToString("yyyy-MM-dd HH:mm:ss")
+                    }, new System.Text.Json.JsonSerializerOptions()
+                    {
+                        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                        ReferenceHandler = ReferenceHandler.IgnoreCycles,
                     });
                 }
             }
@@ -178,7 +182,8 @@ namespace it_template.Areas.V1.Controllers
             }).ToList();
             return Json(users, new System.Text.Json.JsonSerializerOptions()
             {
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
             });
         }
 
@@ -186,7 +191,11 @@ namespace it_template.Areas.V1.Controllers
         {
             var All = GetChild(0);
             //var jsonData = new { data = ProcessModel };
-            return Json(All);
+            return Json(All, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            });
         }
         private List<SelectResponse> GetChild(int parent)
         {

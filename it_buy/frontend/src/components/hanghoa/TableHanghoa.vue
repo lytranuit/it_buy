@@ -303,7 +303,7 @@ const columns = ref([
 
   {
     id: 6,
-    label: "Đề nghị mua hàng",
+    label: "DNMH",
     data: "list_muahang",
     className: "text-center",
   },
@@ -441,7 +441,8 @@ const phancong = () => {
   }
   Promise.all(All).then((response) => {
     visiblePhancong.value = false;
-
+    selected.value = null;
+    selectedItem.value = {};
     toast.add({
       severity: "success",
       summary: "Thành công",
@@ -453,7 +454,7 @@ const phancong = () => {
 }
 
 const tag = () => {
-  console.log(selectedItem.value);
+  //console.log(selectedItem.value);
   if (!selectedItem.value.list_tag) {
     alert("Chưa nhập tag");
     return false;
@@ -461,6 +462,7 @@ const tag = () => {
   dutruApi.tag({ id: selectedItem.value.id, list_tag: selectedItem.value.list_tag }).then((response) => {
     visibleTag.value = false;
 
+    selectedItem.value = {};
     toast.add({
       severity: "success",
       summary: "Thành công",

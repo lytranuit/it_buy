@@ -1,7 +1,7 @@
 ﻿<template>
   <section class="card card-fluid">
     <div class="card-body" style="overflow: auto; position: relative">
-      <div class="card-header d-flex align-items-center">
+      <div class="card-header d-md-flex align-items-center">
         <PopupDutru></PopupDutru>
         <div class="ml-auto d-flex align-items-center">
           <span>Bộ phận:</span>
@@ -13,13 +13,13 @@
         </div>
       </div>
       <div class="card-body">
-        <DataTable class="p-datatable-customers" showGridlines :value="datatable" :lazy="true" ref="dt"
+        <DataTable class="dt-responsive-table" showGridlines :value="datatable" :lazy="true" ref="dt"
           scrollHeight="70vh" v-model:selection="selectedProducts" :paginator="true" :rowsPerPageOptions="[10, 50, 100]"
           :rows="rows" :totalRecords="totalRecords" @page="onPage($event)" :rowHover="true" :loading="loading"
           responsiveLayout="scroll" :resizableColumns="true" columnResizeMode="expand" v-model:filters="filters"
           filterDisplay="menu">
           <template #header>
-            <div class="d-flex align-items-center">
+            <div class="d-md-flex align-items-center">
               <div style="width: 200px">
                 <TreeSelect :options="columns" v-model="showing" multiple :limit="0"
                   :limitText="(count) => 'Hiển thị: ' + count + ' cột'">
@@ -43,37 +43,73 @@
             :showFilterMatchModes="false">
 
             <template #body="slotProps">
-              <template v-if="col.data == 'id'">
-                <RouterLink :to="'/dutru/edit/' + slotProps.data[col.data]">
-                  <i class="fas fa-pencil-alt mr-2"></i>
-                  {{ slotProps.data[col.data] }}
-                </RouterLink>
-              </template>
 
-              <template v-else-if="col.data == 'name'">
-                <div>
-                  <div style="text-wrap: pretty;">
-                    <RouterLink :to="'/dutru/edit/' + slotProps.data.id" class="text-blue">{{ slotProps.data.name }}
-                    </RouterLink>
-                  </div>
-                  <small>Tạo bởi <i>{{ slotProps.data.user_created_by?.fullName }}</i> lúc {{
+              <span class="ui-column-title">{{ col.label }}</span>
+              <div class="ui-column-data">
+                <template v-if="col.data == 'id'">
+                  <RouterLink :to="'/dutru/edit/' + slotProps.data[col.data]">
+                    <i class="fas fa-pencil-alt mr-2"></i>
+                    {{ slotProps.data[col.data] }}
+                  </RouterLink>
+                </template>
+
+                <template v-else-if="col.data == 'name'">
+                  <div>
+                    <div style="text-wrap: pretty;">
+                      <RouterLink :to="'/dutru/edit/' + slotProps.data.id" class="text-blue">{{ slotProps.data.name }}
+                      </RouterLink>
+                    </div>
+                    <small>Tạo bởi <i>{{ slotProps.data.user_created_by?.FullName }}</i> lúc {{
               formatDate(slotProps.data.created_at, "YYYY-MM-DD HH:mm") }}</small>
-                </div>
-              </template>
+                  </div>
+                </template>
 
-              <template v-else-if="col.data == 'status_id'">
-                <div class="text-center">
-                  <Tag value="Hoàn thành" severity="success" size="small" v-if="slotProps.data['date_finish']" />
-                  <Tag value="Nháp" severity="secondary" size="small" v-else-if="slotProps.data[col.data] == 1" />
-                  <Tag value="Đang trình ký" severity="warning" size="small"
-                    v-else-if="slotProps.data[col.data] == 2" />
-                  <Tag value="Chờ ký duyệt" severity="warning" size="small" v-else-if="slotProps.data[col.data] == 3" />
-                  <Tag value="Đã duyệt" severity="success" size="small" v-else-if="slotProps.data[col.data] == 4" />
-                  <Tag value="Không duyệt" severity="danger" size="small" v-else-if="slotProps.data[col.data] == 5" />
-                </div>
-              </template>
+                <template v-else-if="col.data == 'list_muahang'">
+                  <div v-for="item of slotProps.data[col.data]" :key="item.id">
+                    <RouterLink :to="'/muahang/edit/' + item.id" class="text-primary mr-2" v-if="is_Cungung">{{ item.id
+                      }} - {{ item.code
+                      }}
+                    </RouterLink>
+                    <RouterLink :to="'/muahang/nhanhang/' + item.id" class="text-primary mr-2"
+                      v-else-if="item['is_dathang'] && ((item['loaithanhtoan'] == 'tra_sau' && !item['is_nhanhang']) || (item['loaithanhtoan'] == 'tra_truoc' && item['is_thanhtoan']))">
+                      {{ item.id
+                      }} - {{ item.code
+                      }}
+                    </RouterLink>
+                    <span class="mr-2" v-else>{{ item.id }} - {{ item.code
+                      }}
+                    </span>
+                    <Tag value="Hoàn thành" severity="success" v-if="item['date_finish']" />
+                    <Tag value="Chờ nhận hàng" severity="info"
+                      v-else-if="item['is_dathang'] && ((item['loaithanhtoan'] == 'tra_sau' && !item['is_nhanhang']) || (item['loaithanhtoan'] == 'tra_truoc' && item['is_thanhtoan']))" />
+                    <Tag value="Chờ thanh toán" severity="info"
+                      v-else-if="item['is_dathang'] && ((item['loaithanhtoan'] == 'tra_truoc' && !item['is_thanhtoan']) || (item['loaithanhtoan'] == 'tra_sau' && item['is_nhanhang']))" />
+                    <Tag value="Đang thực hiện" severity="secondary" v-else-if="item['status_id'] == 1" />
+                    <Tag value="Đang gửi và nhận báo giá" severity="warning" v-else-if="item['status_id'] == 6" />
+                    <Tag value="So sánh giá" severity="warning" v-else-if="item['status_id'] == 7" />
+                    <Tag value="Đang trình ký" severity="warning" v-else-if="item['status_id'] == 8" />
+                    <Tag value="Chờ ký duyệt" severity="warning" v-else-if="item['status_id'] == 9" />
+                    <Tag value="Đã duyệt" v-else-if="item['status_id'] == 10" />
+                    <Tag value="Không duyệt" severity="danger" v-else-if="item['status_id'] == 11" />
+                  </div>
+                </template>
 
-              <div v-else v-html="slotProps.data[col.data]"></div>
+                <template v-else-if="col.data == 'status_id'">
+                  <div class="text-center">
+                    <Tag value="Hoàn thành" severity="success" size="small" v-if="slotProps.data['date_finish']" />
+                    <Tag value="Nháp" severity="secondary" size="small" v-else-if="slotProps.data[col.data] == 1" />
+                    <Tag value="Đang trình ký" severity="warning" size="small"
+                      v-else-if="slotProps.data[col.data] == 2" />
+                    <Tag value="Chờ ký duyệt" severity="warning" size="small"
+                      v-else-if="slotProps.data[col.data] == 3" />
+                    <Tag value="Đã duyệt" severity="success" size="small" v-else-if="slotProps.data[col.data] == 4" />
+                    <Tag value="Không duyệt" severity="danger" size="small" v-else-if="slotProps.data[col.data] == 5" />
+                  </div>
+                </template>
+
+                <div v-else v-html="slotProps.data[col.data]"></div>
+              </div>
+
             </template>
 
             <template #filter="{ filterModel, filterCallback }" v-if="col.filter == true">
@@ -146,6 +182,12 @@ const columns = ref([
     id: 3,
     label: "Trạng thái",
     data: "status_id",
+    className: "text-center",
+  },
+  {
+    id: 4,
+    label: "DNMH",
+    data: "list_muahang",
     className: "text-center",
   },
 ]);
@@ -243,6 +285,9 @@ const fill = () => {
 
   if (list_filterTable.value.length > 0) {
     filterTable.value = list_filterTable.value[0].value;
+    if (is_Cungung.value) {
+      filterTable.value = 100;
+    }
   }
 }
 const waiting = ref();

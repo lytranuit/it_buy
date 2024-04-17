@@ -4,6 +4,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections;
+using System.Text.Json.Serialization;
 using Vue.Data;
 using Vue.Models;
 
@@ -45,7 +46,11 @@ namespace it_template.Areas.V1.Controllers
             }
 
 
-            return Json(jsonData);
+            return Json(jsonData, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            });
         }
 
         [HttpPost]
@@ -64,7 +69,11 @@ namespace it_template.Areas.V1.Controllers
             }
 
 
-            return Json(jsonData);
+            return Json(jsonData, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            });
         }
         [HttpPost]
         public async Task<JsonResult> Table()
@@ -101,7 +110,11 @@ namespace it_template.Areas.V1.Controllers
             //	data.Add(data1);
             //}
             var jsonData = new { draw = draw, recordsFiltered = recordsFiltered, recordsTotal = recordsTotal, data = datapost };
-            return Json(jsonData);
+            return Json(jsonData, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            });
         }
         public void CopyValues<T>(T target, T source)
         {

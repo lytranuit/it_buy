@@ -1,15 +1,65 @@
 <template>
-    
+    <div class="row justify-content-center">
+
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <b>Quy trình mua hàng</b>
+                </div>
+                <div class="card-body">
+                    <Stepper>
+                        <StepperPanel :header="item.label" v-for="item in items">
+                        </StepperPanel>
+                    </Stepper>
+                </div>
+                <!--end card-body-->
+            </div>
+            <!--end card-->
+        </div>
+        <!--end col-->
+        <!-- <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <b>Thảo luận liên quan đến tôi</b>
+                </div>
+                <div class="card-body">
+
+                </div>
+              
+            </div>
+           
+        </div> -->
+        <!--end col-->
+    </div>
 </template>
 <script setup>
 import { onMounted, ref } from "vue";
 import Chart from "primevue/chart";
+import Stepper from 'primevue/stepper';
+import StepperPanel from 'primevue/stepperpanel';
 import Api from "../api/Api";
 import Loading from "../components/Loading.vue";
 import { useAuth } from "../stores/auth";
 import { useRouter } from "vue-router";
 import SelectButton from 'primevue/selectbutton';
 import Calendar from 'primevue/calendar';
+const items = ref([{
+    label: 'Dự trù'
+}, {
+    label: 'Trình ký'
+}, {
+    label: 'Tiếp nhận'
+}, {
+    label: 'Đề nghị mua hàng'
+}, {
+    label: 'Trình ký'
+}, {
+    label: 'Đặt hàng'
+}, {
+    label: 'Nhận hàng và thanh toán'
+}, {
+    label: 'Hoàn thành'
+}])
 const store = useAuth();
 const sodutru = ref(0);
 const somuahang = ref(0);
@@ -32,12 +82,8 @@ const router = useRouter();
 const dates = ref();
 const type_chiphi = ref("Month");
 onMounted(() => {
-    Api.HomeBadge().then((res) => {
-        sodutru.value = res.sodutru;
-        somuahang.value = res.somuahang;
-        success.value = res.success;
-        failed.value = res.failed;
-    });
-
+    // Api.comments({}).then((res) => {
+    //     console.log(res);
+    // })
 });
 </script>

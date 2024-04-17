@@ -53,9 +53,9 @@
                 <template v-else-if="col.data == 'created_by'">
                   <div v-if="slotProps.data['user_created_by']" class="d-flex">
                     <Avatar :image="slotProps.data.user_created_by.image_url"
-                      :title="slotProps.data.user_created_by.fullName" size="small" shape="circle" /> <span
+                      :title="slotProps.data.user_created_by.FullName" size="small" shape="circle" /> <span
                       class="align-self-center ml-2">{{
-            slotProps.data.user_created_by.fullName }}</span>
+            slotProps.data.user_created_by.FullName }}</span>
                   </div>
                 </template>
 

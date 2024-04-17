@@ -1,12 +1,18 @@
 <template>
   <div class="left-sidenav">
     <ul class="metismenu left-sidenav-menu">
-      <li>
-        <router-link class="nav-link" to="/admin" v-if="is_admin">
+      <li v-if="is_admin">
+        <router-link class="nav-link" to="/admin">
+          <i class="fas fa-chart-bar"></i>
+          <span>Admin</span>
+        </router-link>
+      </li>
+      <!-- <li>
+        <router-link class="nav-link" to="/">
           <i class="fas fa-chart-bar"></i>
           <span>Tổng quan</span>
         </router-link>
-      </li>
+      </li> -->
       <li>
         <router-link class="nav-link" to="/dutru">
           <i class="ti-briefcase"></i>

@@ -140,7 +140,7 @@ const columns = ref([
   {
     id: 2,
     label: "Họ và tên",
-    data: "fullName",
+    data: "FullName",
     className: "text-center",
     filter: true,
   },
@@ -159,7 +159,7 @@ const columns = ref([
 ]);
 const filters = ref({
   id: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  fullName: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  FullName: { value: null, matchMode: FilterMatchMode.CONTAINS },
   email: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
 const totalRecords = ref(0);

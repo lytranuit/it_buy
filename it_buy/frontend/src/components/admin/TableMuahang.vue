@@ -29,7 +29,7 @@
                                                     class="text-blue">[{{
                         slotProps.data.code }}] {{ slotProps.data.name }}</RouterLink>
                                             </div>
-                                            <div>Tạo bởi <i>{{ slotProps.data.user_created_by?.fullName }}</i> lúc {{
+                                            <div>Tạo bởi <i>{{ slotProps.data.user_created_by?.FullName }}</i> lúc {{
                         formatDate(slotProps.data.created_at, "YYYY-MM-DD HH:mm") }}</div>
                                         </div>
                                     </template>

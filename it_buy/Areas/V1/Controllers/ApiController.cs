@@ -73,7 +73,8 @@ namespace it_template.Areas.V1.Controllers
             var departments = _context.DepartmentModel.Where(d => d.deleted_at == null && d.parent == 0 && list_department.Contains(d.id)).ToList();
             return Json(departments, new System.Text.Json.JsonSerializerOptions()
             {
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
             });
         }
         public async Task<JsonResult> departments()
@@ -142,7 +143,8 @@ namespace it_template.Areas.V1.Controllers
             //var jsonData = new { data = ProcessModel };
             return Json(new { sodutru = sodutru, somuahang = somuahang, success = success, failed = 0 }, new System.Text.Json.JsonSerializerOptions()
             {
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
             });
         }
 
@@ -207,7 +209,11 @@ namespace it_template.Areas.V1.Controllers
                 data.Add(data1);
             }
             var jsonData = new { draw = draw, recordsFiltered = recordsFiltered, recordsTotal = recordsTotal, data = data };
-            return Json(jsonData);
+            return Json(jsonData, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            });
         }
         [HttpPost]
         public async Task<JsonResult> TableDutru()
@@ -265,7 +271,11 @@ namespace it_template.Areas.V1.Controllers
             //	data.Add(data1);
             //}
             var jsonData = new { draw = draw, recordsFiltered = recordsFiltered, recordsTotal = recordsTotal, data = datapost };
-            return Json(jsonData);
+            return Json(jsonData, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            });
         }
         [HttpPost]
         public async Task<JsonResult> chiphi(DateTime? tungay, DateTime? denngay, string timetype = "Month")
@@ -363,6 +373,10 @@ namespace it_template.Areas.V1.Controllers
             {
                 data = dulieu,
                 list = list
+            }, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
             });
         }
         [HttpPost]
@@ -428,6 +442,41 @@ namespace it_template.Areas.V1.Controllers
             return Json(new
             {
                 data = dulieu,
+            }, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            });
+        }
+        [HttpPost]
+        public async Task<JsonResult> Comments()
+        {
+            System.Security.Claims.ClaimsPrincipal currentUser = this.User;
+            var user_id = UserManager.GetUserId(currentUser);
+            // Du tru
+            var list_dutru = _context.DutruModel.Where(d => d.created_by == user_id).Select(d => d.id).ToList(); /// dự trù tạo
+            var list_comment = _context.DutruCommentModel.Where(d => d.user_id == user_id).Select(d => d.dutru_id).ToList(); /// dự trù có comment
+            var list_comment_releated = _context.DutruCommentUserModel.Include(d => d.comment).Where(d => d.user_id == user_id).Select(d => d.comment.dutru_id).ToList(); /// dự trù có comment
+
+            var list_related_dutru = new List<int>();
+            list_related_dutru.AddRange(list_dutru);
+            list_related_dutru.AddRange(list_comment);
+            list_related_dutru.AddRange(list_comment_releated);
+            list_related_dutru = list_related_dutru.Distinct().ToList();
+            var new_comment = _context.DutruCommentModel.Where(d => d.deleted_at == null && list_related_dutru.Contains(d.dutru_id)).Include(d => d.files).OrderByDescending(d => d.created_at).ToList();
+            foreach (var item in new_comment)
+            {
+
+            }
+            ///
+            return Json(new
+            {
+                success = true,
+                new_comment = new_comment,
+            }, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
             });
         }
     }
@@ -456,5 +505,13 @@ namespace it_template.Areas.V1.Controllers
         public string sort { get; set; }
         public DepartmentModel bophan { get; set; }
         public decimal? thanhtien { get; set; }
+    }
+    public class Comments
+    {
+        public string title { get; set; }
+        public string comment { get; set; }
+        public UserModel user { get; set; }
+        public DateTime? created_at { get; set; }
+        public string link { get; set; }
     }
 }

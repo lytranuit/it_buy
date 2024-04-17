@@ -18,11 +18,11 @@
                     <template v-else-if="col.data == 'dongia'">
                         <InputNumber v-model="slotProps.data[col.data]" class="p-inputtext-sm"
                             :suffix="' ' + modelncc.tiente" @update:modelValue="changeDongia()" :disabled="readonly"
-                            :maxFractionDigits="2" />
+                            :maxFractionDigits="5" />
                     </template>
                     <template v-else-if="col.data == 'vat'">
                         <InputNumber v-model="slotProps.data[col.data]" class="p-inputtext-sm" :suffix="'%'"
-                            inputStyle="width: 50px;" @update:modelValue="changeDongia()" :disabled="readonly"
+                            :inputStyle="{ width: '50px' }" @update:modelValue="changeDongia()" :disabled="readonly"
                             :maxFractionDigits="0" />
                     </template>
 
@@ -64,6 +64,9 @@ const selected = ref();
 const modelncc = computed(() => {
     return nccs.value[props.index];
 });
+const is_vat = computed(() => {
+    return modelncc.value.is_vat;
+})
 const columns = ref([
     {
         label: "STT",
@@ -147,4 +150,102 @@ onMounted(() => {
     // console.log(props.index)
     // console.log(modelncc.value)
 })
+
+watch(is_vat, () => {
+    console.log(is_vat)
+    if (is_vat.value) {
+        columns.value = [
+            {
+                label: "STT",
+                data: "stt",
+                className: "text-center",
+            },
+            {
+                label: "Mã",
+                "data": "hh_id",
+                "className": "text-center",
+            },
+            {
+                label: "Tên",
+                "data": "tenhh",
+                "className": "text-center"
+            },
+            {
+                label: "ĐVT",
+                "data": "dvt",
+                "className": "text-center",
+            },
+            {
+                label: "Số lượng",
+                "data": "soluong",
+                "className": "text-center"
+            },
+            {
+                label: "Đơn giá",
+                "data": "dongia",
+                "className": "text-center"
+            },
+            {
+                label: "VAT",
+                "data": "vat",
+                "className": "text-center"
+            },
+            {
+                label: "Thành tiền (Chưa vat)",
+                "data": "thanhtien",
+                "className": "text-center"
+            },
+            {
+                label: "Thành tiền",
+                "data": "thanhtien_vat",
+                "className": "text-center"
+            }
+        ]
+    } else {
+        columns.value = [
+            {
+                label: "STT",
+                data: "stt",
+                className: "text-center",
+            },
+            {
+                label: "Mã",
+                "data": "hh_id",
+                "className": "text-center",
+            },
+            {
+                label: "Tên",
+                "data": "tenhh",
+                "className": "text-center"
+            },
+            {
+                label: "ĐVT",
+                "data": "dvt",
+                "className": "text-center",
+            },
+            {
+                label: "Số lượng",
+                "data": "soluong",
+                "className": "text-center"
+            },
+            {
+                label: "Đơn giá",
+                "data": "dongia",
+                "className": "text-center"
+            },
+            {
+                label: "Thành tiền",
+                "data": "thanhtien_vat",
+                "className": "text-center"
+            }
+        ];
+        ///// Đưa VAT = 0
+        var ncc = nccs.value[props.index];
+        for (var item of ncc.chitiet) {
+            item.vat = 0;
+        }
+        changeDongia();
+    }
+}, { immediate: true })
+
 </script>

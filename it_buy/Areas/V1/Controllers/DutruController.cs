@@ -69,7 +69,11 @@ namespace it_template.Areas.V1.Controllers
                     }
                 }
             }
-            return Json(data);
+            return Json(data, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            });
         }
         public JsonResult GetFiles(int id)
         {
@@ -89,7 +93,11 @@ namespace it_template.Areas.V1.Controllers
 
             ///Sort
             data = data.OrderBy(d => d.created_at).ToList();
-            return Json(data);
+            return Json(data, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            });
         }
         public JsonResult GetNhanhang(int id)
         {
@@ -118,16 +126,24 @@ namespace it_template.Areas.V1.Controllers
                 items = d.ToList()
             });
 
-            return Json(list);
+            return Json(list, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            });
         }
         public JsonResult GetMuahang(int id)
         {
             var list_items = _context.DutruChitietModel.Where(d => d.dutru_id == id).Select(d => d.id).ToList();
-            var data = _context.MuahangChitietModel.Include(d => d.muahang).Where(d => list_items.Contains(d.dutru_chitiet_id) && d.muahang.deleted_at == null).ToList();
+            var data = _context.MuahangChitietModel.Include(d => d.muahang).Where(d => list_items.Contains(d.dutru_chitiet_id) && d.muahang.deleted_at == null && d.muahang.status_id != (int)Status.MuahangEsignError).ToList();
 
             var list = data.GroupBy(d => new { d.muahang }).Select(d => d.Key.muahang).ToList();
 
-            return Json(list);
+            return Json(list, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            });
         }
 
         [HttpPost]
@@ -137,7 +153,11 @@ namespace it_template.Areas.V1.Controllers
             Model.deleted_at = DateTime.Now;
             _context.Update(Model);
             _context.SaveChanges();
-            return Json(Model);
+            return Json(Model, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            });
         }
 
         [HttpPost]
@@ -643,6 +663,8 @@ namespace it_template.Areas.V1.Controllers
                     });
                 }
                 _context.AddRange(list_attachment);
+
+
                 ////Signature
                 for (int k = 0; k < 1; ++k)
                 {
@@ -748,34 +770,30 @@ namespace it_template.Areas.V1.Controllers
                 customerData = customerData.Where(d => d.id == id);
             }
             int recordsFiltered = customerData.Count();
-            var datapost = customerData.OrderByDescending(d => d.id).Skip(skip).Take(pageSize).Include(d => d.user_created_by).ToList();
-            //var data = new ArrayList();
-            //foreach (var record in datapost)
-            //{
-            //	var ngaythietke = record.ngaythietke != null ? record.ngaythietke.Value.ToString("yyyy-MM-dd") : null;
-            //	var ngaysodk = record.ngaysodk != null ? record.ngaysodk.Value.ToString("yyyy-MM-dd") : null;
-            //	var ngayhethanthietke = record.ngayhethanthietke != null ? record.ngayhethanthietke.Value.ToString("yyyy-MM-dd") : null;
-            //	var data1 = new
-            //	{
-            //		mahh = record.mahh,
-            //		tenhh = record.tenhh,
-            //		dvt = record.dvt,
-            //		mansx = record.mansx,
-            //		mancc = record.mancc,
-            //		tennvlgoc = record.tennvlgoc,
-            //		masothietke = record.masothietke,
-            //		ghichu_thietke = record.ghichu_thietke,
-            //		masodk = record.masodk,
-            //		ghichu_sodk = record.ghichu_sodk,
-            //		nhuongquyen = record.nhuongquyen,
-            //		ngaythietke = ngaythietke,
-            //		ngaysodk = ngaysodk,
-            //		ngayhethanthietke = ngayhethanthietke
-            //	};
-            //	data.Add(data1);
-            //}
-            var jsonData = new { draw = draw, recordsFiltered = recordsFiltered, recordsTotal = recordsTotal, data = datapost };
-            return Json(jsonData);
+            var datapost = customerData.OrderByDescending(d => d.id).Skip(skip).Take(pageSize).Include(d => d.user_created_by).Include(d => d.chitiet).ThenInclude(d => d.muahang_chitiet).ThenInclude(d => d.muahang).ToList();
+            var data = new ArrayList();
+            foreach (var record in datapost)
+            {
+                var muahang = record.chitiet.SelectMany(d => d.muahang_chitiet.Where(d => d.muahang.deleted_at == null && d.muahang.status_id != (int)Status.MuahangEsignError).Select(d => d.muahang).ToList()).Distinct().ToList();
+                var data1 = new
+                {
+                    id = record.id,
+                    code = record.code,
+                    name = record.name,
+                    created_by = record.created_by,
+                    user_created_by = record.user_created_by,
+                    status_id = record.status_id,
+                    created_at = record.created_at,
+                    list_muahang = muahang
+                };
+                data.Add(data1);
+            }
+            var jsonData = new { draw = draw, recordsFiltered = recordsFiltered, recordsTotal = recordsTotal, data = data };
+            return Json(jsonData, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            });
         }
         [HttpPost]
         public async Task<JsonResult> TableChitiet()
@@ -890,7 +908,7 @@ namespace it_template.Areas.V1.Controllers
                     .Where(d => d.muahang_ncc.muahang.deleted_at == null && d.muahang_ncc.muahang.status_id != (int)Status.MuahangEsignError && list_muahang_ncc_id.Contains(d.muahang_ncc_id) && list_muahang_chitiet_id.Contains(d.muahang_chitiet_id))
                     .ToList();
                 var thanhtien = thanhtien1.Sum(d => d.thanhtien_vat * d.muahang_ncc.quidoi);
-                var muahang_chitiet = record.muahang_chitiet.Where(d => d.muahang.deleted_at == null && d.muahang.status_id != 11).ToList();
+                var muahang_chitiet = record.muahang_chitiet.Where(d => d.muahang.deleted_at == null && d.muahang.status_id != (int)Status.MuahangEsignError).ToList();
                 var soluong_dutru = record.soluong;
                 var soluong_mua = muahang_chitiet.Sum(d => d.soluong * d.quidoi);
 
@@ -1052,6 +1070,10 @@ namespace it_template.Areas.V1.Controllers
             {
                 success = 1,
                 comment = CommentModel
+            }, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
             });
         }
 

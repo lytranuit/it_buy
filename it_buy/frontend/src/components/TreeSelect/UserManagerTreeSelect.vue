@@ -41,7 +41,7 @@ const options = computed(() => {
   let data = list_users.value.map((node) => {
     return {
       id: node.userManager.id,
-      label: node.userManager.fullName + "<" + node.userManager.email + ">",
+      label: node.userManager.FullName + "<" + node.userManager.email + ">",
     }
   });
   // console.log(data);

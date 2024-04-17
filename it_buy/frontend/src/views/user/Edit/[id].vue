@@ -29,8 +29,8 @@
                 <div class="form-group row">
                   <b class="col-12 col-lg-2 col-form-label">Họ và tên:<i class="text-danger">*</i></b>
                   <div class="col-12 col-lg-4 pt-1">
-                    <input class="form-control form-control-sm" type="text" name="fullName" required=""
-                      placeholder="FullName" v-model="data.fullName" />
+                    <input class="form-control form-control-sm" type="text" name="FullName" required=""
+                      placeholder="FullName" v-model="data.FullName" />
                   </div>
                   <b class="col-12 col-lg-2 col-form-label">Nhóm:</b>
                   <div class="col-lg-4 pt-1">

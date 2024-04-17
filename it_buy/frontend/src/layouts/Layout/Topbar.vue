@@ -202,7 +202,7 @@ const application = ref({
       </div> -->
       <button class="p-link" @click="toggle" aria-haspopup="true" aria-controls="overlay_tmenu">
         <img :src="user.image_url" alt="profile-user" class="rounded-circle" width="40" />
-        {{ user.fullName }}
+        {{ user.FullName }}
       </button>
       <TieredMenu id="overlay_tmenu" ref="menu" :model="items" :popup="true" style="width: 200px"></TieredMenu>
     </div>

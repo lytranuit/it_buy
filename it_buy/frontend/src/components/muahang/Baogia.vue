@@ -48,6 +48,17 @@
 
             </div>
 
+            <div class="form-group row">
+              <b class="col-12 col-lg-12 col-form-label">Bao gồm VAT:</b>
+              <div class="col-12 col-lg-12 pt-1">
+                <div class="custom-control custom-switch switch-success" style="height: 36px;;">
+                  <input type="checkbox" :id="'novat_' + key" class="custom-control-input" v-model="item.is_vat"
+                    :disabled="readonly">
+                  <label :for="'novat_' + key" class="custom-control-label"></label>
+                </div>
+              </div>
+            </div>
+
           </div>
           <div class="col-md-6">
 
@@ -79,7 +90,7 @@
 
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-4" v-if="item.is_vat">
               <div class="row">
                 <b class="col">Thành tiền (Chưa VAT):</b>
                 <span class="col text-right">{{ formatPrice(item.thanhtien, 0) }} {{ item.tiente }}</span>
@@ -92,7 +103,7 @@
 
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-4" v-if="item.is_vat">
               <div class="row">
                 <b class="col">Tiền VAT:</b>
                 <span class="col text-right">{{ formatPrice(item.tienvat, 0) }} {{ item.tiente }}</span>
@@ -260,6 +271,7 @@ const addNCC = () => {
   ncc.baohanh = "";
   ncc.thanhtoan = "";
   ncc.dapung = true;
+  ncc.is_vat = true;
   ncc.tienvat = 0;
   ncc.phigiaohang = 0;
   ncc.thanhtien = 0;

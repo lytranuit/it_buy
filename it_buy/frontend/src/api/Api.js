@@ -20,7 +20,9 @@ export default {
     return repository.get(`/v1/${resoure}/departments`).then((res) => res.data);
   },
   departmentsofuser() {
-    return repository.get(`/v1/${resoure}/departmentsofuser`).then((res) => res.data);
+    return repository
+      .get(`/v1/${resoure}/departmentsofuser`)
+      .then((res) => res.data);
   },
   HomeBadge() {
     return repository.get(`/v1/${resoure}/HomeBadge`).then((res) => res.data);
@@ -70,6 +72,15 @@ export default {
   tablemuahang(params) {
     return repository
       .post(`/v1/${resoure}/tablemuahang`, params, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => res.data);
+  },
+  comments(params) {
+    return repository
+      .post(`/v1/${resoure}/comments`, params, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

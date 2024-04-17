@@ -203,7 +203,11 @@ namespace it_template.Areas.V1.Controllers
             var role_avaliable = _configuration.GetSection("Roles").Get<string[]>().ToList();
             var roles_old = RoleManager.Roles.Where(d => role_avaliable.Contains(d.Name)).Select(a => a.Id).ToList();
             var roles = _context.UserRoleModel.Where(d => d.UserId == id && roles_old.Contains(d.RoleId)).Select(d => d.RoleId).ToList();
-            return Json(new { success = true, id = User.Id, roles = roles, departments = User.departments.Select(d => d.department_id.ToString()).ToList(), email = User.Email, FullName = User.FullName, image_url = User.image_url, image_sign = User.image_sign, PhoneNumber = User.PhoneNumber });
+            return Json(new { success = true, id = User.Id, roles = roles, departments = User.departments.Select(d => d.department_id.ToString()).ToList(), email = User.Email, FullName = User.FullName, image_url = User.image_url, image_sign = User.image_sign, PhoneNumber = User.PhoneNumber }, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            });
         }
 
         public async Task<JsonResult> active()
@@ -262,16 +266,20 @@ namespace it_template.Areas.V1.Controllers
                 var image_sign = "<img src='" + record.image_sign + "' class='' width='100'>";
                 var data1 = new
                 {
-                    Id = record.Id,
+                    id = record.Id,
                     email = record.Email,
-                    fullName = record.FullName,
+                    FullName = record.FullName,
                     image = image,
                     image_sign = image_sign
                 };
                 data.Add(data1);
             }
             var jsonData = new { draw = draw, recordsFiltered = recordsFiltered, recordsTotal = recordsTotal, data = data };
-            return Json(jsonData);
+            return Json(jsonData, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            });
         }
 
         public class InputModel
@@ -452,7 +460,11 @@ namespace it_template.Areas.V1.Controllers
                 workbook.SaveToFile("./wwwroot" + documentPath, ExcelVersion.Version2013);
                 //var congthuc_ct = _QLSXcontext.Congthuc_CTModel.Where()
                 var jsonData = new { success = true, link = documentPath };
-                return Json(jsonData);
+                return Json(jsonData, new System.Text.Json.JsonSerializerOptions()
+                {
+                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                    ReferenceHandler = ReferenceHandler.IgnoreCycles,
+                });
             }
             catch (Exception ex)
             {

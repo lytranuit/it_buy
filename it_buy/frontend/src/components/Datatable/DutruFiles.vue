@@ -37,9 +37,9 @@
                     <template v-else-if="col.data == 'created_by'">
                         <div v-if="slotProps.data.list_file[0]?.user_created_by" class="d-flex">
                             <Avatar :image="slotProps.data.list_file[0]?.user_created_by?.image_url"
-                                :title="slotProps.data.list_file[0]?.user_created_by?.fullName" size="small"
+                                :title="slotProps.data.list_file[0]?.user_created_by?.FullName" size="small"
                                 shape="circle" /> <span class="align-self-center ml-2">{{
-            slotProps.data.list_file[0]?.user_created_by?.fullName }}</span>
+            slotProps.data.list_file[0]?.user_created_by?.FullName }}</span>
                         </div>
                     </template>
                     <template

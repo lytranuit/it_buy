@@ -41,7 +41,7 @@
               <RouterLink :to="'/muahang/edit/' + slotProps.data.id" class="text-blue">{{ slotProps.data.name }}
               </RouterLink>
             </div>
-            <small>Tạo bởi <i>{{ slotProps.data.user_created_by?.fullName }}</i> lúc {{
+            <small>Tạo bởi <i>{{ slotProps.data.user_created_by?.FullName }}</i> lúc {{
     formatDate(slotProps.data.created_at, "YYYY-MM-DD HH:mm") }}</small>
           </div>
         </template>

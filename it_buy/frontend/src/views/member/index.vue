@@ -23,8 +23,8 @@
                         <div class="form-group row">
                             <b class="col-12 col-lg-2 col-form-label">Họ và tên:</b>
                             <div class="col-12 col-lg-10 pt-1">
-                                <input class="form-control form-control-sm" type="text" name="fullName"
-                                    placeholder="FullName" readonly :value="user.fullName" />
+                                <input class="form-control form-control-sm" type="text" name="FullName"
+                                    placeholder="FullName" readonly :value="user.FullName" />
                             </div>
                         </div>
                     </div>

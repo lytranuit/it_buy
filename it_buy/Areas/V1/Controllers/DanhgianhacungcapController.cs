@@ -44,7 +44,11 @@ namespace it_template.Areas.V1.Controllers
         {
             var data = _context.DanhgianhacungcapModel.Where(d => d.id == id).Include(d => d.user_created_by).Include(d => d.user_chapnhan).FirstOrDefault();
 
-            return Json(data);
+            return Json(data, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            });
         }
         public JsonResult GetFiles(int id)
         {
@@ -64,7 +68,11 @@ namespace it_template.Areas.V1.Controllers
 
             ///Sort
             data = data.OrderBy(d => d.created_at).ToList();
-            return Json(data);
+            return Json(data, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            });
         }
         [HttpPost]
         public async Task<JsonResult> Delete(int id)
@@ -73,7 +81,11 @@ namespace it_template.Areas.V1.Controllers
             Model.deleted_at = DateTime.Now;
             _context.Update(Model);
             _context.SaveChanges();
-            return Json(Model);
+            return Json(Model, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            });
         }
         [HttpPost]
 
@@ -266,7 +278,11 @@ namespace it_template.Areas.V1.Controllers
             //	data.Add(data1);
             //}
             var jsonData = new { draw = draw, recordsFiltered = recordsFiltered, recordsTotal = recordsTotal, data = datapost };
-            return Json(jsonData);
+            return Json(jsonData, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            });
         }
 
         [HttpPost]
@@ -396,6 +412,10 @@ namespace it_template.Areas.V1.Controllers
             {
                 success = 1,
                 comment = CommentModel
+            }, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
             });
         }
 
