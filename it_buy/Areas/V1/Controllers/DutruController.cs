@@ -135,7 +135,10 @@ namespace it_template.Areas.V1.Controllers
         public JsonResult GetMuahang(int id)
         {
             var list_items = _context.DutruChitietModel.Where(d => d.dutru_id == id).Select(d => d.id).ToList();
-            var data = _context.MuahangChitietModel.Include(d => d.muahang).Where(d => list_items.Contains(d.dutru_chitiet_id) && d.muahang.deleted_at == null && d.muahang.status_id != (int)Status.MuahangEsignError).ToList();
+            var data = _context.MuahangChitietModel
+                .Include(d => d.muahang).ThenInclude(d => d.muahang_chonmua).ThenInclude(d => d.ncc)
+                .Where(d => list_items.Contains(d.dutru_chitiet_id) && d.muahang.deleted_at == null && d.muahang.status_id != (int)Status.MuahangEsignError)
+                .ToList();
 
             var list = data.GroupBy(d => new { d.muahang }).Select(d => d.Key.muahang).ToList();
 

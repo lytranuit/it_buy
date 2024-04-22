@@ -34,26 +34,26 @@
                     <Form></Form>
                   </template>
                 </StepperPanel>
-                <StepperPanel header="Báo giá">
+                <StepperPanel header="Báo giá" v-if="!model.is_sample">
 
                   <template #content="{ prevCallback, nextCallback }">
                     <Baogia></Baogia>
                   </template>
                 </StepperPanel>
-                <StepperPanel header="So sánh báo giá">
+                <StepperPanel header="So sánh báo giá" v-if="!model.is_sample">
 
                   <template #content="{ prevCallback }">
                     <Sosanhbaogia></Sosanhbaogia>
                   </template>
                 </StepperPanel>
-                <StepperPanel header="Trình ký">
+                <StepperPanel header="Trình ký" v-if="!model.is_sample">
 
                   <template #content="{ prevCallback }">
                     <Trinhky></Trinhky>
                   </template>
                 </StepperPanel>
 
-                <StepperPanel header="Đơn đặt hàng" v-if="model.status_id == 10">
+                <StepperPanel header="Đơn đặt hàng" v-if="!model.is_sample && model.status_id == 10">
 
                   <template #content="{ prevCallback, nextCallback }">
                     <Dondathang @next="nextCallback"></Dondathang>
@@ -61,7 +61,7 @@
                 </StepperPanel>
 
                 <StepperPanel header="Đề nghị thanh toán"
-                  v-if="model.status_id == 10 && model.loaithanhtoan == 'tra_truoc'">
+                  v-if="!model.is_sample && model.status_id == 10 && model.loaithanhtoan == 'tra_truoc'">
 
                   <template #content="{ prevCallback, nextCallback }">
                     <Thanhtoan @next="nextCallback"></Thanhtoan>
@@ -76,7 +76,7 @@
                 </StepperPanel>
 
                 <StepperPanel header="Đề nghị thanh toán "
-                  v-if="model.status_id == 10 && model.loaithanhtoan == 'tra_sau'">
+                  v-if="!model.is_sample && model.status_id == 10 && model.loaithanhtoan == 'tra_sau'">
 
                   <template #content="{ prevCallback, nextCallback }">
                     <Thanhtoan @next="nextCallback"></Thanhtoan>
@@ -148,24 +148,34 @@ import Thanhtoan from "../../../components/muahang/Thanhtoan.vue";
 import { formatDate } from "../../../utilities/util";
 const activeStep = computed(() => {
   var value = 0;
-  if (model.value.status_id == 6) {
-    value = 1;
-  } else if (model.value.status_id == 7) {
-    value = 2;
-  } else if ([8, 9, 11].indexOf(model.value.status_id) != -1) {
-    value = 3;
-  } else if ([10].indexOf(model.value.status_id) != -1) {
-    value = 4;
+  if (model.value.is_sample) {
+    if (model.value.is_dathang) {
+      value++;
+    } 
+    if (model.value.date_finish) {
+      value = 2;
+    }
+  } else {
+    if (model.value.status_id == 6) {
+      value = 1;
+    } else if (model.value.status_id == 7) {
+      value = 2;
+    } else if ([8, 9, 11].indexOf(model.value.status_id) != -1) {
+      value = 3;
+    } else if ([10].indexOf(model.value.status_id) != -1) {
+      value = 4;
+    }
+    if (model.value.is_dathang) {
+      value++;
+    }
+    if (model.value.is_thanhtoan) {
+      value++;
+    }
+    if (model.value.date_finish) {
+      value = 7;
+    }
   }
-  if (model.value.is_dathang) {
-    value++;
-  }
-  if (model.value.is_thanhtoan) {
-    value++;
-  }
-  if (model.value.date_finish) {
-    value = 7;
-  }
+
   return value;
 });
 const route = useRoute();

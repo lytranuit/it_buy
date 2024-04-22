@@ -384,6 +384,7 @@ const onPage = (event) => {
 };
 const taodenghimuahang = () => {
   // console.log(selected);
+  store_muahang.reset();
   if (selected.value.length) {
     for (var item of selected.value) {
       if (!(item.soluong > 0)) {

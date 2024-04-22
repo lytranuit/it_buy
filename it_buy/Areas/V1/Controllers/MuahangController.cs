@@ -1,10 +1,12 @@
 ﻿
 
+using iText.Commons.Actions.Contexts;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using QRCoder;
+using System;
 using System.Collections;
 using System.Data;
 using System.Diagnostics;
@@ -346,6 +348,7 @@ namespace it_template.Areas.V1.Controllers
 
                 MuahangModel_old = MuahangModel;
 
+
             }
             else
             {
@@ -366,7 +369,7 @@ namespace it_template.Areas.V1.Controllers
 
             if (list_delete != null)
                 _context.RemoveRange(list_delete);
-            if (list_add != null)
+            if (list_add != null)   
             {
                 foreach (var item in list_add)
                 {
@@ -389,8 +392,72 @@ namespace it_template.Areas.V1.Controllers
             //}
             _context.SaveChanges();
 
-            return Json(new { success = true, id = MuahangModel_old.id });
 
+            return Json(new { success = true, id = MuahangModel_old.id });
+        }
+        [HttpPost]
+        public async Task<JsonResult> saveHangmau(int muahang_id, int nhacungcap_id)
+        {
+            var muahang = _context.MuahangModel.Where(d => d.id == muahang_id).Include(d => d.muahang_chonmua).Include(d => d.chitiet).FirstOrDefault();
+            if (muahang.muahang_chonmua == null || muahang.muahang_chonmua.ncc_id != nhacungcap_id)
+            {
+                var date_now = DateTime.Now;
+                var count_type_in_day = _context.DocumentModel.Where(d => d.type_id == 73 && d.created_at.Value.DayOfYear == date_now.DayOfYear).Count();
+                var type = _context.DocumentTypeModel.Where(d => d.id == 73).Include(d => d.users_receive).FirstOrDefault();
+                muahang.code = type.symbol + date_now.ToString("ddMMyy") + (count_type_in_day < 9 ? "0" : "") + (count_type_in_day + 1);
+
+                muahang.is_dathang = true;
+                muahang.is_thanhtoan = true;
+                muahang.status_id = (int)Status.MuahangEsignSuccess;
+                _context.Update(muahang);
+
+                var chitiet = new List<MuahangNccChitietModel>();
+
+                var MuahangNccModel = new MuahangNccModel()
+                {
+                    muahang_id = muahang.id,
+                    ncc_id = nhacungcap_id,
+                    chonmua = true,
+                    thanhtien = 0,
+                    thanhtien_vat = 0,
+                    tonggiatri = 0,
+                    phigiaohang = 0,
+                    tienvat = 0,
+                    vat = 0,
+                    tiente = "VND",
+                    quidoi = 1,
+                };
+                _context.Add(MuahangNccModel);
+                _context.SaveChanges();
+
+
+                muahang.muahang_chonmua_id = MuahangNccModel.id;
+                _context.Update(muahang);
+
+
+                foreach (var item in muahang.chitiet)
+                {
+                    chitiet.Add(new MuahangNccChitietModel()
+                    {
+                        id = 0,
+                        muahang_ncc_id = MuahangNccModel.id,
+                        muahang_chitiet_id = item.id,
+                        hh_id = item.hh_id,
+                        soluong = item.soluong,
+                        dongia = 0,
+                        thanhtien = 0,
+                        thanhtien_vat = 0,
+                        vat = 0,
+                        mahh = item.mahh,
+                        tenhh = item.tenhh,
+                        dvt = item.dvt,
+                    });
+                }
+                _context.AddRange(chitiet);
+                _context.SaveChanges();
+            }
+
+            return Json(new { success = true });
         }
         [HttpPost]
         public async Task<JsonResult> saveNcc(List<MuahangNccModel> nccs)
@@ -948,13 +1015,13 @@ namespace it_template.Areas.V1.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> xuatpdf(int id, bool is_view = false)
+        public async Task<JsonResult> xuatpdf(int id, bool is_view = false, int loaimau = 0)
         {
             System.Security.Claims.ClaimsPrincipal currentUser = this.User;
             var user_id = UserManager.GetUserId(currentUser);
             var now = DateTime.Now;
 
-            var is_nvl_moi = false;
+            //var is_nvl_moi = false;
             bool? is_vat = false;
             var raw = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
             {
@@ -990,8 +1057,8 @@ namespace it_template.Areas.V1.Controllers
                     var stt = 1;
                     foreach (var item in ncc_chon.chitiet)
                     {
-                        if (item.hh_id != null && data.type_id == 1) /// Check có phải mua nguyên liệu mới hay ko?
-                            is_nvl_moi = true;
+                        //if (item.hh_id != null && data.type_id == 1) /// Check có phải mua nguyên liệu mới hay ko?
+                        //    is_nvl_moi = true;
                         //var material = _context.MaterialModel.Where(d => item.hh_id == "m-" + d.id).FirstOrDefault();
                         //if (material != null)
                         //{
@@ -1056,7 +1123,7 @@ namespace it_template.Areas.V1.Controllers
             //Creates Document instance
             Spire.Doc.Document document = new Spire.Doc.Document();
             //Loads the word document
-            if (is_nvl_moi == true && is_vat == false)
+            if (loaimau == 1 && is_vat == false)
             {
                 document.LoadFromFile(_configuration["Source:Path_Private"] + "/buy/templates/denghimuahangnvlmoi.docx", Spire.Doc.FileFormat.Docx);
             }
@@ -1064,7 +1131,7 @@ namespace it_template.Areas.V1.Controllers
             {
                 document.LoadFromFile(_configuration["Source:Path_Private"] + "/buy/templates/denghimuahangnvl.docx", Spire.Doc.FileFormat.Docx);
             }
-            else if (is_nvl_moi == true && is_vat == true)
+            else if (loaimau == 1 && is_vat == true)
             {
                 document.LoadFromFile(_configuration["Source:Path_Private"] + "/buy/templates/denghimuahangnvlmoi_vat.docx", Spire.Doc.FileFormat.Docx);
             }

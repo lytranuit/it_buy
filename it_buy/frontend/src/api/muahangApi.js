@@ -2,11 +2,11 @@ import repository from "../service/repository";
 
 const resoure = "muahang";
 export default {
-  xuatpdf(id, is_view = false) {
+  xuatpdf(id, is_view = false, loaimau = 0) {
     return repository
       .post(
         `/v1/${resoure}/xuatpdf`,
-        { id: id, is_view: is_view },
+        { id: id, is_view: is_view, loaimau: loaimau },
         {
           headers: {
             "Content-Type": "multipart/form-data",
@@ -63,6 +63,15 @@ export default {
   save(params) {
     return repository
       .post(`/v1/${resoure}/Save`, params, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => res.data);
+  },
+  saveHangmau(params) {
+    return repository
+      .post(`/v1/${resoure}/saveHangmau`, params, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

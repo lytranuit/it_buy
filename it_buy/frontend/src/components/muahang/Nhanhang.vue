@@ -12,6 +12,7 @@
       <b class="col-md-3 text-md-right">Mã nhận hàng:</b>
       <div class="col-md-8">
         <img :src="item" style="width: 100px" v-for="(item, index) in QrNhanhang" :key="index">
+        hoặc <a :href="'/muahang/nhanhang/' + model.id" target="_blank" class="text-blue">Link</a>
         <!-- <div class="col-12 pt-3 text-center">
         <Button label="Tải xuống" icon="fas fa-download" @click="download" />
       </div> -->

@@ -27,6 +27,9 @@ namespace Vue.Models
         public bool? is_dathang { get; set; }
         public bool? is_thanhtoan { get; set; }
         public bool? is_nhanhang { get; set; }
+        public bool? is_sample { get; set; }
+
+
 
         public string? dondathang { get; set; }
         public string? loaithanhtoan { get; set; } // Trả trước or trả sau

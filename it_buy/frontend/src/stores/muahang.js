@@ -40,6 +40,7 @@ export const useMuahang = defineStore("muahang", () => {
     var user = res.user_created_by;
     var muahang_chonmua = res.muahang_chonmua;
     res.date = res.date ? moment(res.date).format("YYYY-MM-DD") : null;
+    res.nhacungcap_id = muahang_chonmua ? muahang_chonmua.ncc_id : null;
     delete res.chitiet;
     delete res.nccs;
     delete res.uynhiemchi;
@@ -52,7 +53,6 @@ export const useMuahang = defineStore("muahang", () => {
     chonmua.value = muahang_chonmua;
     list_uynhiemchi.value = uynhiemchi;
 
-    
     waiting.value = false;
   };
   const getQrNhanhang = async (id) => {

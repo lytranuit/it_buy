@@ -106,7 +106,22 @@
         </div>
       </div>
     </div>
-    <div class="text-center" v-if="readonly == false">
+    <div class="d-flex align-items-center justify-content-center" v-if="readonly == false && model.type_id != 1">
+      <Button label="Xem trước" icon="pi pi-eye" class="p-button-info p-button-sm mr-2"
+        @click.prevent="view()"></Button>
+      <Button label="Xuất PDF và trình ký" icon="pi pi-file" class="p-button-sm mr-2"
+        @click.prevent="xuatpdf()"></Button>
+    </div>
+    <div class="d-flex align-items-center justify-content-center mb-3" v-if="readonly == false && model.type_id == 1">
+      <span class="mr-2">Mẫu mua NVL mới:</span>
+      <Button label="Xem trước" icon="pi pi-eye" class="p-button-info p-button-sm mr-2"
+        @click.prevent="view(1)"></Button>
+      <Button label="Xuất PDF và trình ký" icon="pi pi-file" class="p-button-sm mr-2"
+        @click.prevent="xuatpdf(1)"></Button>
+    </div>
+
+    <div class="d-flex align-items-center justify-content-center" v-if="readonly == false && model.type_id == 1">
+      <span class="mr-2">Mẫu mua NVL cũ:</span>
       <Button label="Xem trước" icon="pi pi-eye" class="p-button-info p-button-sm mr-2"
         @click.prevent="view()"></Button>
       <Button label="Xuất PDF và trình ký" icon="pi pi-file" class="p-button-sm mr-2"
@@ -128,7 +143,7 @@ const { model, datatable, nccs, waiting } = storeToRefs(store_muahang);
 
 const readonly = ref(false);
 
-const view = async () => {
+const view = async (loaimau = 0) => {
   if (!model.value.name) {
     alert("Chưa nhập tiêu đề!");
     return false;
@@ -143,14 +158,14 @@ const view = async () => {
   }
   await muahangApi.save(model.value);
   waiting.value = true;
-  muahangApi.xuatpdf(model.value.id, true).then((response) => {
+  muahangApi.xuatpdf(model.value.id, true, loaimau).then((response) => {
     waiting.value = false;
     if (response.success) {
       window.open(response.link, '_blank').focus();
     }
   });
 }
-const xuatpdf = async () => {
+const xuatpdf = async (loaimau = 0) => {
   if (!model.value.name) {
     alert("Chưa nhập tiêu đề!");
     return false;
@@ -165,7 +180,7 @@ const xuatpdf = async () => {
   }
   await muahangApi.save(model.value);
   waiting.value = true;
-  muahangApi.xuatpdf(model.value.id).then((response) => {
+  muahangApi.xuatpdf(model.value.id, false, loaimau).then((response) => {
     waiting.value = false;
     if (response.success) {
       toast.add({ severity: 'success', summary: 'Thành công!', detail: 'Xuất file thành công', life: 3000 });
