@@ -3,32 +3,27 @@
         <DataTable showGridlines :value="files" ref="dt" class="p-datatable-ct" :rowHover="true" :loading="loading"
             responsiveLayout="scroll" :resizableColumns="true" columnResizeMode="expand" v-model:selection="selected">
             <template #header>
-                <div class="d-inline-flex" style="width:200px">
+                <div class="d-inline-flex" style="width: 200px">
                     <Button label="Thêm" icon="pi pi-plus" class="p-button-success p-button-sm mr-2"
                         @click="openNew"></Button>
                 </div>
-                <div class="d-inline-flex float-right">
-                </div>
+                <div class="d-inline-flex float-right"></div>
             </template>
 
             <template #empty>
-                <div class='text-center'>Không có dữ liệu.</div>
+                <div class="text-center">Không có dữ liệu.</div>
             </template>
             <Column v-for="(col, index) in selectedColumns" :field="col.data" :header="col.label" :key="col.data"
                 :showFilterMatchModes="false" :class="col.data">
-
                 <template #body="slotProps">
-
                     <template v-if="col.data == 'note'">
                         <a target="_blank" :href="slotProps.data['link']"
-                            :class="{ 'text-blue': slotProps.data['link'] }">{{ slotProps.data[col.data]
-                            }}</a>
+                            :class="{ 'text-blue': slotProps.data['link'] }">{{ slotProps.data[col.data] }}</a>
                     </template>
                     <template v-else-if="col.data == 'file'">
                         <div class="mt-2" v-for="(item, index) in slotProps.data['list_file']">
                             <a target="_blank" :href="item.url" class="text-blue" :download="download(item.name)">{{
-            item.name
-        }}</a>
+                                item.name }}</a>
                         </div>
                     </template>
                     <template v-else-if="col.data == 'created_at'">
@@ -38,12 +33,17 @@
                         <div v-if="slotProps.data.list_file[0]?.user_created_by" class="d-flex">
                             <Avatar :image="slotProps.data.list_file[0]?.user_created_by?.image_url"
                                 :title="slotProps.data.list_file[0]?.user_created_by?.FullName" size="small"
-                                shape="circle" /> <span class="align-self-center ml-2">{{
-            slotProps.data.list_file[0]?.user_created_by?.FullName }}</span>
+                                shape="circle" />
+                            <span class="align-self-center ml-2">{{
+                                slotProps.data.list_file[0]?.user_created_by?.FullName
+                                }}</span>
                         </div>
                     </template>
-                    <template
-                        v-else-if="col.data == 'action' && slotProps.data['is_user_upload'] == true && slotProps.data.list_file[0]?.user_created_by?.id == user.id">
+                    <template v-else-if="
+                        col.data == 'action' &&
+                        slotProps.data['is_user_upload'] == true &&
+                        slotProps.data.list_file[0]?.created_by == user.id
+                    ">
                         <a class="p-link text-danger font-16" @click="confirmDeleteDinhkem(slotProps.data)"><i
                                 class="pi pi-trash"></i></a>
                     </template>
@@ -67,7 +67,7 @@
                     <label for="name">Files:<span class="text-danger">*</span></label>
                     <div class="custom-file mt-2">
                         <input type="file" class="file-input" :id="'customFileup'" :multiple="true"
-                            @change="fileChange($event)">
+                            @change="fileChange($event)" />
                         <label class="custom-file-label" :for="'customFileup'">Choose file</label>
                     </div>
                 </div>
@@ -81,23 +81,22 @@
 </template>
 
 <script setup>
+import { onMounted, ref, watch, computed } from "vue";
+import DataTable from "primevue/datatable";
+import Column from "primevue/column";
+import Button from "primevue/button";
+import Avatar from "primevue/avatar";
+import Dialog from "primevue/dialog";
+import InputText from "primevue/inputtext";
+import { storeToRefs } from "pinia";
 
-import { onMounted, ref, watch, computed } from 'vue';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
-import Button from 'primevue/button';
-import Avatar from 'primevue/avatar';
-import Dialog from 'primevue/dialog';
-import InputText from 'primevue/inputtext';
-import { storeToRefs } from 'pinia'
-
-import { useDutru } from '../../stores/dutru';
-import dutruApi from '../../api/dutruApi';
-import { useRoute } from 'vue-router';
-import { download, formatDate } from '../../utilities/util';
-import { useConfirm } from 'primevue/useconfirm';
-import { useToast } from 'primevue/usetoast';
-import { useAuth } from '../../stores/auth';
+import { useDutru } from "../../stores/dutru";
+import dutruApi from "../../api/dutruApi";
+import { useRoute } from "vue-router";
+import { download, formatDate } from "../../utilities/util";
+import { useConfirm } from "primevue/useconfirm";
+import { useToast } from "primevue/usetoast";
+import { useAuth } from "../../stores/auth";
 
 const toast = useToast();
 const confirm = useConfirm();
@@ -114,38 +113,38 @@ const selected = ref();
 const columns = ref([
     {
         label: "Mô tả",
-        "data": "note",
-        "className": "text-center",
+        data: "note",
+        className: "text-center",
     },
     {
         label: "Tập tin",
-        "data": "file",
-        "className": "text-center",
+        data: "file",
+        className: "text-center",
     },
     {
         label: "Ngày tạo",
-        "data": "created_at",
-        "className": "text-center"
-    }, {
+        data: "created_at",
+        className: "text-center",
+    },
+    {
         label: "Người tạo",
-        "data": "created_by",
-        "className": "text-center"
+        data: "created_by",
+        className: "text-center",
     },
     {
         label: "Hành động",
-        "data": "action",
-        "className": "text-center"
-    }
+        data: "action",
+        className: "text-center",
+    },
 ]);
 
 const confirmDeleteDinhkem = (item) => {
     // console.log(item.dinhkem[key1]);
     confirm.require({
-        message: 'Bạn có chắc muốn xóa?',
-        header: 'Xác nhận',
-        icon: 'pi pi-exclamation-triangle',
+        message: "Bạn có chắc muốn xóa?",
+        header: "Xác nhận",
+        icon: "pi pi-exclamation-triangle",
         accept: () => {
-
             waiting.value = true;
             var list_id = item.list_file.map((x) => {
                 return x.id;
@@ -158,12 +157,9 @@ const confirmDeleteDinhkem = (item) => {
 
                 // console.log(response)
             });
-
-
-        }
+        },
     });
-
-}
+};
 const save = () => {
     submitted.value = true;
     if (!modelfile.value.note) {
@@ -182,12 +178,17 @@ const save = () => {
     dutruApi.saveDinhkem(params).then((response) => {
         waiting.value = false;
         if (response.success) {
-            toast.add({ severity: 'success', summary: 'Thành công!', detail: 'Thay đổi thành công', life: 3000 });
+            toast.add({
+                severity: "success",
+                summary: "Thành công!",
+                detail: "Thay đổi thành công",
+                life: 3000,
+            });
             load();
         }
         // console.log(response)
     });
-}
+};
 const hideDialog = () => {
     visibleDialog.value = false;
     submitted.value = false;
@@ -196,20 +197,20 @@ const openNew = () => {
     visibleDialog.value = true;
     modelfile.value = {};
     submitted.value = false;
-}
+};
 const fileChange = (e) => {
     var parents = $(e.target).parents(".custom-file");
     var label = $(".custom-file-label", parents);
     label.text(e.target.files.length + " Files");
-}
+};
 const selectedColumns = computed(() => {
-    return columns.value.filter(col => col.hide != true);
+    return columns.value.filter((col) => col.hide != true);
 });
 const load = async () => {
     var res = await dutruApi.getFiles(route.params.id);
     files.value = res;
-}
+};
 onMounted(() => {
     load();
-})
+});
 </script>

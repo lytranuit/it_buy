@@ -19,8 +19,9 @@ namespace Vue.Models
         public decimal? thanhtien_vat { get; set; }
         public int? vat { get; set; }
 
+		public string? note { get; set; }
 
-        [ForeignKey("muahang_ncc_id")]
+		[ForeignKey("muahang_ncc_id")]
         public virtual MuahangNccModel? muahang_ncc { get; set; }
         [ForeignKey("muahang_chitiet_id")]
         public virtual MuahangChitietModel? muahang_chitiet { get; set; }

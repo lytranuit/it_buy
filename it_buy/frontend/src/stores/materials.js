@@ -6,10 +6,15 @@ export const useMaterials = defineStore("Materials", () => {
   const headerForm = ref("Tạo mới");
   const model = ref({});
   const submited = ref();
+
+  const files = ref([]);
+  const waiting = ref();
   return {
     model,
     headerForm,
     visibleDialog,
     submited,
+    files,
+    waiting,
   };
 });

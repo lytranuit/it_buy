@@ -23,8 +23,8 @@
                                 <span class="ui-column-title">{{ col.label }}</span>
                                 <div class="ui-column-data">
                                     <template v-if="col.data == 'name'">
-                                        <div style="font-size: 12px;">
-                                            <div style="text-wrap: pretty;">
+                                        <div style="font-size: 12px;text-wrap: pretty;">
+                                            <div>
                                                 <RouterLink :to="'/dutru/edit/' + slotProps.data.id" class="text-blue">
                                                     [{{
                         slotProps.data.code }}] {{ slotProps.data.name }}</RouterLink>

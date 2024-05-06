@@ -9,6 +9,7 @@ using System.Collections;
 using System.Text.Json.Serialization;
 using Vue.Data;
 using Vue.Models;
+using static it_template.Areas.V1.Controllers.MuahangController;
 
 namespace it_template.Areas.V1.Controllers
 {
@@ -203,7 +204,119 @@ namespace it_template.Areas.V1.Controllers
         //    return Json(list);
         //}
 
+        public JsonResult GetFiles(int id)
+        {
+            var data = new List<RawFileMaterial>();
 
+            ///File up
+            var files_up = _context.MaterialDinhkemModel.Where(d => d.hh_id == id && d.deleted_at == null).Include(d => d.user_created_by).ToList();
+            if (files_up.Count > 0)
+            {
+                data.AddRange(files_up.GroupBy(d => new { d.note, d.created_at }).Select(d => new RawFileMaterial
+                {
+                    note = d.First().note,
+                    list_file = d.ToList(),
+                    is_user_upload = true,
+                    created_at = d.Key.created_at
+                }).ToList());
+            }
+
+            ///Sort
+            data = data.OrderBy(d => d.created_at).ToList();
+            return Json(data, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            });
+        }
+        [HttpPost]
+        public async Task<JsonResult> xoadinhkem(List<int> list_id)
+        {
+            var Model = _context.MaterialDinhkemModel.Where(d => list_id.Contains(d.id)).ToList();
+            foreach (var item in Model)
+            {
+                item.deleted_at = DateTime.Now;
+            }
+            _context.UpdateRange(Model);
+            _context.SaveChanges();
+            return Json(new { success = true });
+        }
+
+        [HttpPost]
+
+        public async Task<JsonResult> SaveDinhkem(string note, int hh_id)
+        {
+            System.Security.Claims.ClaimsPrincipal currentUser = this.User;
+            var user_id = UserManager.GetUserId(currentUser);
+            var user = await UserManager.GetUserAsync(currentUser);
+            //MuahangModel? MuahangModel_old;
+            //MuahangModel_old = _context.MuahangModel.Where(d => d.id == muahang_id).FirstOrDefault();
+
+            var files = Request.Form.Files;
+            var now = DateTime.Now;
+            var items = new List<MaterialDinhkemModel>();
+            if (files != null && files.Count > 0)
+            {
+
+                foreach (var file in files)
+                {
+                    var timeStamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
+                    string name = file.FileName;
+                    string type = file.Name;
+                    string ext = Path.GetExtension(name);
+                    string mimeType = file.ContentType;
+                    //var fileName = Path.GetFileName(name);
+                    var newName = timeStamp + "-" + hh_id + "-" + name;
+                    //var muahang_id = MuahangModel_old.id;
+                    newName = newName.Replace("+", "_");
+                    newName = newName.Replace("%", "_");
+                    var dir = _configuration["Source:Path_Private"] + "\\materials\\" + hh_id;
+                    bool exists = Directory.Exists(dir);
+
+                    if (!exists)
+                        Directory.CreateDirectory(dir);
+
+
+                    var filePath = dir + "\\" + newName;
+
+                    string url = "/private/materials/" + hh_id + "/" + newName;
+                    items.Add(new MaterialDinhkemModel
+                    {
+                        note = note,
+                        ext = ext,
+                        url = url,
+                        name = name,
+                        mimeType = mimeType,
+                        hh_id = hh_id,
+                        created_at = now,
+                        created_by = user_id
+                    });
+
+                    using (var fileSrteam = new FileStream(filePath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(fileSrteam);
+                    }
+                }
+                _context.AddRange(items);
+                _context.SaveChanges();
+            }
+
+            return Json(new { success = true });
+        }
+
+
+        public class RawFileMaterial
+        {
+            public string link { get; set; }
+            public string note { get; set; }
+            public List<MaterialDinhkemModel>? list_file { get; set; }
+            //public string file_url { get; set; }
+
+            public bool is_user_upload { get; set; }
+
+            public DateTime? created_at { get; set; }
+
+        }
         public class SelectResponse
         {
             public string id { get; set; }

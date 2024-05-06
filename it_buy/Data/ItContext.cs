@@ -43,6 +43,7 @@ namespace Vue.Data
 
         public DbSet<MaterialGroupModel> MaterialGroupModel { get; set; }
         public DbSet<MaterialModel> MaterialModel { get; set; }
+        public DbSet<MaterialDinhkemModel> MaterialDinhkemModel { get; set; }
         public DbSet<NhacungcapModel> NhacungcapModel { get; set; }
         public DbSet<DutruModel> DutruModel { get; set; }
         public DbSet<DutruChitietModel> DutruChitietModel { get; set; }
@@ -216,7 +217,7 @@ namespace Vue.Data
             }
             var list_talbe2 = new List<string>()
             {
-                "dm_hanghoa","TBL_DANHMUCNHACC","TBL_DANHMUCHANGHOA","TBL_DANHMUCNHASX","TBL_DANHMUCNHOMHANG"
+                "dm_hanghoa","TBL_DANHMUCNHACC","TBL_DANHMUCHANGHOA","TBL_DANHMUCHANGHOA_DINHKEM","TBL_DANHMUCNHASX","TBL_DANHMUCNHOMHANG"
             };
             //var tableName = "AspNetUsers";
             foreach (var tableName in list_talbe2)

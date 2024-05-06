@@ -37,6 +37,7 @@ namespace Vue.Models
         public virtual NsxModel? nhasanxuat { get; set; }
         public string? mancc { get; set; }
         public virtual NhacungcapModel? nhacungcap { get; set; }
+        public virtual List<MaterialDinhkemModel>? dinhkem { get; set; }
 
 
 

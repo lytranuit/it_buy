@@ -1,10 +1,12 @@
 ﻿
 
 using iText.Commons.Actions.Contexts;
+using iText.StyledXmlParser.Jsoup.Nodes;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Packaging;
 using QRCoder;
 using System;
 using System.Collections;
@@ -18,6 +20,7 @@ using System.Text.Json.Serialization;
 using Vue.Data;
 using Vue.Models;
 using Vue.Services;
+using static it_template.Areas.V1.Controllers.MaterialController;
 using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 
 namespace it_template.Areas.V1.Controllers
@@ -53,6 +56,7 @@ namespace it_template.Areas.V1.Controllers
                             name = d.name,
                             ext = ".pdf",
                             url = d.pdf,
+                            created_by = d.created_by,
                             user_created_by = d.user_created_by,
                         }
                     },
@@ -61,7 +65,30 @@ namespace it_template.Areas.V1.Controllers
                 };
                 data.Add(file);
             }
+            ///Lấy Dinhkem hang hoa
+            var list_hh = _context.MuahangChitietModel.Where(d => d.muahang_id == id).ToList();
+            foreach (var hh in list_hh)
+            {
+                var files_up1 = _context.MaterialDinhkemModel.Where(d => "m-" + d.hh_id == hh.hh_id && d.deleted_at == null).Include(d => d.user_created_by).ToList();
+                if (files_up1.Count > 0)
+                {
+                    data.AddRange(files_up1.GroupBy(d => new { d.note, d.created_at }).Select(d => new RawFile
+                    {
+                        note = d.First().note + "-" + hh.tenhh,
+                        list_file = d.Select(e => new MuahangDinhkemModel()
+                        {
+                            name = e.name,
+                            ext = e.ext,
+                            url = e.url,
+                            created_by = e.created_by,
+                            user_created_by = e.user_created_by
+                        }).ToList(),
+                        is_user_upload = false,
+                        created_at = d.Key.created_at
+                    }).ToList());
+                }
 
+            }
             ///Lấy báo giá
             var baogia = _context.MuahangNccModel.Where(d => d.muahang_id == id).Include(d => d.dinhkem).ThenInclude(d => d.user_created_by).Include(d => d.ncc).ToList();
             foreach (var d in baogia)
@@ -76,6 +103,7 @@ namespace it_template.Areas.V1.Controllers
                         name = item.name,
                         ext = item.ext,
                         url = item.url,
+                        created_by = item.created_by,
                         user_created_by = item.user_created_by
                     });
                 }
@@ -105,6 +133,7 @@ namespace it_template.Areas.V1.Controllers
                             name = muahang.name,
                             ext = ".pdf",
                             url = muahang.pdf,
+                            created_by = muahang.created_by,
                             user_created_by = muahang.user_created_by
                         }
                     },
@@ -123,6 +152,7 @@ namespace it_template.Areas.V1.Controllers
                         name = d.name,
                         ext = d.ext,
                         url = d.url,
+                        created_by = d.created_by,
                         user_created_by = d.user_created_by
                     }).ToList(),
                     is_user_upload = false,
@@ -369,7 +399,7 @@ namespace it_template.Areas.V1.Controllers
 
             if (list_delete != null)
                 _context.RemoveRange(list_delete);
-            if (list_add != null)   
+            if (list_add != null)
             {
                 foreach (var item in list_add)
                 {
@@ -1071,8 +1101,8 @@ namespace it_template.Areas.V1.Controllers
                             soluong = item.soluong.Value.ToString("#,##0.##"),
                             dongia = item.dongia.Value.ToString("#,##0.##"),
                             thanhtien = item.thanhtien.Value.ToString("#,##0"),
-                            vat = item.vat
-                            //note = item.note,
+                            vat = item.vat,
+                            note = item.note,
                             //artwork = material.masothietke,
                             //date = data.date.Value.ToString("yyyy-MM-dd")
                         });

@@ -27,8 +27,8 @@
                     <template v-else-if="col.data == 'file'">
                         <div class="mt-2" v-for="(item, index) in slotProps.data['list_file']">
                             <a target="_blank" :href="item.url" class="text-blue" :download="download(item.name)">{{
-            item.name
-        }}</a>
+                                item.name
+                                }}</a>
                         </div>
                     </template>
                     <template v-else-if="col.data == 'created_at'">
@@ -39,12 +39,12 @@
                             <Avatar :image="slotProps.data.list_file[0]?.user_created_by?.image_url"
                                 :title="slotProps.data.list_file[0]?.user_created_by?.FullName" size="small"
                                 shape="circle" /> <span class="align-self-center ml-2">{{
-            slotProps.data.list_file[0]?.user_created_by?.FullName }}</span>
+                                    slotProps.data.list_file[0]?.user_created_by?.FullName }}</span>
                         </div>
                     </template>
 
                     <template
-                        v-else-if="col.data == 'action' && slotProps.data['is_user_upload'] == true && slotProps.data.list_file[0]?.user_created_by?.id == user.id && !model.is_chapnhan">
+                        v-else-if="col.data == 'action' && slotProps.data['is_user_upload'] == true && slotProps.data.list_file[0]?.created_by == user.id && !model.is_chapnhan">
                         <a class="p-link text-danger font-16" @click="confirmDeleteDinhkem(slotProps.data)"><i
                                 class="pi pi-trash"></i></a>
                     </template>

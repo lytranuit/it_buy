@@ -43,7 +43,7 @@
                         </div>
                     </template>
                     <template
-                        v-else-if="col.data == 'action' && slotProps.data['is_user_upload'] == true && slotProps.data.list_file[0]?.user_created_by?.id == user.id">
+                        v-else-if="col.data == 'action' && slotProps.data['is_user_upload'] == true && slotProps.data.list_file[0]?.created_by== user.id">
                         <a class="p-link text-danger font-16" @click="confirmDeleteDinhkem(slotProps.data)"><i
                                 class="pi pi-trash"></i></a>
                     </template>
