@@ -5,17 +5,27 @@
         <div class="card-body">
           <div class="flex-m">
             <h5 class="title">
-              <span>
-                {{ model.name }}</span>
+              <span> {{ model.name }}</span>
             </h5>
-
           </div>
-          <div class="flex-m"><span class=""><span class="">ID</span>: <span class="font-weight-bold">{{ model.code
-                }}</span></span><span class="mx-2">|</span>
-            <div class=""><span class="">Người tạo</span>: <span class="font-weight-bold">{{ user_created_by.FullName
-                }}</span></div><span class="mx-2">|</span>
-            <div class=""><span class=""> Ngày tạo: </span><span class="font-weight-bold">{{
-                  formatDate(model.created_at) }}</span></div>
+          <div class="flex-m">
+            <span class=""
+              ><span class="">ID</span>:
+              <span class="font-weight-bold">{{ model.code }}</span></span
+            ><span class="mx-2">|</span>
+            <div class="">
+              <span class="">Người tạo</span>:
+              <span class="font-weight-bold">{{
+                user_created_by.FullName
+              }}</span>
+            </div>
+            <span class="mx-2">|</span>
+            <div class="">
+              <span class=""> Ngày tạo: </span
+              ><span class="font-weight-bold">{{
+                formatDate(model.created_at)
+              }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -25,68 +35,110 @@
         <div class="card-body">
           <TabView v-model:activeIndex="tabviewActive">
             <TabPanel>
-              <template #header>
-                Quy trình
-              </template>
+              <template #header> Quy trình </template>
               <div class="row">
                 <div class="col-12">
                   <Panel header="Dự trù hàng hóa" :toggleable="true">
                     <div class="row">
                       <div class="col-md-6">
                         <div class="form-group row">
-                          <b class="col-12 col-lg-12 col-form-label">Tiêu đề:<i class="text-danger">*</i></b>
+                          <b class="col-12 col-lg-12 col-form-label"
+                            >Tiêu đề:<i class="text-danger">*</i></b
+                          >
                           <div class="col-12 col-lg-12 pt-1">
-                            <input class="form-control" v-model="model.name" required :disabled="model.status_id != 1">
+                            <input
+                              class="form-control"
+                              v-model="model.name"
+                              required
+                              :disabled="model.status_id != 1"
+                            />
                           </div>
                         </div>
                       </div>
                       <div class="col-md-3">
                         <div class="form-group row">
-                          <b class="col-12 col-lg-12 col-form-label">Bộ phận dự trù:<i class="text-danger">*</i></b>
+                          <b class="col-12 col-lg-12 col-form-label"
+                            >Bộ phận dự trù:<i class="text-danger">*</i></b
+                          >
                           <div class="col-12 col-lg-12 pt-1">
-                            <DepartmentTreeSelect v-model="model.bophan_id" :clearable="false"
-                              :disabled="model.status_id != 1">
+                            <DepartmentTreeSelect
+                              v-model="model.bophan_id"
+                              :clearable="false"
+                              :disabled="model.status_id != 1"
+                            >
                             </DepartmentTreeSelect>
-
                           </div>
                         </div>
                       </div>
                       <div class="col-md-3">
                         <div class="form-group row">
-                          <b class="col-12 col-lg-12 col-form-label">Hạn giao hàng:<i class="text-danger">*</i></b>
+                          <b class="col-12 col-lg-12 col-form-label"
+                            >Hạn giao hàng:<i class="text-danger">*</i></b
+                          >
                           <div class="col-12 col-lg-12 pt-1">
-                            <Calendar v-model="model.date" dateFormat="yy-mm-dd" class="date-custom"
-                              :manualInput="false" showIcon :minDate="minDate" :disabled="model.status_id != 1" />
+                            <Calendar
+                              v-model="model.date"
+                              dateFormat="yy-mm-dd"
+                              class="date-custom"
+                              :manualInput="false"
+                              showIcon
+                              :minDate="minDate"
+                              :disabled="model.status_id != 1"
+                            />
                           </div>
                         </div>
                       </div>
                       <div class="col-md-12">
                         <div class="form-group row">
-                          <b class="col-12 col-lg-12 col-form-label">Lý do mua hàng:<i class="text-danger">*</i></b>
+                          <b class="col-12 col-lg-12 col-form-label"
+                            >Lý do mua hàng:<i class="text-danger">*</i></b
+                          >
                           <div class="col-12 col-lg-12 pt-1">
-                            <textarea class="form-control form-control-sm" v-model="model.note" required
-                              :disabled="model.status_id != 1"></textarea>
+                            <textarea
+                              class="form-control form-control-sm"
+                              v-model="model.note"
+                              required
+                              :disabled="model.status_id != 1"
+                            ></textarea>
                           </div>
                         </div>
                         <div class="form-group row">
-                          <b class="col-12 col-lg-12 col-form-label">Hàng hóa:<i class="text-danger">*</i></b>
+                          <b class="col-12 col-lg-12 col-form-label"
+                            >Hàng hóa:<i class="text-danger">*</i></b
+                          >
                           <div class="col-12 col-lg-12 pt-1">
                             <FormDutruChitiet></FormDutruChitiet>
                           </div>
                           <div class="col-12 col-lg-12 pt-4" v-if="is_Cungung">
-                            <TableHanghoa :dutru_id="route.params.id"></TableHanghoa>
+                            <TableHanghoa
+                              :dutru_id="route.params.id"
+                            ></TableHanghoa>
                           </div>
                         </div>
                       </div>
-                      <div class="col-md-12 text-center" v-if="model.status_id == 1">
-                        <Button label="Lưu lại" icon="pi pi-save" class="p-button-success p-button-sm mr-2"
-                          @click.prevent="submit()"></Button>
-                        <Button label="Xem trước" icon="pi pi-eye" class="p-button-info p-button-sm mr-2"
-                          @click.prevent="view()"></Button>
-                        <Button label="Xuất PDF và trình ký" icon="pi pi-file" class="p-button-sm mr-2"
-                          @click.prevent="xuatpdf()"></Button>
+                      <div
+                        class="col-md-12 text-center"
+                        v-if="model.status_id == 1"
+                      >
+                        <Button
+                          label="Lưu lại"
+                          icon="pi pi-save"
+                          class="p-button-success p-button-sm mr-2"
+                          @click.prevent="submit()"
+                        ></Button>
+                        <Button
+                          label="Xem trước"
+                          icon="pi pi-eye"
+                          class="p-button-info p-button-sm mr-2"
+                          @click.prevent="view()"
+                        ></Button>
+                        <Button
+                          label="Xuất PDF và trình ký"
+                          icon="pi pi-file"
+                          class="p-button-sm mr-2"
+                          @click.once="xuatpdf()"
+                        ></Button>
                       </div>
-
                     </div>
                   </Panel>
                 </div>
@@ -94,9 +146,15 @@
                   <Panel header="Trình ký" :toggleable="true">
                     <div class="row">
                       <div class="col-md-12 text-center">
-                        <a :href="model.pdf" :download="download(model.pdf)"
-                          class="download-icon-link d-inline-flex align-items-center">
-                          <i class="far fa-file text-danger" style="font-size: 40px; margin-right: 10px;"></i>
+                        <a
+                          :href="model.pdf"
+                          :download="download(model.pdf)"
+                          class="download-icon-link d-inline-flex align-items-center"
+                        >
+                          <i
+                            class="far fa-file text-danger"
+                            style="font-size: 40px; margin-right: 10px"
+                          ></i>
                           {{ model.pdf }}
                         </a>
                         <!-- <div class="d-inline-block ml-5" v-if="model.status_id == 2">
@@ -106,27 +164,73 @@
                           </a>
                         </div> -->
 
-                        <div class="d-inline-block ml-5" v-if="model.status_id == 3">
-                          <a :href="path_esign + '/admin/document/details/' + model.esign_id">
-                            <Button label="Đang trình ký" class="p-button-warning p-button-sm mr-2"
-                              icon="fas fa-spinner fa-spin"></Button>
+                        <div
+                          class="d-inline-block ml-5"
+                          v-if="model.status_id == 3"
+                        >
+                          <a
+                            :href="
+                              path_esign +
+                              '/admin/document/details/' +
+                              model.esign_id
+                            "
+                          >
+                            <Button
+                              label="Đang trình ký"
+                              class="p-button-warning p-button-sm mr-2"
+                              icon="fas fa-spinner fa-spin"
+                            ></Button>
                           </a>
-                          <a :href="path_esign + '/admin/document/edit/' + model.esign_id">
-                            <Button label="Đi đến cài đặt" class="p-button-sm mr-2" icon="fas fa-cog"></Button>
+                          <a
+                            :href="
+                              path_esign +
+                              '/admin/document/edit/' +
+                              model.esign_id
+                            "
+                          >
+                            <Button
+                              label="Đi đến cài đặt"
+                              class="p-button-sm mr-2"
+                              icon="fas fa-cog"
+                            ></Button>
                           </a>
                         </div>
 
-                        <div class="d-inline-block ml-5" v-else-if="model.status_id == 4">
-                          <a :href="path_esign + '/admin/document/details/' + model.esign_id">
-                            <Button label="Đã hoàn thành" class="p-button-success p-button-sm mr-2"
-                              icon="fas fa-thumbs-up"></Button>
+                        <div
+                          class="d-inline-block ml-5"
+                          v-else-if="model.status_id == 4"
+                        >
+                          <a
+                            :href="
+                              path_esign +
+                              '/admin/document/details/' +
+                              model.esign_id
+                            "
+                          >
+                            <Button
+                              label="Đã hoàn thành"
+                              class="p-button-success p-button-sm mr-2"
+                              icon="fas fa-thumbs-up"
+                            ></Button>
                           </a>
                         </div>
 
-                        <div class="d-inline-block ml-5" v-else-if="model.status_id == 5">
-                          <a :href="path_esign + '/admin/document/details/' + model.esign_id">
-                            <Button label="Không duyệt" class="p-button-danger p-button-sm mr-2"
-                              icon="fas fa-times"></Button>
+                        <div
+                          class="d-inline-block ml-5"
+                          v-else-if="model.status_id == 5"
+                        >
+                          <a
+                            :href="
+                              path_esign +
+                              '/admin/document/details/' +
+                              model.esign_id
+                            "
+                          >
+                            <Button
+                              label="Không duyệt"
+                              class="p-button-danger p-button-sm mr-2"
+                              icon="fas fa-times"
+                            ></Button>
                           </a>
                         </div>
                       </div>
@@ -138,13 +242,19 @@
                     <div class="row">
                       <div class="col-md-12" v-if="list_muahang.length > 0">
                         <TabView>
-                          <TabPanel v-for="(item, key) in list_muahang" :key="key">
+                          <TabPanel
+                            v-for="(item, key) in list_muahang"
+                            :key="key"
+                          >
                             <template #header>
                               {{ item.code }} - {{ item.name }}
                             </template>
                             <div class="row">
                               <div class="col-12">
-                                <Steps :model="items" :activeStep="muahangActive(item)" />
+                                <Steps
+                                  :model="items"
+                                  :activeStep="muahangActive(item)"
+                                />
                               </div>
                             </div>
                           </TabPanel>
@@ -158,25 +268,44 @@
                     <div class="row">
                       <div class="col-md-12" v-if="list_nhanhang.length > 0">
                         <TabView v-model:activeIndex="active">
-                          <TabPanel v-for="(item, key) in list_nhanhang" :key="key">
+                          <TabPanel
+                            v-for="(item, key) in list_nhanhang"
+                            :key="key"
+                          >
                             <template #header>
-                              {{ item.muahang.code }} - {{ item.muahang.muahang_chonmua.ncc.tenncc }}
+                              {{ item.muahang.code }} -
+                              {{ item.muahang.muahang_chonmua.ncc.tenncc }}
                             </template>
                             <div class="row m-0">
                               <div class="col-md-4 form-group">
                                 <b class="">Ngày giao hàng dự kiến:</b>
                                 <div class="mt-2">
-                                  <Calendar :modelValue="formatDate(item.muahang.date)" dateFormat="yy-mm-dd"
-                                    class="date-custom" :manualInput="false" showIcon :minDate="minDate"
-                                    :disabled="item.muahang.is_dathang" />
+                                  <Calendar
+                                    :modelValue="formatDate(item.muahang.date)"
+                                    dateFormat="yy-mm-dd"
+                                    class="date-custom"
+                                    :manualInput="false"
+                                    showIcon
+                                    :minDate="minDate"
+                                    :disabled="item.muahang.is_dathang"
+                                  />
                                 </div>
                               </div>
                               <div class="col-md-12 mb-2">
-                                <FormDutruNhanhang :index="key"></FormDutruNhanhang>
+                                <FormDutruNhanhang
+                                  :index="key"
+                                ></FormDutruNhanhang>
                               </div>
-                              <div class="col-md-12 text-center mt-3" v-if="!model.date_finish">
-                                <Button label="Lưu lại" icon="pi pi-save" class="p-button-success p-button-sm mr-2"
-                                  @click.prevent="savenhanhang()"></Button>
+                              <div
+                                class="col-md-12 text-center mt-3"
+                                v-if="!model.date_finish"
+                              >
+                                <Button
+                                  label="Lưu lại"
+                                  icon="pi pi-save"
+                                  class="p-button-success p-button-sm mr-2"
+                                  @click.prevent="savenhanhang()"
+                                ></Button>
                               </div>
                             </div>
                           </TabPanel>
@@ -188,11 +317,10 @@
                 <div class="col-12 mt-3">
                   <Panel header="Hoàn thành" v-if="model.date_finish">
                     <div class="row text-center">
-
                       <div class="col-md-12">
                         <img src="/src/assets/images/Purchase_Success.png" />
                       </div>
-                      <div class="col-md-12 ">
+                      <div class="col-md-12">
                         <b class="text-success">Hoàn thành</b>
                       </div>
                     </div>
@@ -201,9 +329,7 @@
               </div>
             </TabPanel>
             <TabPanel>
-              <template #header>
-                Files
-              </template>
+              <template #header> Files </template>
               <DutruFiles></DutruFiles>
             </TabPanel>
           </TabView>
@@ -218,25 +344,24 @@
 </template>
 
 <script setup>
-
 import { ref } from "vue";
 import { onMounted, computed } from "vue";
 import { useAuth } from "../../../stores/auth";
 import { useToast } from "primevue/usetoast";
-import TabView from 'primevue/tabview';
-import TabPanel from 'primevue/tabpanel';
-import Stepper from 'primevue/stepper';
-import Divider from 'primevue/divider';
-import Panel from 'primevue/panel';
-import Steps from 'primevue/steps';
+import TabView from "primevue/tabview";
+import TabPanel from "primevue/tabpanel";
+import Stepper from "primevue/stepper";
+import Divider from "primevue/divider";
+import Panel from "primevue/panel";
+import Steps from "primevue/steps";
 import Button from "primevue/button";
 import Calendar from "primevue/calendar";
 import Loading from "../../../components/Loading.vue";
-import FormDutruChitiet from '../../../components/Datatable/FormDutruChitiet.vue'
+import FormDutruChitiet from "../../../components/Datatable/FormDutruChitiet.vue";
 import DepartmentTreeSelect from "../../../components/TreeSelect/DepartmentTreeSelect.vue";
 import { useRoute, useRouter } from "vue-router";
 import dutruApi from "../../../api/dutruApi";
-import { useDutru } from '../../../stores/dutru';
+import { useDutru } from "../../../stores/dutru";
 
 import { storeToRefs } from "pinia";
 import { useGeneral } from "../../../stores/general";
@@ -255,21 +380,21 @@ const items = ref([
     label: "Đề nghị mua hàng",
   },
   {
-    label: "Báo giá"
+    label: "Báo giá",
   },
   {
-    label: "So sánh báo giá"
+    label: "So sánh báo giá",
   },
   {
-    label: "Trình ký"
+    label: "Trình ký",
   },
   {
-    label: "Đặt hàng"
+    label: "Đặt hàng",
   },
   {
-    label: "Thanh toán"
+    label: "Thanh toán",
   },
-])
+]);
 const active = ref(0);
 const activeStep = ref(0);
 const path_esign = import.meta.env.VITE_ESIGNURL;
@@ -277,7 +402,18 @@ const toast = useToast();
 const minDate = new Date();
 const route = useRoute();
 const storeDutru = useDutru();
-const { model, datatable, list_add, list_update, list_delete, list_nhanhang, tabviewActive, waiting, list_muahang, user_created_by } = storeToRefs(storeDutru);
+const {
+  model,
+  datatable,
+  list_add,
+  list_update,
+  list_delete,
+  list_nhanhang,
+  tabviewActive,
+  waiting,
+  list_muahang,
+  user_created_by,
+} = storeToRefs(storeDutru);
 
 const muahangActive = (muahang) => {
   let ret = 0;
@@ -286,18 +422,22 @@ const muahangActive = (muahang) => {
   } else if (muahang.is_dathang) {
     ret = 4;
   } else if ([8, 9, 10, 11].indexOf(muahang.status_id) != -1) {
-    ret = 3
+    ret = 3;
   } else if ([7].indexOf(muahang.status_id) != -1) {
-    ret = 2
+    ret = 2;
   } else if ([6].indexOf(muahang.status_id) != -1) {
-    ret = 1
+    ret = 1;
   }
   return ret;
-}
+};
 const load_data = async (id) => {
   waiting.value = true;
 
-  var all = [dutruApi.get(id), dutruApi.getNhanhang(id), dutruApi.getMuahang(id)];
+  var all = [
+    dutruApi.get(id),
+    dutruApi.getNhanhang(id),
+    dutruApi.getMuahang(id),
+  ];
   var response = await Promise.all(all);
 
   var chitiet = response[0].chitiet;
@@ -320,9 +460,9 @@ const load_data = async (id) => {
   list_muahang.value = response[2];
 
   waiting.value = false;
-}
+};
 onMounted(() => {
-  load_data(route.params.id)
+  load_data(route.params.id);
 });
 const submit = async () => {
   if (!model.value.name) {
@@ -389,7 +529,12 @@ const submit = async () => {
   var response = await dutruApi.save(model.value);
   waiting.value = false;
   if (response.success) {
-    toast.add({ severity: 'success', summary: 'Thành công!', detail: 'Thay đổi thành công', life: 3000 });
+    toast.add({
+      severity: "success",
+      summary: "Thành công!",
+      detail: "Thay đổi thành công",
+      life: 3000,
+    });
     load_data(model.value.id);
   }
 };
@@ -399,19 +544,24 @@ const view = async () => {
   var response = await dutruApi.xuatpdf(model.value.id, true);
   waiting.value = false;
   if (response.success) {
-    window.open(response.link, '_blank').focus();
+    window.open(response.link, "_blank").focus();
   }
-}
+};
 const xuatpdf = async () => {
   await submit();
   waiting.value = true;
   var response = await dutruApi.xuatpdf(model.value.id);
   waiting.value = false;
   if (response.success) {
-    toast.add({ severity: 'success', summary: 'Thành công!', detail: 'Xuất file thành công', life: 3000 });
+    toast.add({
+      severity: "success",
+      summary: "Thành công!",
+      detail: "Xuất file thành công",
+      life: 3000,
+    });
     load_data(model.value.id);
   }
-}
+};
 const savenhanhang = async () => {
   // console.log(list_nhanhang);
   var items = [];
@@ -434,13 +584,21 @@ const savenhanhang = async () => {
   // console.log(items);
   // return false;
   waiting.value = true;
-  var response = await dutruApi.savenhanhang({ dutru_id: model.value.id, list: items });
+  var response = await dutruApi.savenhanhang({
+    dutru_id: model.value.id,
+    list: items,
+  });
   waiting.value = false;
   if (response.success) {
-    toast.add({ severity: 'success', summary: 'Thành công!', detail: 'Thay đổi thành công', life: 3000 });
+    toast.add({
+      severity: "success",
+      summary: "Thành công!",
+      detail: "Thay đổi thành công",
+      life: 3000,
+    });
     load_data(model.value.id);
   }
-}
+};
 </script>
 <style>
 .p-Panel .p-Panel -toggleable .p-Panel -header {

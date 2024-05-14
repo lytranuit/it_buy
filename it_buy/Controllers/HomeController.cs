@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using System;
+using iText.StyledXmlParser.Jsoup.Nodes;
 
 namespace Vue.Controllers
 {
@@ -181,7 +182,7 @@ namespace Vue.Controllers
                     }
                 }
             }
-            ////
+            ////finish mua hàng
             var muahang_list = _context.MuahangModel.Where(d => d.deleted_at == null && d.date_finish == null && d.is_nhanhang == true && d.is_thanhtoan == true)
                 .Include(d => d.chitiet).ThenInclude(d => d.dutru_chitiet)
                 .Include(d => d.chitiet).ThenInclude(d => d.muahang_ncc_chitiet)
@@ -234,6 +235,85 @@ namespace Vue.Controllers
                 //}
 
             }
+
+
+
+            return Json(new { success = true });
+        }
+        public async Task<JsonResult> cronjobDaily()
+        {
+            ///Check chờ thanh toán gửi mail
+            var customerData = _context.MuahangModel
+                .Where(d => d.deleted_at == null && d.date_finish == null && d.is_dathang == true && ((d.loaithanhtoan == "tra_truoc" && d.is_thanhtoan == false) || (d.loaithanhtoan == "tra_sau" && d.is_nhanhang == true)))
+                .OrderByDescending(d => d.id)
+                .Include(d => d.muahang_chonmua)
+                .ToList();
+            var mail_string = "tram.nth@astahealthcare.com";
+            string Domain = (HttpContext.Request.IsHttps ? "https://" : "http://") + HttpContext.Request.Host.Value;
+            var body = _view.Render("Emails/RemindThanhtoan",
+                new
+                {
+                    link_logo = Domain + "/images/clientlogo_astahealthcare.com_f1800.png",
+                    link = Domain + "/muahang/thanhtoan",
+                    Domain = Domain,
+                    data = customerData
+                });
+
+            var email = new EmailModel
+            {
+                email_to = mail_string,
+                subject = "[Nhắc nhở] Các đề nghị đang chờ thanh toán",
+                body = body,
+                email_type = "thanhtoan_purchase",
+                status = 1,
+            };
+            _context.Add(email);
+            _context.SaveChanges();
+
+            ///Check chờ nhận hàng gửi mail
+            var customerData1 = _context.MuahangModel
+                .Where(d => d.deleted_at == null && d.is_dathang == true && d.date < DateTime.Now
+                && ((d.loaithanhtoan == "tra_sau" && d.is_nhanhang == false) || (d.loaithanhtoan == "tra_truoc" && d.is_thanhtoan == true)))
+                .Select(d => d.id)
+                .ToList();
+            var chitiet = _context.MuahangChitietModel.Where(d => customerData1.Contains(d.muahang_id)).Include(d => d.muahang).Include(d => d.dutru_chitiet).ThenInclude(d => d.dutru).ThenInclude(d => d.user_created_by).ToList();
+            var data_nhanhang = chitiet.GroupBy(d => d.dutru_chitiet.dutru.user_created_by).Select(d => new
+            {
+                user = d.Key,
+                list = d.Select(e => new
+                {
+                    hanghoa = e.mahh + "-" + e.tenhh,
+                    soluong = e.soluong.Value.ToString("#,##0.##") + " " + e.dvt,
+                    dutru = e.dutru_chitiet.dutru.code + "-" + e.dutru_chitiet.dutru.name,
+                    dnmh = e.muahang.code + "-" + e.muahang.name,
+                    ngaygiaohang = e.muahang.date.Value.ToString("dd/MM/yyyy"),
+                    muahang_id = e.muahang_id
+                }).ToList(),
+            }).ToList();
+            foreach (var d in data_nhanhang)
+            {
+                mail_string = d.user.Email;
+                Domain = (HttpContext.Request.IsHttps ? "https://" : "http://") + HttpContext.Request.Host.Value;
+                body = _view.Render("Emails/RemindNhanhang",
+                    new
+                    {
+                        link_logo = Domain + "/images/clientlogo_astahealthcare.com_f1800.png",
+                        Domain = Domain,
+                        data = d.list
+                    });
+
+                email = new EmailModel
+                {
+                    email_to = mail_string,
+                    subject = "[Nhắc nhở] Nhận hàng hóa",
+                    body = body,
+                    email_type = "remind_nhanhang_purchase",
+                    status = 1,
+                };
+                _context.Add(email);
+                _context.SaveChanges();
+            }
+
             return Json(new { success = true });
         }
     }

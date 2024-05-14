@@ -777,7 +777,20 @@ namespace it_template.Areas.V1.Controllers
             var data = new ArrayList();
             foreach (var record in datapost)
             {
-                var muahang = record.chitiet.SelectMany(d => d.muahang_chitiet.Where(d => d.muahang.deleted_at == null && d.muahang.status_id != (int)Status.MuahangEsignError).Select(d => d.muahang).ToList()).Distinct().ToList();
+                var muahang = record.chitiet.SelectMany(d => d.muahang_chitiet.Where(d => d.muahang.deleted_at == null && d.muahang.status_id != (int)Status.MuahangEsignError).Select(d => d.muahang).ToList()).Distinct()
+                    .Select(d => new MuahangModel()
+                    {
+                        id = d.id,
+                        name = d.name,
+                        code = d.code,
+                        date_finish = d.date_finish,
+                        is_dathang = d.is_dathang,
+                        is_thanhtoan = d.is_thanhtoan,
+                        is_nhanhang = d.is_nhanhang,
+                        loaithanhtoan = d.loaithanhtoan,
+                        status_id = d.status_id,
+                    })
+                    .ToList();
                 var data1 = new
                 {
                     id = record.id,
@@ -916,6 +929,23 @@ namespace it_template.Areas.V1.Controllers
                 var soluong_mua = muahang_chitiet.Sum(d => d.soluong * d.quidoi);
 
                 var soluong = soluong_mua < soluong_dutru ? soluong_dutru - soluong_mua : 0;
+                var list_muahang = new List<MuahangModel>();
+                foreach (var m in muahang_chitiet)
+                {
+                    var muahang = m.muahang;
+                    list_muahang.Add(new MuahangModel()
+                    {
+                        id = muahang.id,
+                        name = muahang.name,
+                        code = muahang.code,
+                        date_finish = muahang.date_finish,
+                        is_dathang = muahang.is_dathang,
+                        is_thanhtoan = muahang.is_thanhtoan,
+                        is_nhanhang = muahang.is_nhanhang,
+                        loaithanhtoan = muahang.loaithanhtoan,
+                        status_id = muahang.status_id,
+                    });
+                }
                 data.Add(new
                 {
                     id = record.id,
@@ -934,8 +964,14 @@ namespace it_template.Areas.V1.Controllers
                     user = record.user,
                     list_tag = record.list_tag,
                     dutru_chitiet_id = record.id,
-                    list_dutru = new List<DutruModel>() { dutru },
-                    list_muahang = muahang_chitiet.Select(d => d.muahang).ToList(),
+                    dutru = new DutruModel()
+                    {
+                        id = dutru.id,
+                        name = dutru.name,
+                        code = dutru.code,
+                        type_id = dutru.type_id
+                    },
+                    list_muahang = list_muahang
                 });
             }
 

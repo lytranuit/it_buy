@@ -1,0 +1,53 @@
+﻿@{
+    ViewData["Title"] = "Index";
+    Layout = null;
+}
+<center>
+    <table width="100%">
+        <tbody>
+            <tr>
+                <td>
+                    <div>
+
+                        <p style="text-align:center;margin-bottom:30px">
+                            <img style="border:0;height:auto;line-height:100%;outline:none;text-decoration:none;width:400px;" src="@Model.link_logo" />
+                        </p>
+                        <div style="box-sizing:border-box;margin:0;padding:0 40px">
+                            <h2 style="text-align:left">Xin chào,</h2>
+                            <p style="text-align:left">Hệ thống Asta, bạn đã nhận được các hàng hóa này chưa?</p>
+                            <p style="text-align:left"><b>Hàng hóa:</b></p>
+                            <table style="width:100%">
+                                <thead style="background:#f1f5fa;">
+                                    <tr>
+                                        <td style="padding:10px;">Hàng hóa</td>
+                                        <td style="padding:10px;">Số lượng</td>
+                                        <td style="padding:10px;">Dự trù</td>
+                                        <td style="padding:10px;">Đề nghị mua hàng</td>
+                                        <td style="padding:10px;">Ngày giao hàng dự kiến</td>
+                                        <td style="padding:10px;">Chi tiết</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.data)
+                                    {
+                                        <tr>
+                                            <td style="padding:10px;">@item.hanghoa</td>
+                                            <td style="padding:10px;">@item.soluong</td>
+                                            <td style="padding:10px;">@item.dutru</td>
+                                            <td style="padding:10px;">@item.dnmh</td>
+                                            <td style="padding:10px;">@item.ngaygiaohang</td>
+                                            <td style="padding:10px;"><a href="@(Model.Domain + "/muahang/nhanhang/" + item.muahang_id)" target="_blank">Link</a></td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                            <p style="text-align:left">Trân trọng.</p>
+                            <p style="text-align:left">ASTA</p>
+                            <br>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</center>
