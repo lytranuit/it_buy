@@ -36,11 +36,13 @@ namespace Vue.Models
         public DateTime? created_at { get; set; }
 
 
-        public int? mansx { get; set; }
+        public string? nhacc { get; set; }
+        public string? nhasx { get; set; }
+        //public int? mansx { get; set; }
 
-        public virtual NsxModel? nhasanxuat { get; set; }
-        public int? mancc { get; set; }
-        public virtual NhacungcapModel? nhacungcap { get; set; }
+        //public virtual NsxModel? nhasanxuat { get; set; }
+        //public int? mancc { get; set; }
+        //public virtual NhacungcapModel? nhacungcap { get; set; }
     }
 
 }

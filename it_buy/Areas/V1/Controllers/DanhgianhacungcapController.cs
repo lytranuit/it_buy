@@ -25,6 +25,7 @@ using QRCoder;
 using static QRCoder.PayloadGenerator;
 using NuGet.Packaging;
 using Vue.Services;
+using Microsoft.CodeAnalysis.Differencing;
 
 namespace it_template.Areas.V1.Controllers
 {
@@ -237,6 +238,9 @@ namespace it_template.Areas.V1.Controllers
             var length = Request.Form["length"].FirstOrDefault();
             int pageSize = length != null ? Convert.ToInt32(length) : 0;
             var id_text = Request.Form["filters[id]"].FirstOrDefault();
+            var nhacc = Request.Form["filters[nhacc]"].FirstOrDefault();
+            var nhasx = Request.Form["filters[nhasx]"].FirstOrDefault();
+            var tenhh = Request.Form["filters[tenhh]"].FirstOrDefault();
             int id = id_text != null ? Convert.ToInt32(id_text) : 0;
             //var tenhh = Request.Form["filters[tenhh]"].FirstOrDefault();
             int skip = start != null ? Convert.ToInt32(start) : 0;
@@ -246,12 +250,24 @@ namespace it_template.Areas.V1.Controllers
 
 
             int recordsTotal = customerData.Count();
+            if (nhacc != null && nhacc != "")
+            {
+                customerData = customerData.Where(d => d.nhacc.Contains(nhacc));
+            }
+            if (nhasx != null && nhasx != "")
+            {
+                customerData = customerData.Where(d => d.nhasx.Contains(nhasx));
+            }
+            if (tenhh != null && tenhh != "")
+            {
+                customerData = customerData.Where(d => d.tenhh.Contains(tenhh));
+            }
             if (id != 0)
             {
                 customerData = customerData.Where(d => d.id == id);
             }
             int recordsFiltered = customerData.Count();
-            var datapost = customerData.OrderByDescending(d => d.id).Skip(skip).Take(pageSize).Include(d => d.user_created_by).Include(d => d.nhacungcap).Include(d => d.nhasanxuat).ToList();
+            var datapost = customerData.OrderByDescending(d => d.id).Skip(skip).Take(pageSize).Include(d => d.user_created_by).ToList();
             //var data = new ArrayList();
             //foreach (var record in datapost)
             //{
@@ -349,7 +365,7 @@ namespace it_template.Areas.V1.Controllers
                 _context.SaveChanges();
             }
             ///lây user liên quan
-            var danhgianhacungcap = _context.DanhgianhacungcapModel.Where(d => d.id == CommentModel.danhgianhacungcap_id).Include(d => d.nhacungcap).FirstOrDefault();
+            var danhgianhacungcap = _context.DanhgianhacungcapModel.Where(d => d.id == CommentModel.danhgianhacungcap_id).FirstOrDefault();
             var comments = _context.DanhgianhacungcapCommentModel.Where(d => d.danhgianhacungcap_id == CommentModel.danhgianhacungcap_id).Include(d => d.users_related).ToList();
 
             var users_related_id = new List<string>();
@@ -386,7 +402,7 @@ namespace it_template.Areas.V1.Controllers
                 var email = new EmailModel
                 {
                     email_to = mail_string,
-                    subject = "[Tin nhắn mới] Đánh giá " + danhgianhacungcap.nhacungcap.tenncc + " cho nguyên liệu " + danhgianhacungcap.tenhh,
+                    subject = "[Tin nhắn mới] Đánh giá " + danhgianhacungcap.nhacc + " cho nguyên liệu " + danhgianhacungcap.tenhh,
                     body = body,
                     email_type = "new_comment_purchase",
                     status = 1,
@@ -434,13 +450,22 @@ namespace it_template.Areas.V1.Controllers
             //string current_user_id = UserManager.GetUserId(currentUser); // Get user id:
 
 
-            return Json(new { success = 1, comments });
+            return Json(new
+            {
+                success = 1,
+                comments,
+
+            }, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            });
         }
         [HttpPost]
         public async Task<IActionResult> thongbao(int danhgianhacungcap_id, List<string> list_user)
         {
 
-            var data = _context.DanhgianhacungcapModel.Where(d => d.id == danhgianhacungcap_id).Include(d => d.nhacungcap).Include(d => d.nhasanxuat).FirstOrDefault();
+            var data = _context.DanhgianhacungcapModel.Where(d => d.id == danhgianhacungcap_id).FirstOrDefault();
             //SEND MAIL
             if (list_user != null && list_user.Count() > 0 && data != null)
             {

@@ -117,15 +117,15 @@ namespace Vue.Data
               .HasForeignKey(e => e.muahang_chonmua_id);
             //modelBuilder.Entity<UserManagerModel>().HasOne(e => e.user);
 
-            modelBuilder.Entity<DanhgianhacungcapModel>()
-            .HasOne(s => s.nhacungcap)
-            .WithMany()
-            .HasForeignKey(e => e.mancc).HasPrincipalKey(d => d.id);
+            //modelBuilder.Entity<DanhgianhacungcapModel>()
+            //.HasOne(s => s.nhacungcap)
+            //.WithMany()
+            //.HasForeignKey(e => e.mancc).HasPrincipalKey(d => d.id);
 
-            modelBuilder.Entity<DanhgianhacungcapModel>()
-            .HasOne(s => s.nhasanxuat)
-            .WithMany()
-            .HasForeignKey(e => e.mansx).HasPrincipalKey(d => d.id);
+            //modelBuilder.Entity<DanhgianhacungcapModel>()
+            //.HasOne(s => s.nhasanxuat)
+            //.WithMany()
+            //.HasForeignKey(e => e.mansx).HasPrincipalKey(d => d.id);
 
         }
         public override int SaveChanges()

@@ -2,22 +2,54 @@
   <div class="row clearfix">
     <div class="col-12">
       <h5 class="card-header drag-handle">
-        <Button label="Tạo mới" icon="pi pi-plus" class="p-button-success p-button-sm mr-2" @click="openNew"></Button>
-        <Button label="Xóa" icon="pi pi-trash" class="p-button-danger p-button-sm" @click="confirmDeleteSelected"
-          :disabled="!selectedProducts || !selectedProducts.length"></Button>
+        <Button
+          label="Tạo mới"
+          icon="pi pi-plus"
+          class="p-button-success p-button-sm mr-2"
+          @click="openNew"
+        ></Button>
+        <Button
+          label="Xóa"
+          icon="pi pi-trash"
+          class="p-button-danger p-button-sm"
+          @click="confirmDeleteSelected"
+          :disabled="!selectedProducts || !selectedProducts.length"
+        ></Button>
       </h5>
       <section class="card card-fluid">
         <div class="card-body" style="overflow: auto; position: relative">
-          <DataTable class="p-datatable-customers" showGridlines :value="datatable" :lazy="true" ref="dt"
-            scrollHeight="70vh" v-model:selection="selectedProducts" :paginator="true"
-            :rowsPerPageOptions="[10, 50, 100]" :rows="rows" :totalRecords="totalRecords" @page="onPage($event)"
-            :rowHover="true" :loading="loading" responsiveLayout="scroll" :resizableColumns="true"
-            columnResizeMode="expand" v-model:filters="filters" filterDisplay="menu" editMode="cell"
-            @cell-edit-complete="onCellEditComplete">
+          <DataTable
+            class="p-datatable-customers"
+            showGridlines
+            :value="datatable"
+            :lazy="true"
+            ref="dt"
+            scrollHeight="70vh"
+            v-model:selection="selectedProducts"
+            :paginator="true"
+            :rowsPerPageOptions="[10, 50, 100]"
+            :rows="rows"
+            :totalRecords="totalRecords"
+            @page="onPage($event)"
+            :rowHover="true"
+            :loading="loading"
+            responsiveLayout="scroll"
+            :resizableColumns="true"
+            columnResizeMode="expand"
+            v-model:filters="filters"
+            filterDisplay="menu"
+            editMode="cell"
+            @cell-edit-complete="onCellEditComplete"
+          >
             <template #header>
               <div style="width: 200px">
-                <TreeSelect :options="columns" v-model="showing" multiple :limit="0"
-                  :limitText="(count) => 'Hiển thị: ' + count + ' cột'">
+                <TreeSelect
+                  :options="columns"
+                  v-model="showing"
+                  multiple
+                  :limit="0"
+                  :limitText="(count) => 'Hiển thị: ' + count + ' cột'"
+                >
                 </TreeSelect>
               </div>
             </template>
@@ -25,34 +57,55 @@
             <template #empty>
               <div class="text-center">Không có dữ liệu.</div>
             </template>
-            <Column selectionMode="multiple" style="width: 3rem" :exportable="false"></Column>
-            <Column v-for="col of selectedColumns" :field="col.data" :header="col.label" :key="col.data"
-              :showFilterMatchModes="false">
-
+            <Column
+              selectionMode="multiple"
+              style="width: 3rem"
+              :exportable="false"
+            ></Column>
+            <Column
+              v-for="col of selectedColumns"
+              :field="col.data"
+              :header="col.label"
+              :key="col.data"
+              :showFilterMatchModes="false"
+            >
               <template #body="slotProps">
-
                 <template v-if="col.data == 'mansx'">
+                  ({{ slotProps.data.mansx }})
                   {{ slotProps.data.nhasanxuat?.tennsx }}
                 </template>
                 <template v-else-if="col.data == 'mancc'">
+                  ({{ slotProps.data.mancc }})
                   {{ slotProps.data.nhacungcap?.tenncc }}
                 </template>
                 <div v-else v-html="slotProps.data[col.data]"></div>
               </template>
 
-              <template #filter="{ filterModel, filterCallback }" v-if="col.filter == true">
-                <InputText type="text" v-model="filterModel.value" @keydown.enter="filterCallback()"
-                  class="p-column-filter" />
+              <template
+                #filter="{ filterModel, filterCallback }"
+                v-if="col.filter == true"
+              >
+                <InputText
+                  type="text"
+                  v-model="filterModel.value"
+                  @keydown.enter="filterCallback()"
+                  class="p-column-filter"
+                />
               </template>
             </Column>
 
             <Column style="width: 1rem">
-
               <template #body="slotProps">
-                <a class="p-link text-warning mr-2 font-16" @click="editProduct(slotProps.data)"><i
-                    class="pi pi-pencil"></i></a>
-                <a class="p-link text-danger font-16" @click="confirmDeleteProduct(slotProps.data)"><i
-                    class="pi pi-trash"></i></a>
+                <a
+                  class="p-link text-warning mr-2 font-16"
+                  @click="editProduct(slotProps.data)"
+                  ><i class="pi pi-pencil"></i
+                ></a>
+                <a
+                  class="p-link text-danger font-16"
+                  @click="confirmDeleteProduct(slotProps.data)"
+                  ><i class="pi pi-trash"></i
+                ></a>
               </template>
             </Column>
           </DataTable>
@@ -61,27 +114,57 @@
     </div>
 
     <PopupAdd @save="loadLazyData"></PopupAdd>
-    <Dialog v-model:visible="deleteProductDialog" header="Xác nhận" :modal="true">
+    <Dialog
+      v-model:visible="deleteProductDialog"
+      header="Xác nhận"
+      :modal="true"
+    >
       <div class="confirmation-content">
         <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-        <span v-if="model">Bạn có muốn xóa <b>{{ model.mahh }}</b> này không?</span>
+        <span v-if="model"
+          >Bạn có muốn xóa <b>{{ model.mahh }}</b> này không?</span
+        >
       </div>
 
       <template #footer>
-        <Button label="Không" icon="pi pi-times" class="p-button-text" @click="deleteProductDialog = false"></Button>
-        <Button label="Đồng ý" icon="pi pi-check" class="p-button-text" @click="deleteProduct"></Button>
+        <Button
+          label="Không"
+          icon="pi pi-times"
+          class="p-button-text"
+          @click="deleteProductDialog = false"
+        ></Button>
+        <Button
+          label="Đồng ý"
+          icon="pi pi-check"
+          class="p-button-text"
+          @click="deleteProduct"
+        ></Button>
       </template>
     </Dialog>
 
-    <Dialog v-model:visible="deleteProductsDialog" header="Xác nhận" :modal="true">
+    <Dialog
+      v-model:visible="deleteProductsDialog"
+      header="Xác nhận"
+      :modal="true"
+    >
       <div class="confirmation-content">
         <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
         <span>Bạn có muốn xóa tất cả những mục đã chọn không?</span>
       </div>
 
       <template #footer>
-        <Button label="Không" icon="pi pi-times" class="p-button-text" @click="deleteProductsDialog = false"></Button>
-        <Button label="Đồng ý" icon="pi pi-check" class="p-button-text" @click="deleteSelectedProducts"></Button>
+        <Button
+          label="Không"
+          icon="pi pi-times"
+          class="p-button-text"
+          @click="deleteProductsDialog = false"
+        ></Button>
+        <Button
+          label="Đồng ý"
+          icon="pi pi-check"
+          class="p-button-text"
+          @click="deleteSelectedProducts"
+        ></Button>
       </template>
     </Dialog>
     <Loading :waiting="waiting"></Loading>
@@ -139,17 +222,21 @@ const columns = ref([
     label: "Nhà sản xuất",
     data: "mansx",
     className: "text-center",
+    filter: true,
   },
   {
     id: 4,
     label: "Nhà cung cấp",
     data: "mancc",
     className: "text-center",
+    filter: true,
   },
 ]);
 const filters = ref({
   mahh: { value: null, matchMode: FilterMatchMode.CONTAINS },
   tenhh: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  mancc: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  mansx: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
 const totalRecords = ref(0);
 const loading = ref(true);

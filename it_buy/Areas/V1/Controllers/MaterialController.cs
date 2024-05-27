@@ -113,11 +113,21 @@ namespace it_template.Areas.V1.Controllers
             var start = Request.Form["start"].FirstOrDefault();
             var length = Request.Form["length"].FirstOrDefault();
             int pageSize = length != null ? Convert.ToInt32(length) : 0;
+            var mancc = Request.Form["filters[mancc]"].FirstOrDefault();
+            var mansx = Request.Form["filters[mansx]"].FirstOrDefault();
             var mahh = Request.Form["filters[mahh]"].FirstOrDefault();
             var tenhh = Request.Form["filters[tenhh]"].FirstOrDefault();
             int skip = start != null ? Convert.ToInt32(start) : 0;
             var customerData = _context.MaterialModel.Where(d => d.deleted_at == null);
             int recordsTotal = customerData.Count();
+            if (mancc != null && mancc != "")
+            {
+                customerData = customerData.Where(d => d.mancc.Contains(mancc));
+            }
+            if (mansx != null && mansx != "")
+            {
+                customerData = customerData.Where(d => d.mansx.Contains(mansx));
+            }
             if (mahh != null && mahh != "")
             {
                 customerData = customerData.Where(d => d.mahh.Contains(mahh));
