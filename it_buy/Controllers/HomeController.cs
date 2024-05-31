@@ -244,7 +244,7 @@ namespace Vue.Controllers
         {
             ///Check chờ thanh toán gửi mail
             var customerData = _context.MuahangModel
-                .Where(d => d.deleted_at == null && d.date_finish == null && d.is_dathang == true && ((d.loaithanhtoan == "tra_truoc" && d.is_thanhtoan == false) || (d.loaithanhtoan == "tra_sau" && d.is_nhanhang == true && d.is_thanhtoan == false)))
+                .Where(d => d.deleted_at == null && d.date_finish == null && d.is_dathang == true && (d.is_thanhtoan == null || d.is_thanhtoan == false) && (d.loaithanhtoan == "tra_truoc" || (d.loaithanhtoan == "tra_sau" && d.is_nhanhang == true)))
                 .OrderByDescending(d => d.id)
                 .Include(d => d.muahang_chonmua)
                 .ToList();
@@ -272,8 +272,8 @@ namespace Vue.Controllers
 
             ///Check chờ nhận hàng gửi mail
             var customerData1 = _context.MuahangModel
-                .Where(d => d.deleted_at == null && d.is_dathang == true && d.date < DateTime.Now && d.date_finish == null
-                && ((d.loaithanhtoan == "tra_sau" && d.is_nhanhang == false) || (d.loaithanhtoan == "tra_truoc" && d.is_thanhtoan == true && d.is_nhanhang == false)))
+                .Where(d => d.deleted_at == null && d.is_dathang == true && d.date < DateTime.Now && d.date_finish == null && (d.is_nhanhang == null || d.is_nhanhang == false)
+                && (d.loaithanhtoan == "tra_sau" || (d.loaithanhtoan == "tra_truoc" && d.is_thanhtoan == true)))
                 .Select(d => d.id)
                 .ToList();
             var chitiet = _context.MuahangChitietModel.Where(d => customerData1.Contains(d.muahang_id)).Include(d => d.muahang).Include(d => d.dutru_chitiet).ThenInclude(d => d.dutru).ThenInclude(d => d.user_created_by).ToList();

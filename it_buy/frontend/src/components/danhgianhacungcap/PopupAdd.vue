@@ -153,8 +153,8 @@ const save = () => {
 const valid = () => {
   if (!model.value.tenhh) return false;
   if (!model.value.dvt) return false;
-  if (!model.value.mancc) return false;
-  if (!model.value.mansx) return false;
+  if (!model.value.nhacc) return false;
+  if (!model.value.nhasx) return false;
   return true;
 };
 </script>
