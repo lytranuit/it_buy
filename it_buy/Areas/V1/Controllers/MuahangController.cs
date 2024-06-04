@@ -1099,7 +1099,7 @@ namespace it_template.Areas.V1.Controllers
                             mahh = item.mahh,
                             dvt = item.dvt,
                             soluong = item.soluong.Value.ToString("#,##0.##"),
-                            dongia = item.dongia.Value.ToString("#,##0.##"),
+                            dongia = item.dongia.Value.ToString("#,##0.#####"),
                             thanhtien = item.thanhtien.Value.ToString("#,##0"),
                             vat = item.vat,
                             note = item.note,
