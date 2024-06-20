@@ -27,6 +27,16 @@ namespace it_template.Areas.V1.Controllers
             UserManager = UserMgr;
         }
 
+        public async Task<JsonResult> DutruChitiet()
+        {
+            var All = _context.MaterialModel.ToList();
+            //var jsonData = new { data = ProcessModel };
+            return Json(All, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            });
+        }
+
         public async Task<JsonResult> materials()
         {
             var All = _context.MaterialModel.ToList();
@@ -140,8 +150,9 @@ namespace it_template.Areas.V1.Controllers
             var sodutru = _context.DutruModel.Where(d => d.deleted_at == null).Count();
             var somuahang = _context.MuahangModel.Where(d => d.deleted_at == null).Count();
             var success = _context.MuahangModel.Where(d => d.deleted_at == null && d.date_finish != null).Count();
+            var failed = _context.MuahangChitietModel.Include(d => d.muahang).Where(d => d.muahang.deleted_at == null && d.status_nhanhang == 2).Count();
             //var jsonData = new { data = ProcessModel };
-            return Json(new { sodutru = sodutru, somuahang = somuahang, success = success, failed = 0 }, new System.Text.Json.JsonSerializerOptions()
+            return Json(new { sodutru = sodutru, somuahang = somuahang, success = success, failed = failed }, new System.Text.Json.JsonSerializerOptions()
             {
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                 ReferenceHandler = ReferenceHandler.IgnoreCycles,

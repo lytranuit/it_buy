@@ -7,6 +7,15 @@ export const useGeneral = defineStore("general", () => {
   const supliers = ref([]);
   const producers = ref([]);
   const materialGroup = ref([]);
+  const DutruChitiet = ref([]);
+  const fetchDutruChitiet = (cache = true) => {
+    if (cache == true && DutruChitiet.value.length) return DutruChitiet.value;
+    return Api.dutruchitiet().then((response) => {
+      DutruChitiet.value = response;
+      return response;
+    });
+  };
+
   const fetchMaterials = (cache = true) => {
     if (cache == true && materials.value.length) return materials.value;
     return Api.materials().then((response) => {
@@ -82,6 +91,8 @@ export const useGeneral = defineStore("general", () => {
     materials,
     supliers,
     producers,
+    DutruChitiet,
+    fetchDutruChitiet,
     fetchMaterials,
     fetchMaterialGroup,
     fetchNhacc,

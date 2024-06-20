@@ -1,7 +1,19 @@
 <template>
-  <TreeSelect :options="departments" :normalizer="normalizer" :multiple="multiple" :modelValue="modelValue" :flat="flat"
-    :name="name" :required="required" :value-consists-of="valueConsistsOf" :append-to-body="true"
-    @update:modelValue="emit('update:modelValue', $event)" :disabled="disabled" :clearable="clearable"></TreeSelect>
+  <TreeSelect
+    :options="departments"
+    :normalizer="normalizer"
+    :multiple="multiple"
+    :modelValue="modelValue"
+    :flat="flat"
+    :name="name"
+    :required="required"
+    :value-consists-of="valueConsistsOf"
+    :append-to-body="true"
+    @update:modelValue="emit('update:modelValue', $event)"
+    :disabled="disabled"
+    :clearable="clearable"
+    placeholder="Bộ phận"
+  ></TreeSelect>
 </template>
 
 <script setup>
@@ -44,8 +56,8 @@ const normalizer = (node) => {
   return {
     id: node.id,
     label: node.name,
-  }
-}
+  };
+};
 const emit = defineEmits(["update:modelValue"]);
 const departments = ref([]);
 onMounted(() => {

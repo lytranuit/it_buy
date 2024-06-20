@@ -24,6 +24,15 @@ export default {
       })
       .then((res) => res.data);
   },
+  xoancc(params) {
+    return repository
+      .post(`/v1/${resoure}/xoancc`, params, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => res.data);
+  },
   xoadinhkemncc(params) {
     return repository
       .post(`/v1/${resoure}/xoadinhkemncc`, params, {

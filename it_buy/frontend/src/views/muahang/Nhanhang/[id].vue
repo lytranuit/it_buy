@@ -1,39 +1,59 @@
 <template>
   <div class="row clearfix">
     <div class="col-12">
-      <h5 class="card-header drag-handle">
-        Nhận hàng
-      </h5>
+      <h5 class="card-header drag-handle">Nhận hàng</h5>
       <section class="card card-fluid">
         <div class="card-body" style="overflow: auto; position: relative">
           <div class="row m-0">
             <div class="col-md-4 form-group">
               <b class="">Ngày giao hàng dự kiến:</b>
               <div class="mt-2">
-                <Calendar :modelValue="formatDate(model.date)" dateFormat="yy-mm-dd" class="date-custom"
-                  :manualInput="false" showIcon :minDate="minDate" :disabled="true" />
+                <Calendar
+                  :modelValue="formatDate(model.date)"
+                  dateFormat="yy-mm-dd"
+                  class="date-custom"
+                  :manualInput="false"
+                  showIcon
+                  :minDate="minDate"
+                  :disabled="true"
+                />
               </div>
             </div>
             <div class="col-md-4 form-group">
               <b class="">Nhà cung cấp:</b>
               <div class="mt-2">
-                <InputText :modelValue="model?.muahang_chonmua?.ncc?.tenncc" :disabled="true" size="small"
-                  class="form-control"></InputText>
+                <InputText
+                  :modelValue="chonmua.ncc?.tenncc"
+                  :disabled="true"
+                  size="small"
+                  class="form-control"
+                ></InputText>
               </div>
             </div>
             <div class="col-md-4 form-group">
               <b class="">Mã đặt hàng:</b>
               <div class="mt-2">
-                <InputText :modelValue="model?.code" :disabled="true" size="small" class="form-control"></InputText>
+                <InputText
+                  :modelValue="model?.code"
+                  :disabled="true"
+                  size="small"
+                  class="form-control"
+                ></InputText>
               </div>
             </div>
             <div class="col-md-12 mb-2">
               <b class="">Hàng hóa:</b>
-              <FormMuahangNhanhang :editable="!model.is_nhanhang"></FormMuahangNhanhang>
+              <FormMuahangNhanhang
+                :editable="!model.is_nhanhang"
+              ></FormMuahangNhanhang>
             </div>
             <div class="col-md-12 text-center mt-3" v-if="!model.is_nhanhang">
-              <Button label="Lưu lại" icon="pi pi-save" class="p-button-success p-button-sm mr-2"
-                @click.prevent="savenhanhang()"></Button>
+              <Button
+                label="Lưu lại"
+                icon="pi pi-save"
+                class="p-button-success p-button-sm mr-2"
+                @click.prevent="savenhanhang()"
+              ></Button>
             </div>
           </div>
         </div>
@@ -63,7 +83,7 @@ const confirm = useConfirm();
 const toast = useToast();
 const route = useRoute();
 const storeMuahang = useMuahang();
-const { model, waiting, datatable } = storeToRefs(storeMuahang);
+const { model, waiting, datatable, chonmua } = storeToRefs(storeMuahang);
 
 const savenhanhang = () => {
   // console.log(list_nhanhang);
@@ -87,14 +107,21 @@ const savenhanhang = () => {
 
   // console.log(items);
   // return false;
-  muahangApi.savenhanhang({ muahang_id: model.value.id, list: items }).then((response) => {
-    waiting.value = false;
-    if (response.success) {
-      toast.add({ severity: 'success', summary: 'Thành công!', detail: 'Thay đổi thành công', life: 3000 });
-      location.reload();
-    }
-  });
-}
+  muahangApi
+    .savenhanhang({ muahang_id: model.value.id, list: items })
+    .then((response) => {
+      waiting.value = false;
+      if (response.success) {
+        toast.add({
+          severity: "success",
+          summary: "Thành công!",
+          detail: "Thay đổi thành công",
+          life: 3000,
+        });
+        location.reload();
+      }
+    });
+};
 onMounted(() => {
   storeMuahang.load_data(route.params.id);
 });

@@ -236,6 +236,7 @@
             >
               <a
                 :href="item1.url"
+                target="_blank"
                 :download="download(item1.name)"
                 class="download-icon-link"
               >
@@ -248,7 +249,7 @@
                   </h6>
                   <div
                     style="cursor: pointer"
-                    @click="xoadinhkemncc(key1, item)"
+                    @click.prevent="xoadinhkemncc(key1, item)"
                     v-if="readonly == false"
                   >
                     <i class="fas fa-times-circle text-danger font-16"></i>
@@ -390,6 +391,9 @@ const removeNCC = (ncc) => {
     header: "Xác nhận",
     icon: "pi pi-exclamation-triangle",
     accept: () => {
+      if (ncc.id > 0) {
+        muahangApi.xoancc({ id: ncc.id });
+      }
       nccs.value = nccs.value.filter((item) => {
         return ![ncc].includes(item);
       });
@@ -442,8 +446,20 @@ const submit1 = () => {
   for (var ncc of params.nccs) {
     delete ncc.ncc;
     delete ncc.dinhkem;
+    if (ncc.phigiaohang == null) {
+      alert("Chưa nhập phí giao hàng!");
+      return false;
+    }
     for (var c of ncc.chitiet) {
       delete c.muahang_chitiet;
+      if (c.dongia == null) {
+        alert("Chưa nhập đơn giá!");
+        return false;
+      }
+      if (c.vat == null) {
+        alert("Chưa nhập vat!");
+        return false;
+      }
     }
   }
   $(".custom-file-input").each(function (index) {

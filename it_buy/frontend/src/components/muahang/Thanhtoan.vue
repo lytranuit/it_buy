@@ -6,9 +6,14 @@
       <div v-if="chonmua.tiente != 'VND'">
         Qui đổi từ 1 <b>{{ chonmua.tiente }}</b>
         =
-        <template v-if="model.is_dathang == true && !model.is_thanhtoan && is_Ketoan">
-          <input class="form-control form-control-sm d-inline-block" style="width: 60px"
-            v-model="chonmua.quidoi" /><span class="text-danger">*</span>
+        <template
+          v-if="model.is_dathang == true && !model.is_thanhtoan && is_Ketoan"
+        >
+          <input
+            class="form-control form-control-sm d-inline-block"
+            style="width: 60px"
+            v-model="chonmua.quidoi"
+          /><span class="text-danger">*</span>
         </template>
         <template v-else>
           {{ chonmua.quidoi }}
@@ -18,32 +23,67 @@
     </div>
     <div class="col-md-4">
       <b class="">Ủy nhiệm chi:<span class="text-danger">*</span></b>
-      <div class="custom-file mt-2" v-if="model.is_dathang == true && !model.is_thanhtoan && is_Ketoan">
-        <input type="file" class="uynhiemchi-file-input" :id="'uynhiemchi'" :multiple="true"
-          @change="fileChange($event)">
+      <div
+        class="custom-file mt-2"
+        v-if="model.is_dathang == true && !model.is_thanhtoan && is_Ketoan"
+      >
+        <input
+          type="file"
+          class="uynhiemchi-file-input"
+          :id="'uynhiemchi'"
+          :multiple="true"
+          @change="fileChange($event)"
+        />
         <label class="custom-file-label" :for="'uynhiemchi'">Choose file</label>
       </div>
       <div class="mt-2 list_uynhiemchi file-box-content" v-else>
-        <div class="file-box" v-for="(item1, key1) in list_uynhiemchi" :key="key1" :data-key="item1.id">
-          <a :href="item1.url" :download="download(item1.name)" class="download-icon-link">
+        <div
+          class="file-box"
+          v-for="(item1, key1) in list_uynhiemchi"
+          :key="key1"
+          :data-key="item1.id"
+        >
+          <a
+            :href="item1.url"
+            target="_blank"
+            :download="download(item1.name)"
+            class="download-icon-link"
+          >
             <i class="dripicons-download file-download-icon"></i>
 
             <div class="text-center">
               <i class="far fa-file-pdf text-danger"></i>
-              <h6 class="text-truncate" :title="item1.name">{{ item1.name }}</h6>
+              <h6 class="text-truncate" :title="item1.name">
+                {{ item1.name }}
+              </h6>
             </div>
           </a>
         </div>
       </div>
     </div>
 
-    <div class="col-md-4 align-self-center" v-if="model.is_dathang == true && !model.is_thanhtoan">
-      <Button label="Thông báo thanh toán" icon="far fa-paper-plane" size="small" @click.prevent="thongbaothanhtoan()">
+    <div
+      class="col-md-4 align-self-center"
+      v-if="model.is_dathang == true && !model.is_thanhtoan"
+    >
+      <Button
+        label="Thông báo thanh toán"
+        icon="far fa-paper-plane"
+        size="small"
+        @click.prevent="thongbaothanhtoan()"
+      >
       </Button>
     </div>
-    <div class="col-md-12 mt-3" v-if="model.is_dathang == true && !model.is_thanhtoan && is_Ketoan">
-      <Button label="Hoàn thành thanh toán" icon="fas fa-long-arrow-alt-down" class="p-button-success p-button-sm mr-2"
-        @click.prevent="thanhtoan()">
+    <div
+      class="col-md-12 mt-3"
+      v-if="model.is_dathang == true && !model.is_thanhtoan && is_Ketoan"
+    >
+      <Button
+        label="Hoàn thành thanh toán"
+        icon="fas fa-long-arrow-alt-down"
+        class="p-button-success p-button-sm mr-2"
+        @click.prevent="thanhtoan()"
+      >
       </Button>
     </div>
   </div>
@@ -53,13 +93,14 @@ import { onMounted, ref } from "vue";
 import { useMuahang } from "../../stores/muahang";
 import { storeToRefs } from "pinia";
 import muahangApi from "../../api/muahangApi";
-import Button from 'primevue/button';
+import Button from "primevue/button";
 import { useAuth } from "../../stores/auth";
 import { useToast } from "primevue/usetoast";
 import { download } from "../../utilities/util";
 const toast = useToast();
 const store_muahang = useMuahang();
-const { model, tabviewActive, waiting, list_uynhiemchi, chonmua } = storeToRefs(store_muahang);
+const { model, tabviewActive, waiting, list_uynhiemchi, chonmua } =
+  storeToRefs(store_muahang);
 
 const store = useAuth();
 const { is_admin, is_Cungung, is_Ketoan } = storeToRefs(store);
@@ -69,7 +110,7 @@ const fileChange = (e) => {
   var parents = $(e.target).parents(".custom-file");
   var label = $(".custom-file-label", parents);
   label.text(e.target.files.length + " Files");
-}
+};
 const thanhtoan = async () => {
   var params = {};
   params.muahang_id = model.value.id;
@@ -94,7 +135,7 @@ const thanhtoan = async () => {
   store_muahang.load_data(model.value.id);
   waiting.value = false;
   emit("next");
-}
+};
 
 const thongbaothanhtoan = async () => {
   // visibleDialog.value = false;
@@ -107,10 +148,8 @@ const thongbaothanhtoan = async () => {
       life: 3000,
     });
   }
-}
-onMounted(() => {
-
-})
+};
+onMounted(() => {});
 </script>
 
 <style lang="scss"></style>

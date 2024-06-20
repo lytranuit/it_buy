@@ -723,8 +723,10 @@ namespace it_template.Areas.V1.Controllers
             int pageSize = length != null ? Convert.ToInt32(length) : 0;
             var name = Request.Form["filters[name]"].FirstOrDefault();
             var code = Request.Form["filters[code]"].FirstOrDefault();
+            var priority_id_string = Request.Form["filters[priority_id]"].FirstOrDefault();
             var id_text = Request.Form["filters[id]"].FirstOrDefault();
             int id = id_text != null ? Convert.ToInt32(id_text) : 0;
+            int priority_id = priority_id_string != null ? Convert.ToInt32(priority_id_string) : 0;
             var department_id_string = Request.Form["department_id"].FirstOrDefault();
             int department_id = department_id_string != null ? Convert.ToInt32(department_id_string) : 0;
             var type_id_string = Request.Form["type_id"].FirstOrDefault();
@@ -772,6 +774,10 @@ namespace it_template.Areas.V1.Controllers
             {
                 customerData = customerData.Where(d => d.id == id);
             }
+            if (priority_id != 0)
+            {
+                customerData = customerData.Where(d => d.priority_id == priority_id);
+            }
             int recordsFiltered = customerData.Count();
             var datapost = customerData.OrderByDescending(d => d.id).Skip(skip).Take(pageSize).Include(d => d.user_created_by).Include(d => d.chitiet).ThenInclude(d => d.muahang_chitiet).ThenInclude(d => d.muahang).ToList();
             var data = new ArrayList();
@@ -800,6 +806,7 @@ namespace it_template.Areas.V1.Controllers
                     user_created_by = record.user_created_by,
                     status_id = record.status_id,
                     created_at = record.created_at,
+                    priority_id = record.priority_id,
                     list_muahang = muahang
                 };
                 data.Add(data1);
@@ -831,7 +838,9 @@ namespace it_template.Areas.V1.Controllers
 
             var filterTable = Request.Form["filterTable"].FirstOrDefault();
             var dutru_id_string = Request.Form["dutru_id"].FirstOrDefault();
+            var department_id_string = Request.Form["department_id"].FirstOrDefault();
             int dutru_id = dutru_id_string != null ? Convert.ToInt32(dutru_id_string) : 0;
+            int department_id = department_id_string != null ? Convert.ToInt32(department_id_string) : 0;
 
             var departments = _context.UserDepartmentModel.Where(d => d.user_id == user_id).Select(d => d.department_id).ToList();
             var is_CungungNVL = departments.Contains(29) == true;
@@ -846,10 +855,25 @@ namespace it_template.Areas.V1.Controllers
                 .Include(d => d.muahang_chitiet).ThenInclude(d => d.muahang)
                 .Include(d => d.dutru).Where(d => d.dutru.status_id == (int)Status.EsignSuccess && d.date_huy == null);
 
-            //if (is_CungungNVL && is_CungungGiantiep)
-            //{
+            if (!is_CungungNVL && !is_CungungGiantiep && !is_CungungHCTT)
+            {
+                if (department_id != null && department_id != 0)
+                {
+                    customerData = customerData.Where(d => d.dutru.bophan_id == department_id);
+                }
+                else
+                {
+                    customerData = customerData.Where(d => d.dutru.created_by == user_id);
+                }
+            }
+            else
+            {
+                if (type_id != null && type_id != 0)
+                {
+                    customerData = customerData.Where(d => d.dutru.type_id == type_id);
+                }
+            }
 
-            //}
             if (filterTable != null && filterTable == "Chưa xử lý")
             {
                 customerData = customerData.Where(d => d.muahang_chitiet.Count() == 0);
@@ -858,10 +882,12 @@ namespace it_template.Areas.V1.Controllers
             {
                 customerData = customerData.Where(d => d.muahang_chitiet.Count() > 0);
             }
-            if (type_id != null && type_id != 0)
-            {
-                customerData = customerData.Where(d => d.dutru.type_id == type_id);
-            }
+
+
+
+
+
+
             if (dutru_id != null && dutru_id != 0)
             {
                 customerData = customerData.Where(d => d.dutru_id == dutru_id);
@@ -957,6 +983,7 @@ namespace it_template.Areas.V1.Controllers
                     nhasx = nhasx,
                     mahh = mahh1,
                     tenhh = tenhh1,
+                    is_new = record.is_new,
                     grade = record.grade,
                     masothietke = record.masothietke,
                     dvt = record.dvt,
@@ -969,7 +996,8 @@ namespace it_template.Areas.V1.Controllers
                         id = dutru.id,
                         name = dutru.name,
                         code = dutru.code,
-                        type_id = dutru.type_id
+                        type_id = dutru.type_id,
+                        priority_id = dutru.priority_id,
                     },
                     list_muahang = list_muahang
                 });
@@ -1131,7 +1159,11 @@ namespace it_template.Areas.V1.Controllers
             //string current_user_id = UserManager.GetUserId(currentUser); // Get user id:
 
 
-            return Json(new { success = 1, comments });
+            return Json(new { success = 1, comments }, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            });
         }
         [HttpPost]
         public async Task<IActionResult> thongbaodoima(int dutru_chitiet_id, string hh_id)

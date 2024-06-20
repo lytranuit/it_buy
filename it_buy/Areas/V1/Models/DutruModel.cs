@@ -12,6 +12,7 @@ namespace Vue.Models
         public int id { get; set; }
         public string? code { get; set; }
         public string? name { get; set; }
+        public int? priority_id { get; set; }
         public int? bophan_id { get; set; }
         [ForeignKey("bophan_id")]
         public virtual DepartmentModel? bophan { get; set; }
@@ -64,5 +65,15 @@ namespace Vue.Models
         DatHang = 12,
         [Display(Name = "Chấp nhận thanh toán")]
         ThanhtoanSuccess = 13,
+    }
+    enum Priority
+    {
+        [Display(Name = "Bình thường")]
+        Normal = 1,
+        [Display(Name = "Ưu tiên")]
+        High = 2,
+        [Display(Name = "Gấp")]
+        Urgent = 3,
+        
     }
 }

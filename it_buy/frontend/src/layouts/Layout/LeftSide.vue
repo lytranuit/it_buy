@@ -19,7 +19,7 @@
           <span>Dự trù</span>
         </router-link>
       </li>
-      <li v-if="is_CungungGiantiep || is_CungungNVL || is_CungungHCTT">
+      <li>
         <router-link class="nav-link" to="/hanghoa">
           <i class="fab fa-product-hunt"></i>
           <span>Tổng hợp hàng hóa</span>
@@ -31,7 +31,6 @@
           <i class="fas fa-store"></i>
           <span>Đề nghị mua hàng</span>
         </router-link>
-
       </li>
       <li v-if="is_Ketoan">
         <router-link class="nav-link" to="/muahang/thanhtoan">
@@ -56,7 +55,9 @@
 
         <ul class="nav-second-level" aria-expanded="false">
           <li class="nav-item">
-            <router-link class="nav-link" to="/user"><i class="ti-control-record"></i>{{ $t("user") }}</router-link>
+            <router-link class="nav-link" to="/user"
+              ><i class="ti-control-record"></i>{{ $t("user") }}</router-link
+            >
           </li>
         </ul>
       </li>
@@ -69,14 +70,19 @@
 
         <ul class="nav-second-level" aria-expanded="false">
           <li class="nav-item">
-            <router-link class="nav-link" to="/materials"><i class="ti-control-record"></i>Danh mục hàng
-              hóa</router-link>
+            <router-link class="nav-link" to="/materials"
+              ><i class="ti-control-record"></i>Danh mục hàng hóa</router-link
+            >
           </li>
           <li class="nav-item" v-if="is_Cungung">
-            <router-link class="nav-link" to="/supplier"><i class="ti-control-record"></i>Nhà cung cấp</router-link>
+            <router-link class="nav-link" to="/supplier"
+              ><i class="ti-control-record"></i>Nhà cung cấp</router-link
+            >
           </li>
           <li class="nav-item" v-if="is_Cungung">
-            <router-link class="nav-link" to="/producer"><i class="ti-control-record"></i>Nhà sản xuất</router-link>
+            <router-link class="nav-link" to="/producer"
+              ><i class="ti-control-record"></i>Nhà sản xuất</router-link
+            >
           </li>
         </ul>
       </li>
@@ -93,10 +99,17 @@ import { onMounted, ref } from "vue";
 import { useLayout } from "../composables/layout";
 import { storeToRefs } from "pinia";
 
-
 const { initMetisMenu, initActiveMenu } = useLayout();
 const store = useAuth();
-const { is_admin, is_Cungung, is_Ketoan, is_CungungNVL, is_Qa, is_CungungGiantiep, is_CungungHCTT } = storeToRefs(store);
+const {
+  is_admin,
+  is_Cungung,
+  is_Ketoan,
+  is_CungungNVL,
+  is_Qa,
+  is_CungungGiantiep,
+  is_CungungHCTT,
+} = storeToRefs(store);
 onMounted(() => {
   initMetisMenu();
   initActiveMenu();

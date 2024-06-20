@@ -276,7 +276,11 @@ namespace Vue.Controllers
                 && (d.loaithanhtoan == "tra_sau" || (d.loaithanhtoan == "tra_truoc" && d.is_thanhtoan == true)))
                 .Select(d => d.id)
                 .ToList();
-            var chitiet = _context.MuahangChitietModel.Where(d => customerData1.Contains(d.muahang_id)).Include(d => d.muahang).Include(d => d.dutru_chitiet).ThenInclude(d => d.dutru).ThenInclude(d => d.user_created_by).ToList();
+            var chitiet = _context.MuahangChitietModel.Where(d => customerData1.Contains(d.muahang_id) && d.date_nhanhang == null)
+                .Include(d => d.muahang)
+                .Include(d => d.dutru_chitiet)
+                .ThenInclude(d => d.dutru)
+                .ThenInclude(d => d.user_created_by).ToList();
             var data_nhanhang = chitiet.GroupBy(d => d.dutru_chitiet.dutru.user_created_by).Select(d => new
             {
                 user = d.Key,

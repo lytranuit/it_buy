@@ -5,122 +5,290 @@
         <PopupDutru></PopupDutru>
         <div class="ml-auto d-flex align-items-center">
           <span>Bộ phận:</span>
-          <div style="width: 200px;margin-left: 10px;">
-            <DepartmentOfUserTreeSelect v-model="department_id" @update:model-value="loadLazyData">
+          <div style="width: 200px; margin-left: 10px">
+            <DepartmentOfUserTreeSelect
+              v-model="department_id"
+              @update:model-value="loadLazyData"
+            >
             </DepartmentOfUserTreeSelect>
           </div>
-
         </div>
       </div>
       <div class="card-body">
-        <DataTable class="dt-responsive-table" showGridlines :value="datatable" :lazy="true" ref="dt"
-          scrollHeight="70vh" v-model:selection="selectedProducts" :paginator="true" :rowsPerPageOptions="[10, 50, 100]"
-          :rows="rows" :totalRecords="totalRecords" @page="onPage($event)" :rowHover="true" :loading="loading"
-          responsiveLayout="scroll" :resizableColumns="true" columnResizeMode="expand" v-model:filters="filters"
-          filterDisplay="menu">
+        <DataTable
+          class="dt-responsive-table"
+          showGridlines
+          :value="datatable"
+          :lazy="true"
+          ref="dt"
+          scrollHeight="70vh"
+          v-model:selection="selectedProducts"
+          :paginator="true"
+          :rowsPerPageOptions="[10, 50, 100]"
+          :rows="rows"
+          :totalRecords="totalRecords"
+          @page="onPage($event)"
+          :rowHover="true"
+          :loading="loading"
+          responsiveLayout="scroll"
+          :resizableColumns="true"
+          columnResizeMode="expand"
+          v-model:filters="filters"
+          filterDisplay="menu"
+        >
           <template #header>
             <div class="d-md-flex align-items-center">
               <div style="width: 200px">
-                <TreeSelect :options="columns" v-model="showing" multiple :limit="0"
-                  :limitText="(count) => 'Hiển thị: ' + count + ' cột'">
+                <TreeSelect
+                  :options="columns"
+                  v-model="showing"
+                  multiple
+                  :limit="0"
+                  :limitText="(count) => 'Hiển thị: ' + count + ' cột'"
+                >
                 </TreeSelect>
               </div>
               <div class="ml-auto">
-                <SelectButton v-model="filterTable" :options="list_filterTable" aria-labelledby="basic"
-                  :pt="{ 'button': 'form-control-sm' }" @change="loadLazyData" optionValue="value" :allowEmpty="false">
+                <SelectButton
+                  v-model="filterTable"
+                  :options="list_filterTable"
+                  aria-labelledby="basic"
+                  :pt="{ button: 'form-control-sm' }"
+                  @change="loadLazyData"
+                  optionValue="value"
+                  :allowEmpty="false"
+                >
                   <template #option="slotProps">
                     {{ slotProps.option.label }}
                   </template>
                 </SelectButton>
               </div>
-
             </div>
-
           </template>
 
           <template #empty> Không có dữ liệu. </template>
-          <Column v-for="col of selectedColumns" :field="col.data" :header="col.label" :key="col.data"
-            :showFilterMatchModes="false">
-
+          <Column
+            v-for="col of selectedColumns"
+            :field="col.data"
+            :header="col.label"
+            :key="col.data"
+            :showFilterMatchModes="false"
+          >
             <template #body="slotProps">
-
               <span class="ui-column-title">{{ col.label }}</span>
               <div class="ui-column-data">
                 <template v-if="col.data == 'id'">
-                  <RouterLink :to="'/dutru/edit/' + slotProps.data[col.data]">
+                  <router-link :to="'/dutru/edit/' + slotProps.data[col.data]">
                     <i class="fas fa-pencil-alt mr-2"></i>
                     {{ slotProps.data[col.data] }}
-                  </RouterLink>
+                  </router-link>
                 </template>
 
                 <template v-else-if="col.data == 'name'">
                   <div>
-                    <div style="text-wrap: pretty;">
-                      <RouterLink :to="'/dutru/edit/' + slotProps.data.id" class="text-blue">{{ slotProps.data.name }}
-                      </RouterLink>
+                    <div style="text-wrap: pretty">
+                      <router-link
+                        :to="'/dutru/edit/' + slotProps.data.id"
+                        class="text-blue"
+                        >{{ slotProps.data.name }}
+                      </router-link>
                     </div>
-                    <small>Tạo bởi <i>{{ slotProps.data.user_created_by?.FullName }}</i> lúc {{
-              formatDate(slotProps.data.created_at, "YYYY-MM-DD HH:mm") }}</small>
+                    <small
+                      >Tạo bởi
+                      <i>{{ slotProps.data.user_created_by?.FullName }}</i> lúc
+                      {{
+                        formatDate(
+                          slotProps.data.created_at,
+                          "YYYY-MM-DD HH:mm"
+                        )
+                      }}</small
+                    >
                   </div>
                 </template>
 
                 <template v-else-if="col.data == 'list_muahang'">
                   <div v-for="item of slotProps.data[col.data]" :key="item.id">
-                    <RouterLink :to="'/muahang/edit/' + item.id" class="text-primary mr-2" v-if="is_Cungung">{{ item.id
-                      }} - {{ item.code
-                      }}
+                    <RouterLink
+                      :to="'/muahang/edit/' + item.id"
+                      class="text-primary mr-2"
+                      v-if="is_Cungung"
+                      >{{ item.id }} - {{ item.code }}
                     </RouterLink>
-                    <RouterLink :to="'/muahang/nhanhang/' + item.id" class="text-primary mr-2"
-                      v-else-if="item['is_dathang'] && ((item['loaithanhtoan'] == 'tra_sau' && !item['is_nhanhang']) || (item['loaithanhtoan'] == 'tra_truoc' && item['is_thanhtoan']))">
-                      {{ item.id
-                      }} - {{ item.code
-                      }}
+                    <RouterLink
+                      :to="'/muahang/nhanhang/' + item.id"
+                      class="text-primary mr-2"
+                      v-else-if="
+                        item['is_dathang'] &&
+                        ((item['loaithanhtoan'] == 'tra_sau' &&
+                          !item['is_nhanhang']) ||
+                          (item['loaithanhtoan'] == 'tra_truoc' &&
+                            item['is_thanhtoan']))
+                      "
+                    >
+                      {{ item.id }} - {{ item.code }}
                     </RouterLink>
-                    <span class="mr-2" v-else>{{ item.id }} - {{ item.code
-                      }}
+                    <span class="mr-2" v-else
+                      >{{ item.id }} - {{ item.code }}
                     </span>
-                    <Tag value="Hoàn thành" severity="success" v-if="item['date_finish']" />
-                    <Tag value="Chờ nhận hàng" severity="info"
-                      v-else-if="item['is_dathang'] && ((item['loaithanhtoan'] == 'tra_sau' && !item['is_nhanhang']) || (item['loaithanhtoan'] == 'tra_truoc' && item['is_thanhtoan']))" />
-                    <Tag value="Chờ thanh toán" severity="info"
-                      v-else-if="item['is_dathang'] && ((item['loaithanhtoan'] == 'tra_truoc' && !item['is_thanhtoan']) || (item['loaithanhtoan'] == 'tra_sau' && item['is_nhanhang']))" />
-                    <Tag value="Đang thực hiện" severity="secondary" v-else-if="item['status_id'] == 1" />
-                    <Tag value="Đang gửi và nhận báo giá" severity="warning" v-else-if="item['status_id'] == 6" />
-                    <Tag value="So sánh giá" severity="warning" v-else-if="item['status_id'] == 7" />
-                    <Tag value="Đang trình ký" severity="warning" v-else-if="item['status_id'] == 8" />
-                    <Tag value="Chờ ký duyệt" severity="warning" v-else-if="item['status_id'] == 9" />
+                    <Tag
+                      value="Hoàn thành"
+                      severity="success"
+                      v-if="item['date_finish']"
+                    />
+                    <Tag
+                      value="Chờ nhận hàng"
+                      severity="info"
+                      v-else-if="
+                        item['is_dathang'] &&
+                        ((item['loaithanhtoan'] == 'tra_sau' &&
+                          !item['is_nhanhang']) ||
+                          (item['loaithanhtoan'] == 'tra_truoc' &&
+                            item['is_thanhtoan']))
+                      "
+                    />
+                    <Tag
+                      value="Chờ thanh toán"
+                      severity="info"
+                      v-else-if="
+                        item['is_dathang'] &&
+                        ((item['loaithanhtoan'] == 'tra_truoc' &&
+                          !item['is_thanhtoan']) ||
+                          (item['loaithanhtoan'] == 'tra_sau' &&
+                            item['is_nhanhang']))
+                      "
+                    />
+                    <Tag
+                      value="Đang thực hiện"
+                      severity="secondary"
+                      v-else-if="item['status_id'] == 1"
+                    />
+                    <Tag
+                      value="Đang gửi và nhận báo giá"
+                      severity="warning"
+                      v-else-if="item['status_id'] == 6"
+                    />
+                    <Tag
+                      value="So sánh giá"
+                      severity="warning"
+                      v-else-if="item['status_id'] == 7"
+                    />
+                    <Tag
+                      value="Đang trình ký"
+                      severity="warning"
+                      v-else-if="item['status_id'] == 8"
+                    />
+                    <Tag
+                      value="Chờ ký duyệt"
+                      severity="warning"
+                      v-else-if="item['status_id'] == 9"
+                    />
                     <Tag value="Đã duyệt" v-else-if="item['status_id'] == 10" />
-                    <Tag value="Không duyệt" severity="danger" v-else-if="item['status_id'] == 11" />
+                    <Tag
+                      value="Không duyệt"
+                      severity="danger"
+                      v-else-if="item['status_id'] == 11"
+                    />
+                  </div>
+                </template>
+                <template v-else-if="col.data == 'priority_id'">
+                  <div class="text-center">
+                    <Tag
+                      value="Bình thường"
+                      size="small"
+                      v-if="slotProps.data['priority_id'] == 1"
+                    />
+                    <Tag
+                      value="Ưu tiên"
+                      severity="warning"
+                      size="small"
+                      v-else-if="slotProps.data['priority_id'] == 2"
+                    />
+                    <Tag
+                      value="Gấp"
+                      severity="danger"
+                      size="small"
+                      v-else-if="slotProps.data['priority_id'] == 3"
+                    />
                   </div>
                 </template>
 
                 <template v-else-if="col.data == 'status_id'">
                   <div class="text-center">
-                    <Tag value="Hoàn thành" severity="success" size="small" v-if="slotProps.data['date_finish']" />
-                    <Tag value="Nháp" severity="secondary" size="small" v-else-if="slotProps.data[col.data] == 1" />
-                    <Tag value="Đang trình ký" severity="warning" size="small"
-                      v-else-if="slotProps.data[col.data] == 2" />
-                    <Tag value="Chờ ký duyệt" severity="warning" size="small"
-                      v-else-if="slotProps.data[col.data] == 3" />
-                    <Tag value="Đã duyệt" severity="success" size="small" v-else-if="slotProps.data[col.data] == 4" />
-                    <Tag value="Không duyệt" severity="danger" size="small" v-else-if="slotProps.data[col.data] == 5" />
+                    <Tag
+                      value="Hoàn thành"
+                      severity="success"
+                      size="small"
+                      v-if="slotProps.data['date_finish']"
+                    />
+                    <Tag
+                      value="Nháp"
+                      severity="secondary"
+                      size="small"
+                      v-else-if="slotProps.data[col.data] == 1"
+                    />
+                    <Tag
+                      value="Đang trình ký"
+                      severity="warning"
+                      size="small"
+                      v-else-if="slotProps.data[col.data] == 2"
+                    />
+                    <Tag
+                      value="Chờ ký duyệt"
+                      severity="warning"
+                      size="small"
+                      v-else-if="slotProps.data[col.data] == 3"
+                    />
+                    <Tag
+                      value="Đã duyệt"
+                      severity="success"
+                      size="small"
+                      v-else-if="slotProps.data[col.data] == 4"
+                    />
+                    <Tag
+                      value="Không duyệt"
+                      severity="danger"
+                      size="small"
+                      v-else-if="slotProps.data[col.data] == 5"
+                    />
                   </div>
                 </template>
 
                 <div v-else v-html="slotProps.data[col.data]"></div>
               </div>
-
             </template>
 
-            <template #filter="{ filterModel, filterCallback }" v-if="col.filter == true">
-              <InputText type="text" v-model="filterModel.value" @keydown.enter="filterCallback()"
-                class="p-column-filter" />
+            <template
+              #filter="{ filterModel, filterCallback }"
+              v-if="col.filter == true"
+            >
+              <template v-if="col.data == 'priority_id'">
+                <select
+                  class="form-control"
+                  v-model="filterModel.value"
+                  @change="filterCallback()"
+                >
+                  <option value="1">Bình thường</option>
+                  <option value="2">Ưu tiên</option>
+                  <option value="3">Gấp</option>
+                </select>
+              </template>
+              <template v-else>
+                <InputText
+                  type="text"
+                  v-model="filterModel.value"
+                  @keydown.enter="filterCallback()"
+                  class="p-column-filter"
+              /></template>
             </template>
           </Column>
           <Column style="width: 1rem">
             <template #body="slotProps">
-              <a class="p-link text-danger font-16" @click="confirmDelete(slotProps.data['id'])"
-                v-if="slotProps.data.created_by == user.id"><i class="pi pi-trash"></i></a>
+              <a
+                class="p-link text-danger font-16"
+                @click="confirmDelete(slotProps.data['id'])"
+                v-if="slotProps.data.created_by == user.id"
+                ><i class="pi pi-trash"></i
+              ></a>
             </template>
           </Column>
         </DataTable>
@@ -146,14 +314,23 @@ import { storeToRefs } from "pinia";
 import PopupDutru from "./PopupDutru.vue";
 import DepartmentOfUserTreeSelect from "../TreeSelect/DepartmentOfUserTreeSelect.vue";
 const store = useAuth();
-const { is_admin, is_Cungung, is_Ketoan, is_CungungNVL, is_Qa, is_CungungGiantiep, is_CungungHCTT, user } = storeToRefs(store);
+const {
+  is_admin,
+  is_Cungung,
+  is_Ketoan,
+  is_CungungNVL,
+  is_Qa,
+  is_CungungGiantiep,
+  is_CungungHCTT,
+  user,
+} = storeToRefs(store);
 // const props = defineProps({
 //   type: Number
 // })
 const confirm = useConfirm();
 const datatable = ref();
 const department_id = ref();
-const list_filterTable = ref([{ 'label': "Tôi tạo", value: null }]);
+const list_filterTable = ref([{ label: "Tôi tạo", value: null }]);
 const filterTable = ref();
 const columns = ref([
   {
@@ -180,12 +357,19 @@ const columns = ref([
   },
   {
     id: 3,
+    label: "Độ ưu tiên",
+    data: "priority_id",
+    className: "text-center",
+    filter: true,
+  },
+  {
+    id: 4,
     label: "Trạng thái",
     data: "status_id",
     className: "text-center",
   },
   {
-    id: 4,
+    id: 5,
     label: "DNMH",
     data: "list_muahang",
     className: "text-center",
@@ -195,6 +379,7 @@ const filters = ref({
   id: { value: null, matchMode: FilterMatchMode.CONTAINS },
   code: { value: null, matchMode: FilterMatchMode.CONTAINS },
   name: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  priority_id: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
 const totalRecords = ref(0);
 const loading = ref(true);
@@ -218,7 +403,7 @@ const lazyParams = computed(() => {
     length: rows.value,
     filters: data_filters,
     type_id: filterTable.value,
-    department_id: department_id.value
+    department_id: department_id.value,
   };
 });
 const dt = ref(null);
@@ -265,7 +450,6 @@ onMounted(() => {
   loadLazyData();
 });
 const fill = () => {
-
   if (is_Cungung.value) {
     list_filterTable.value.push({ label: "Phân công cho tôi", value: 100 });
   }
@@ -289,7 +473,7 @@ const fill = () => {
       filterTable.value = 100;
     }
   }
-}
+};
 const waiting = ref();
 watch(filters, async (newa, old) => {
   first.value = 0;

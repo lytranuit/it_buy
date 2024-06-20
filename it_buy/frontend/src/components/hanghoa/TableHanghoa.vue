@@ -31,6 +31,7 @@
           icon="pi pi-plus"
           class="p-button-success p-button-sm"
           :disabled="!selected || !selected.length"
+          v-if="is_CungungGiantiep || is_CungungNVL || is_CungungHCTT"
           @click="taodenghimuahang()"
         ></Button>
 
@@ -43,7 +44,22 @@
             @change="loadLazyData"
           />
         </div>
-        <div class="ml-3" v-if="!dutru_id">
+        <div
+          style="width: 200px; margin-left: 10px; font-size: 12px"
+          v-if="!is_CungungGiantiep && !is_CungungNVL && !is_CungungHCTT"
+        >
+          <DepartmentOfUserTreeSelect
+            v-model="department_id"
+            @update:model-value="loadLazyData"
+          >
+          </DepartmentOfUserTreeSelect>
+        </div>
+        <div
+          class="ml-3"
+          v-if="
+            !dutru_id && (is_CungungGiantiep || is_CungungNVL || is_CungungHCTT)
+          "
+        >
           <SelectButton
             v-model="filterTable"
             :options="list_filterTable"
@@ -86,6 +102,26 @@
             class="text-primary"
             >{{ slotProps.data.dutru.code }}</RouterLink
           >
+          <Tag
+            value="Bình thường"
+            size="small"
+            class="ml-2"
+            v-if="slotProps.data.dutru['priority_id'] == 1"
+          />
+          <Tag
+            value="Ưu tiên"
+            severity="warning"
+            size="small"
+            class="ml-2"
+            v-else-if="slotProps.data.dutru['priority_id'] == 2"
+          />
+          <Tag
+            value="Gấp"
+            severity="danger"
+            size="small"
+            class="ml-2"
+            v-else-if="slotProps.data.dutru['priority_id'] == 3"
+          />
         </template>
 
         <template v-else-if="col.data == 'list_muahang'">
@@ -93,8 +129,10 @@
             <RouterLink
               :to="'/muahang/edit/' + item.id"
               class="text-primary mr-2"
+              v-if="is_CungungGiantiep || is_CungungNVL || is_CungungHCTT"
               >{{ item.id }} - {{ item.code }}
             </RouterLink>
+            <span class="mr-2" v-else>{{ item.id }} - {{ item.code }}</span>
             <Tag
               value="Hoàn thành"
               severity="success"
@@ -159,7 +197,9 @@
         </template>
 
         <template v-else-if="col.data == 'thanhtien'">
-          {{ formatPrice(slotProps.data[col.data], 0) }} VNĐ
+          <div v-if="is_CungungGiantiep || is_CungungNVL || is_CungungHCTT">
+            {{ formatPrice(slotProps.data[col.data], 0) }} VNĐ
+          </div>
         </template>
 
         <template v-else-if="col.data == 'soluong_dutru'">
@@ -183,16 +223,38 @@
         </template>
 
         <template v-else-if="col.data == 'tenhh'">
-          <div style="word-break: break-all; white-space: pre-line">
+          <div
+            style="word-break: break-all; white-space: pre-line; display: flex"
+          >
             {{ slotProps.data[col.data] }}
+            <Tag
+              v-if="
+                slotProps.data.is_new == true &&
+                slotProps.data.dutru.type_id == 1
+              "
+              severity="success"
+              value="Active"
+              class="ml-auto"
+            />
+            <Tag
+              v-else-if="
+                !slotProps.data.is_new && slotProps.data.dutru.type_id == 1
+              "
+              severity="warning"
+              value="Unactive"
+              class="ml-auto"
+            />
           </div>
-          <div v-if="slotProps.data.user" class="small">
-            Phân công cho <i>{{ slotProps.data.user.FullName }}</i>
+          <div class="small">
+            <span v-if="slotProps.data.user">
+              Phân công cho <i>{{ slotProps.data.user.FullName }}</i></span
+            >
             <Tag
               severity="secondary"
               :value="tag"
               v-for="tag in slotProps.data.list_tag"
               class="ml-2"
+              :key="tag"
             ></Tag>
           </div>
         </template>
@@ -350,7 +412,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item, index) in modelDialog.history">
+            <tr v-for="item in modelDialog.history" :key="item.id">
               <th>
                 <RouterLink :to="'/muahang/edit/' + item.muahang.id"
                   >{{ item.muahang.code }} - {{ item.muahang.name }}
@@ -394,6 +456,7 @@ import { useToast } from "primevue/usetoast";
 import Loading from "../Loading.vue";
 import UserTreeSelect from "../../components/TreeSelect/UserTreeSelect.vue";
 import { useAuth } from "../../stores/auth";
+import DepartmentOfUserTreeSelect from "../TreeSelect/DepartmentOfUserTreeSelect.vue";
 
 const store = useAuth();
 const {
@@ -507,6 +570,7 @@ const column_cache = "columns_dutru_chitiet"; ////
 const first = ref(0);
 const rows = ref(20);
 const draw = ref(0);
+const department_id = ref();
 const selectedColumns = computed(() => {
   return columns.value.filter((col) => showing.value.includes(col.id));
 });
@@ -526,6 +590,7 @@ const lazyParams = computed(() => {
     type_id: filterTable.value,
     dutru_id: props.dutru_id,
     filterTable: filterTable1.value,
+    department_id: department_id.value,
   };
 });
 const dt = ref(null);

@@ -10,6 +10,18 @@
     <div class="row mb-2">
       <div class="field col">
         <label for="name"
+          >Nguyên liệu dự trù <span class="text-danger">*</span></label
+        >
+        <div>
+          <dutru-chitiet-tree-select
+            v-model="model.list_dutru_chitiet"
+          ></dutru-chitiet-tree-select>
+        </div>
+      </div>
+    </div>
+    <div class="row mb-2">
+      <div class="field col">
+        <label for="name"
           >Tên nguyên liệu <span class="text-danger">*</span></label
         >
         <div>
@@ -105,8 +117,7 @@ import Dialog from "primevue/dialog";
 import Button from "primevue/button";
 import InputText from "primevue/inputtext";
 import { useDanhgianhacungcap } from "../../stores/danhgianhacungcap";
-import NsxTreeSelect from "../TreeSelect/NsxTreeSelect.vue";
-import NccTreeSelect from "../TreeSelect/NccTreeSelect.vue";
+import DutruChitietTreeSelect from "../TreeSelect/DutruChitietTreeSelect.vue";
 
 const toast = useToast();
 const store_danhgianhacungcap = useDanhgianhacungcap();
@@ -155,6 +166,7 @@ const valid = () => {
   if (!model.value.dvt) return false;
   if (!model.value.nhacc) return false;
   if (!model.value.nhasx) return false;
+  if (!model.value.list_dutru_chitiet) return false;
   return true;
 };
 </script>

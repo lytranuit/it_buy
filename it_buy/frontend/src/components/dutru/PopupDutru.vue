@@ -1,8 +1,18 @@
 ﻿<template>
-  <Button label="Tạo mới" icon="pi pi-plus" class="p-button-success p-button-sm mr-2" @click="visible = true"></Button>
+  <Button
+    label="Tạo mới"
+    icon="pi pi-plus"
+    class="p-button-success p-button-sm mr-2"
+    @click="visible = true"
+  ></Button>
 
-  <Dialog v-model:visible="visible" modal header="Chọn loại hàng hóa" style="width: 500px;"
-    :breakpoints="{ '1199px': '75vw', '575px': '95vw' }">
+  <Dialog
+    v-model:visible="visible"
+    modal
+    header="Chọn loại hàng hóa"
+    style="width: 500px"
+    :breakpoints="{ '1199px': '75vw', '575px': '95vw' }"
+  >
     <div class="row">
       <div class="col-12">
         <div class="process-group" id="accordionselect">
@@ -27,26 +37,22 @@ const visible = ref();
 const groups = ref([
   {
     id: 2,
-    name: "Mua hàng gián tiếp"
+    name: "Mua hàng gián tiếp",
   },
   {
     id: 3,
-    name: "Hóa chất, thuốc thử QC"
+    name: "Hóa chất, thuốc thử QC",
   },
   {
     id: 1,
-    name: "Nguyên vật liệu"
+    name: "Nguyên vật liệu",
   },
 ]);
 const execute = (id) => {
   visible.value = false;
-  router.push(
-    "/dutru/add/" + id
-  );
+  router.push("/dutru/add/" + id);
 };
-onMounted(() => {
-
-});
+onMounted(() => {});
 </script>
 <style scoped>
 .process-group .process {

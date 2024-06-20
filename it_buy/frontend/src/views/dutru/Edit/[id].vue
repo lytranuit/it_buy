@@ -40,7 +40,7 @@
                 <div class="col-12">
                   <Panel header="Dự trù hàng hóa" :toggleable="true">
                     <div class="row">
-                      <div class="col-md-6">
+                      <div class="col-md-12">
                         <div class="form-group row">
                           <b class="col-12 col-lg-12 col-form-label"
                             >Tiêu đề:<i class="text-danger">*</i></b
@@ -52,6 +52,24 @@
                               required
                               :disabled="model.status_id != 1"
                             />
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group row">
+                          <b class="col-12 col-lg-12 col-form-label"
+                            >Độ ưu tiên:<i class="text-danger">*</i></b
+                          >
+                          <div class="col-12 col-lg-12 pt-1">
+                            <select
+                              class="form-control"
+                              v-model="model.priority_id"
+                              :disabled="model.status_id != 1"
+                            >
+                              <option value="1">Bình thường</option>
+                              <option value="2">Ưu tiên</option>
+                              <option value="3">Gấp</option>
+                            </select>
                           </div>
                         </div>
                       </div>
@@ -148,6 +166,7 @@
                       <div class="col-md-12 text-center">
                         <a
                           :href="model.pdf"
+                          target="_blank"
                           :download="download(model.pdf)"
                           class="download-icon-link d-inline-flex align-items-center"
                         >

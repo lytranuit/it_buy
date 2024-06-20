@@ -8,31 +8,71 @@
         <input name="dutru_id" :value="model.id" type="hidden" />
 
         <InputGroup>
-          <input type="file" class="d-none" name='file[]' multiple @change="changeFile" />
-          <DxHtmlEditor v-model:value="text" ref="editor_filecontent" :mentions="mentions_employee"
-            style="width: 100%;">
+          <input
+            type="file"
+            class="d-none"
+            name="file[]"
+            multiple
+            @change="changeFile"
+          />
+          <DxHtmlEditor
+            v-model:value="text"
+            ref="editor_filecontent"
+            :mentions="mentions_employee"
+            style="width: 100%"
+          >
           </DxHtmlEditor>
-          <Button label="" icon="pi pi-file" size="small" severity="success" @click="AddCommentFile"></Button>
+          <Button
+            label=""
+            icon="pi pi-file"
+            size="small"
+            severity="success"
+            @click="AddCommentFile"
+          ></Button>
 
-          <Button label="Gửi" icon="pi pi-send" size="small" @click="add_comment"></Button>
+          <Button
+            label="Gửi"
+            icon="pi pi-send"
+            size="small"
+            @click="add_comment"
+          ></Button>
         </InputGroup>
         <div v-html="uploadText" v-if="uploadText" class="mt-2"></div>
       </form>
       <hr />
       <ul class="list-unstyled" id="comment_box">
-        <li class="media comment_box my-2" :data-read="comment.is_read" v-for="(comment, index) in comments">
-          <img class="mr-3 rounded-circle" :src="comment.user.image_url" width="50" alt="" />
+        <li
+          class="media comment_box my-2"
+          :data-read="comment.is_read"
+          v-for="(comment, index) in comments"
+        >
+          <img
+            class="mr-3 rounded-circle"
+            :src="comment.user.image_url"
+            width="50"
+            alt=""
+          />
           <div class="media-body border-bottom" style="display: grid">
-            <h5 class="mt-0 mb-1" style="font-size: 14px;">
+            <h5 class="mt-0 mb-1" style="font-size: 14px">
               {{ comment.user.FullName }}
               <small class="text-muted">
                 -
-                {{ formatDate(comment.created_at, "HH:mm DD/MM/YYYY") }}</small>
+                {{ formatDate(comment.created_at, "HH:mm DD/MM/YYYY") }}</small
+              >
             </h5>
-            <div class="mb-2" style="white-space: pre-wrap;word-break: break-word;" v-html="comment.comment"></div>
+            <div
+              class="mb-2"
+              style="white-space: pre-wrap; word-break: break-word"
+              v-html="comment.comment"
+            ></div>
             <div class="mb-2 attach_file file-box-content">
-              <div class="file-box" v-for="(file, index1) in comment.files">
-                <a :href="file.url" :download="download(file.name)" class="download-icon-link">
+              <div class="file-box" v-for="file in comment.files">
+                <a
+                  :href="file.url"
+                  target="_blank"
+                  :download="download(file.name)"
+                  class="download-icon-link"
+                >
                   <i class="dripicons-download file-download-icon"></i>
 
                   <div class="text-center">
@@ -61,12 +101,10 @@ import { download, formatDate } from "../../utilities/util";
 import { useDutru } from "../../stores/dutru";
 import { storeToRefs } from "pinia";
 import dutruApi from "../../api/dutruApi";
-import InputGroup from 'primevue/inputgroup';
-import Button from 'primevue/button';
+import InputGroup from "primevue/inputgroup";
+import Button from "primevue/button";
 
-import {
-  DxHtmlEditor,
-} from 'devextreme-vue/html-editor';
+import { DxHtmlEditor } from "devextreme-vue/html-editor";
 import { useAuth } from "../../stores/auth";
 import { useRoute } from "vue-router";
 const route = useRoute();
@@ -87,8 +125,8 @@ const mentions_employee = computed(() => {
       valueExpr: "id",
       marker: "@",
     },
-  ]
-})
+  ];
+});
 const getComments = async () => {
   /// Lấy comments
   var from_id;
@@ -103,13 +141,15 @@ const getComments = async () => {
     $(".load_more").remove();
   }
   comments.value = comments.value.concat(comments_tmp);
-}
+};
 const AddCommentFile = () => {
   $("[name='file[]']").click();
-}
+};
 const changeFile = () => {
-  uploadText.value = $("[name='file[]']")[0].files.length + " Files. Nhấn <i class='pi pi-send'></i> để gửi tin nhắn."
-}
+  uploadText.value =
+    $("[name='file[]']")[0].files.length +
+    " Files. Nhấn <i class='pi pi-send'></i> để gửi tin nhắn.";
+};
 const add_comment = async (e) => {
   e.preventDefault();
   var comment = text.value;
@@ -142,11 +182,11 @@ const add_comment = async (e) => {
     var comment = result.comment;
     comments.value.unshift(comment);
   }
-}
+};
 onMounted(() => {
   getComments();
   store.fetchUsers();
-})
+});
 </script>
 
 <style lang="scss"></style>

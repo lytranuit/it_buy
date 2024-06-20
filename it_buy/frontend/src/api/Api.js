@@ -8,6 +8,9 @@ export default {
   nhacc() {
     return repository.get(`/v1/${resoure}/nhacc`).then((res) => res.data);
   },
+  dutruchitiet() {
+    return repository.get(`/v1/${resoure}/dutruchitiet`).then((res) => res.data);
+  },
   materials() {
     return repository.get(`/v1/${resoure}/materials`).then((res) => res.data);
   },

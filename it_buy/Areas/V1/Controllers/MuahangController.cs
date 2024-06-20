@@ -313,6 +313,22 @@ namespace it_template.Areas.V1.Controllers
             });
         }
         [HttpPost]
+        public async Task<JsonResult> xoancc(int id)
+        {
+            var Model = _context.MuahangNccModel.Where(d => d.id == id).FirstOrDefault();
+
+            _context.Remove(Model);
+            //_context.SaveChanges();
+            var muahang_ncc_chitiet = _context.MuahangNccChitietModel.Where(d => d.muahang_ncc_id == id).ToList();
+
+            _context.RemoveRange(muahang_ncc_chitiet);
+            var muahang_ncc_dinhkem = _context.MuahangNccDinhkemModel.Where(d => d.muahang_ncc_id == id).ToList();
+
+            _context.RemoveRange(muahang_ncc_dinhkem);
+            _context.SaveChanges();
+            return Json(new { success = true });
+        }
+        [HttpPost]
         public async Task<JsonResult> xoadinhkemncc(int id)
         {
             var Model = _context.MuahangNccDinhkemModel.Where(d => d.id == id).FirstOrDefault();
@@ -492,11 +508,13 @@ namespace it_template.Areas.V1.Controllers
         [HttpPost]
         public async Task<JsonResult> saveNcc(List<MuahangNccModel> nccs)
         {
+
             System.Security.Claims.ClaimsPrincipal currentUser = this.User;
 
             var user_id = UserManager.GetUserId(currentUser);
             var user = await UserManager.GetUserAsync(currentUser);
             var muahang_id = 0;
+
             foreach (var item in nccs)
             {
                 muahang_id = item.muahang_id.Value;
@@ -701,7 +719,7 @@ namespace it_template.Areas.V1.Controllers
                         var nhasx = "";
                         if (material != null)
                         {
-                            nhasx = material.nhasanxuat.tennsx;
+                            nhasx = material.nhasanxuat?.tennsx;
                             tieuchuan = material.tieuchuan;
                         }
                         RawDetails.Add(new RawMuahangDetails
