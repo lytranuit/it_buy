@@ -218,7 +218,7 @@ namespace Vue.Data
             }
             var list_talbe2 = new List<string>()
             {
-                "dm_hanghoa","TBL_DANHMUCNHACC","TBL_DANHMUCHANGHOA","TBL_DANHMUCHANGHOA_DINHKEM","TBL_DANHMUCNHASX","TBL_DANHMUCNHOMHANG"
+                "dm_hanghoa","TBL_DANHMUCNHACC","TBL_DANHMUCHANGHOA_MUAHANG","TBL_DANHMUCHANGHOA_DINHKEM","TBL_DANHMUCNHASX","TBL_DANHMUCNHOMHANG"
             };
             //var tableName = "AspNetUsers";
             foreach (var tableName in list_talbe2)

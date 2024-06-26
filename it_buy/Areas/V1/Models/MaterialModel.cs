@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Vue.Models
 {
-    [Table("TBL_DANHMUCHANGHOA")]
+    [Table("TBL_DANHMUCHANGHOA_MUAHANG")]
     public class MaterialModel
     {
         [Key]
