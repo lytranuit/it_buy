@@ -27,9 +27,21 @@ namespace it_template.Areas.V1.Controllers
             UserManager = UserMgr;
         }
 
-        public async Task<JsonResult> DutruChitiet()
+        public async Task<JsonResult> DutruChitiet(int type_id)
         {
-            var All = _context.MaterialModel.ToList();
+            var query = _context.DutruChitietModel
+                .Include(d => d.dutru).Where(d => d.dutru.status_id == (int)Status.EsignSuccess && d.date_huy == null);
+            if (type_id > 0)
+            {
+                query = query.Where(d => d.dutru.type_id == type_id);
+            }
+            var All = query.Select(d => new
+            {
+                id = d.id,
+                mahh = d.mahh,
+                tenhh = d.tenhh,
+                is_danhgia = d.danhgianhacungcap_id > 0 ? true : false,
+            }).ToList();
             //var jsonData = new { data = ProcessModel };
             return Json(All, new System.Text.Json.JsonSerializerOptions()
             {

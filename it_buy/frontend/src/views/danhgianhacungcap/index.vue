@@ -56,14 +56,14 @@
             >
               <template #body="slotProps">
                 <template v-if="col.data == 'id'">
-                  <RouterLink
+                  <router-link
                     :to="
                       '/danhgianhacungcap/details/' + slotProps.data[col.data]
                     "
                   >
                     <i class="fas fa-pencil-alt mr-2"></i>
                     {{ slotProps.data[col.data] }}
-                  </RouterLink>
+                  </router-link>
                 </template>
 
                 <template v-else-if="col.data == 'nhacc'">
@@ -76,16 +76,16 @@
                 <template v-else-if="col.data == 'status_id'">
                   <div class="text-center">
                     <Button
-                      label="Nháp"
-                      class="p-button-secondary"
-                      size="small"
-                      v-if="!slotProps.data['is_thongbao']"
-                    ></Button>
-                    <Button
                       label="Đã chấp nhận"
                       class="p-button-success"
                       size="small"
-                      v-else-if="slotProps.data['is_chapnhan']"
+                      v-if="slotProps.data['is_chapnhan']"
+                    ></Button>
+                    <Button
+                      label="Nháp"
+                      class="p-button-secondary"
+                      size="small"
+                      v-else-if="!slotProps.data['is_thongbao']"
                     ></Button>
                     <Button
                       label="Đang duyệt"
@@ -110,7 +110,11 @@
                   </div>
                 </template>
 
-                <div v-else v-html="slotProps.data[col.data]"></div>
+                <div
+                  v-else
+                  v-html="slotProps.data[col.data]"
+                  style="white-space: break-spaces"
+                ></div>
               </template>
 
               <template
@@ -163,6 +167,7 @@ const store_danhgianhacungcap = useDanhgianhacungcap();
 const { waiting, model, headerForm, visibleDialog } = storeToRefs(
   store_danhgianhacungcap
 );
+const openNew = store_danhgianhacungcap.openNew;
 const store = useAuth();
 const { is_CungungNVL, is_Qa, user } = storeToRefs(store);
 const confirm = useConfirm();
@@ -270,12 +275,6 @@ const confirmDelete = (id) => {
       });
     },
   });
-};
-
-const openNew = () => {
-  model.value = {};
-  headerForm.value = "Tạo mới";
-  visibleDialog.value = true;
 };
 
 onMounted(() => {

@@ -44,7 +44,8 @@
         <li
           class="media comment_box my-2"
           :data-read="comment.is_read"
-          v-for="(comment, index) in comments"
+          v-for="comment in comments"
+          :key="comment.id"
         >
           <img
             class="mr-3 rounded-circle"
@@ -66,7 +67,11 @@
               v-html="comment.comment"
             ></div>
             <div class="mb-2 attach_file file-box-content">
-              <div class="file-box" v-for="file in comment.files">
+              <div
+                class="file-box"
+                v-for="file in comment.files"
+                :key="file.id"
+              >
                 <a
                   :href="file.url"
                   target="_blank"

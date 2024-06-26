@@ -164,6 +164,18 @@ namespace it_template.Areas.V1.Controllers
         }
 
         [HttpPost]
+        public async Task<JsonResult> xoadinhkem(List<int> list_id)
+        {
+            var Model = _context.DutruDinhkemModel.Where(d => list_id.Contains(d.id)).ToList();
+            foreach (var item in Model)
+            {
+                item.deleted_at = DateTime.Now;
+            }
+            _context.UpdateRange(Model);
+            _context.SaveChanges();
+            return Json(new { success = true });
+        }
+        [HttpPost]
         public async Task<JsonResult> xoachitietdinhkem(int id)
         {
             var Model = _context.DutruChitietDinhkemModel.Where(d => d.id == id).FirstOrDefault();
@@ -851,7 +863,6 @@ namespace it_template.Areas.V1.Controllers
             //var tenhh = Request.Form["filters[tenhh]"].FirstOrDefault();
             int skip = start != null ? Convert.ToInt32(start) : 0;
             var customerData = _context.DutruChitietModel
-                .Include(d => d.user)
                 .Include(d => d.muahang_chitiet).ThenInclude(d => d.muahang)
                 .Include(d => d.dutru).Where(d => d.dutru.status_id == (int)Status.EsignSuccess && d.date_huy == null);
 
@@ -926,7 +937,10 @@ namespace it_template.Areas.V1.Controllers
             {
                 customerData = customerData.OrderByDescending(d => d.id);
             }
-            var datapost = customerData.Skip(skip).Take(pageSize).ToList();
+            var datapost = customerData.Skip(skip).Take(pageSize)
+                .Include(d => d.danhgianhacungcap)
+                .Include(d => d.user)
+                .ToList();
             var data = new ArrayList();
             foreach (var record in datapost)
             {
@@ -991,6 +1005,8 @@ namespace it_template.Areas.V1.Controllers
                     user = record.user,
                     list_tag = record.list_tag,
                     dutru_chitiet_id = record.id,
+                    danhgianhacungcap_id = record.danhgianhacungcap_id,
+                    danhgianhacungcap_is_chapnhan = record.danhgianhacungcap?.is_chapnhan,
                     dutru = new DutruModel()
                     {
                         id = dutru.id,

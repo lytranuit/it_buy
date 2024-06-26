@@ -1,7 +1,16 @@
 <template>
-  <TreeSelect :options="userdepartments" :multiple="multiple" :modelValue="modelValue" :flat="flat" :name="name"
-    :required="required" :value-consists-of="valueConsistsOf" :append-to-body="true" @update:modelValue="update" 
-    :disableFuzzyMatching="true">
+  <TreeSelect
+    :options="userdepartments"
+    :multiple="multiple"
+    :modelValue="modelValue"
+    :flat="flat"
+    :name="name"
+    :required="required"
+    :value-consists-of="valueConsistsOf"
+    :append-to-body="true"
+    @update:modelValue="update"
+    :disableFuzzyMatching="true"
+  >
   </TreeSelect>
 </template>
 
@@ -41,8 +50,8 @@ const { userdepartments } = storeToRefs(store);
 
 const update = (value) => {
   value = [...new Set(value)];
-  emit('update:modelValue', value)
-}
+  emit("update:modelValue", value);
+};
 onMounted(() => {
   store.fetchUserDepartment();
 });

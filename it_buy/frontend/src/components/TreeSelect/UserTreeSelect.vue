@@ -1,7 +1,18 @@
 <template>
-  <TreeSelect :options="users" :multiple="multiple" :normalizer="normalizer" :modelValue="modelValue" :name="name"
-    :required="required" :append-to-body="appendToBody" @update:modelValue="emit('update:modelValue', $event)"
-    zIndex="3000" :disableFuzzyMatching="true">
+  <TreeSelect
+    :options="users"
+    :multiple="multiple"
+    :normalizer="normalizer"
+    :modelValue="modelValue"
+    :name="name"
+    :required="required"
+    :append-to-body="appendToBody"
+    @update:modelValue="emit('update:modelValue', $event)"
+    zIndex="3000"
+    :disableFuzzyMatching="true"
+    :placeholder="placeholder"
+    :disabled="disabled"
+  >
   </TreeSelect>
 </template>
 
@@ -21,6 +32,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
   required: {
     type: Boolean,
     default: false,
@@ -28,6 +43,10 @@ const props = defineProps({
   name: {
     type: String,
     default: "user",
+  },
+  placeholder: {
+    type: String,
+    default: "Select",
   },
 });
 const emit = defineEmits(["update:modelValue"]);
@@ -37,11 +56,9 @@ const normalizer = (node) => {
   return {
     id: node.id,
     label: node.name,
-  }
-}
+  };
+};
 onMounted(() => {
-
-  store.fetchUsers().then(() => {
-  });
+  store.fetchUsers().then(() => {});
 });
 </script>

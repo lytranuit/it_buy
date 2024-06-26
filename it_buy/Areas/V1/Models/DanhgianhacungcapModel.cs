@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using static iText.Svg.SvgConstants;
 
 namespace Vue.Models
 {
@@ -28,6 +29,9 @@ namespace Vue.Models
         public string? user_chapnhan_id { get; set; }
         [ForeignKey("user_chapnhan_id")]
         public virtual UserModel? user_chapnhan { get; set; }
+
+        public string? note_chapnhan { get; set; }
+        public virtual List<DutruChitietModel> DutruChitietModels { get; set; }
         public bool? is_thongbao { get; set; }
         public bool? is_chapnhan { get; set; }
         public DateTime? date_chapnhan { get; set; }     ///Ngày hoàn thành
@@ -43,6 +47,13 @@ namespace Vue.Models
         //public virtual NsxModel? nhasanxuat { get; set; }
         //public int? mancc { get; set; }
         //public virtual NhacungcapModel? nhacungcap { get; set; }
+        public virtual List<int>? list_dutru_chitiet
+        {
+            get
+            {
+                return DutruChitietModels != null ? DutruChitietModels.Select(d => d.id).ToList() : new List<int>();
+            }
+        }
     }
 
 }

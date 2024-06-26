@@ -34,7 +34,14 @@
           v-if="is_CungungGiantiep || is_CungungNVL || is_CungungHCTT"
           @click="taodenghimuahang()"
         ></Button>
-
+        <Button
+          label="Tạo đánh giá"
+          icon="pi pi-plus"
+          class="p-button-success p-button-sm ml-2"
+          :disabled="checkdanhgia"
+          v-if="is_CungungNVL"
+          @click="taodanhgia()"
+        ></Button>
         <div class="ml-auto">
           <SelectButton
             v-model="filterTable1"
@@ -65,7 +72,7 @@
             :options="list_filterTable"
             aria-labelledby="basic"
             :pt="{ button: 'form-control-sm' }"
-            @change="loadLazyData"
+            @change="changeFilterTable"
             optionValue="value"
             :allowEmpty="false"
           >
@@ -223,39 +230,61 @@
         </template>
 
         <template v-else-if="col.data == 'tenhh'">
-          <div
-            style="word-break: break-all; white-space: pre-line; display: flex"
-          >
-            {{ slotProps.data[col.data] }}
-            <Tag
-              v-if="
-                slotProps.data.is_new == true &&
-                slotProps.data.dutru.type_id == 1
-              "
-              severity="success"
-              value="Active"
-              class="ml-auto"
-            />
-            <Tag
-              v-else-if="
-                !slotProps.data.is_new && slotProps.data.dutru.type_id == 1
-              "
-              severity="warning"
-              value="Unactive"
-              class="ml-auto"
-            />
-          </div>
-          <div class="small">
-            <span v-if="slotProps.data.user">
-              Phân công cho <i>{{ slotProps.data.user.FullName }}</i></span
+          <div class="d-flex">
+            <div>
+              <div
+                style="
+                  word-break: break-all;
+                  white-space: pre-line;
+                  display: flex;
+                "
+                :class="{ 'text-danger': slotProps.data.is_new == true }"
+              >
+                {{ slotProps.data[col.data] }}
+              </div>
+              <div class="small">
+                <span v-if="slotProps.data.user">
+                  Phân công cho <i>{{ slotProps.data.user.FullName }}</i></span
+                >
+                <Tag
+                  severity="secondary"
+                  :value="tag"
+                  v-for="tag in slotProps.data.list_tag"
+                  class="ml-2"
+                  :key="tag"
+                ></Tag>
+              </div>
+            </div>
+            <span
+              class="ml-auto text-center"
+              style="min-width: 100px"
+              v-if="slotProps.data.dutru.type_id == 1"
             >
-            <Tag
-              severity="secondary"
-              :value="tag"
-              v-for="tag in slotProps.data.list_tag"
-              class="ml-2"
-              :key="tag"
-            ></Tag>
+              <div>
+                <Tag
+                  v-if="!slotProps.data.danhgianhacungcap_id"
+                  severity="danger"
+                  value="Chưa đánh giá"
+                />
+                <router-link
+                  :to="
+                    '/danhgianhacungcap/details/' +
+                    slotProps.data.danhgianhacungcap_id
+                  "
+                  v-else
+                >
+                  <Tag
+                    v-if="!slotProps.data.danhgianhacungcap_is_chapnhan"
+                    severity="warning"
+                    value="Đang đánh giá"
+                  /><Tag
+                    v-else-if="slotProps.data.danhgianhacungcap_is_chapnhan"
+                    severity="success"
+                    value="Chấp nhận"
+                  />
+                </router-link>
+              </div>
+            </span>
           </div>
         </template>
         <template v-else>
@@ -428,6 +457,8 @@
       </div>
     </div>
   </Dialog>
+
+  <PopupAdd @save="saveDanhgia"></PopupAdd>
   <Loading :waiting="waiting"></Loading>
 </template>
 <script setup>
@@ -457,6 +488,8 @@ import Loading from "../Loading.vue";
 import UserTreeSelect from "../../components/TreeSelect/UserTreeSelect.vue";
 import { useAuth } from "../../stores/auth";
 import DepartmentOfUserTreeSelect from "../TreeSelect/DepartmentOfUserTreeSelect.vue";
+import PopupAdd from "../danhgianhacungcap/PopupAdd.vue";
+import { useDanhgianhacungcap } from "../../stores/danhgianhacungcap";
 
 const store = useAuth();
 const {
@@ -472,10 +505,39 @@ const {
 
 const list_filterTable = ref([]);
 const filterTable1 = ref();
+
+const store_danhgianhacungcap = useDanhgianhacungcap();
+const danhgianhacungcap = storeToRefs(store_danhgianhacungcap);
+const taodanhgia = () => {
+  store_danhgianhacungcap.openNew();
+  danhgianhacungcap.model.value.list_dutru_chitiet = selected.value.map(
+    (item) => {
+      return item.id;
+    }
+  );
+  let select = selected.value[0];
+  danhgianhacungcap.model.value.tenhh = select.tenhh;
+  danhgianhacungcap.model.value.dvt = select.dvt;
+  danhgianhacungcap.model.value.grade = select.grade;
+  danhgianhacungcap.model.value.masothietke = select.masothietke;
+  danhgianhacungcap.model.value.nhasx = select.nhasx;
+};
+const saveDanhgia = (id) => {
+  // console.log();
+  router.push("/danhgianhacungcap/details/" + id);
+};
+const changeFilterTable = () => {
+  selected.value = null;
+  loadLazyData();
+};
+const checkdanhgia = computed(() => {
+  if (selected.value && selected.value.length > 0) {
+    if (selected.value[0].dutru.type_id == 1) return false;
+  }
+  return true;
+});
 const customClearFilter = (col, callback) => {
-  // console.log(col);
   if (col == "tenhh") customFilter.value.user_id = null;
-  // console.log(filters.value);
   callback();
 };
 

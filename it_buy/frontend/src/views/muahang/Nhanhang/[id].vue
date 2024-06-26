@@ -122,7 +122,26 @@ const savenhanhang = () => {
       }
     });
 };
+
+const load_data = async (id) => {
+  waiting.value = true;
+  var res = await muahangApi.getNhanhang(id);
+  var chitiet = res.chitiet;
+  var muahang_chonmua = res.muahang_chonmua;
+  res.date = res.date ? moment(res.date).format("YYYY-MM-DD") : null;
+  res.nhacungcap_id = muahang_chonmua ? muahang_chonmua.ncc_id : null;
+  delete res.chitiet;
+  delete res.nccs;
+  delete res.uynhiemchi;
+  delete res.user_created_by;
+  delete res.muahang_chonmua;
+  model.value = res;
+  datatable.value = chitiet;
+  chonmua.value = muahang_chonmua;
+
+  waiting.value = false;
+};
 onMounted(() => {
-  storeMuahang.load_data(route.params.id);
+  load_data(route.params.id);
 });
 </script>

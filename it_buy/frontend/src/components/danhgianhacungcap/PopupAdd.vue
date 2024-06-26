@@ -9,12 +9,12 @@
   >
     <div class="row mb-2">
       <div class="field col">
-        <label for="name"
-          >Nguyên liệu dự trù <span class="text-danger">*</span></label
-        >
+        <label for="name">Nguyên liệu dự trù</label>
         <div>
           <dutru-chitiet-tree-select
             v-model="model.list_dutru_chitiet"
+            :multiple="true"
+            :type_id="1"
           ></dutru-chitiet-tree-select>
         </div>
       </div>
@@ -147,7 +147,7 @@ const save = () => {
         detail: "Thành công",
         life: 3000,
       });
-      emit("save", res.data);
+      emit("save", res.id);
     } else {
       toast.add({
         severity: "error",
@@ -166,7 +166,6 @@ const valid = () => {
   if (!model.value.dvt) return false;
   if (!model.value.nhacc) return false;
   if (!model.value.nhasx) return false;
-  if (!model.value.list_dutru_chitiet) return false;
   return true;
 };
 </script>

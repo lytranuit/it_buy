@@ -204,6 +204,11 @@ export default {
       .get(`/v1/${resoure}/get`, { params: { id: id } })
       .then((res) => res.data);
   },
+  getNhanhang(id) {
+    return repository
+      .get(`/v1/${resoure}/getNhanhang`, { params: { id: id } })
+      .then((res) => res.data);
+  },
   getUserNhanhang(id) {
     return repository
       .get(`/v1/${resoure}/getUserNhanhang`, { params: { muahang_id: id } })

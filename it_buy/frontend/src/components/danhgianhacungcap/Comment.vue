@@ -44,7 +44,8 @@
         <li
           class="media comment_box my-2"
           :data-read="comment.is_read"
-          v-for="(comment, index) in comments"
+          v-for="comment in comments"
+          :key="comment.id"
         >
           <img
             class="mr-3 rounded-circle"

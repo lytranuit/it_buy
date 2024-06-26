@@ -14,6 +14,9 @@ namespace Vue.Models
         public string? hh_id { get; set; }
         public decimal? soluong { get; set; }
         public int? status_id { get; set; }
+        public int? danhgianhacungcap_id { get; set; }
+        [ForeignKey("danhgianhacungcap_id")]
+        public DanhgianhacungcapModel? danhgianhacungcap { get; set; }
         public bool? is_new { get; set; }
         public string? note { get; set; }
         public string? note_huy { get; set; }

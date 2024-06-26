@@ -231,6 +231,39 @@ namespace it_template.Areas.V1.Controllers
                 ReferenceHandler = ReferenceHandler.IgnoreCycles,
             });
         }
+        public JsonResult GetNhanhang(int id)
+        {
+            System.Security.Claims.ClaimsPrincipal currentUser = this.User;
+
+            var user_id = UserManager.GetUserId(currentUser);
+            var my_item = _context.DutruChitietModel.Include(d => d.dutru).Where(d => d.dutru.deleted_at == null && d.dutru.created_by == user_id).Select(d => d.id).ToList();
+
+            var data = _context.MuahangModel.Where(d => d.id == id)
+                .Include(d => d.muahang_chonmua).ThenInclude(d => d.ncc)
+                .Include(d => d.chitiet.Where(e => my_item.Contains(e.dutru_chitiet_id)))
+                .ThenInclude(d => d.user_nhanhang).FirstOrDefault();
+            if (data != null)
+            {
+                var stt = 1;
+                foreach (var item in data.chitiet)
+                {
+                    //var material = _context.MaterialModel.Where(d => item.hh_id == "m-" + d.id).FirstOrDefault();
+                    //if (material != null)
+                    //{
+                    //    item.tenhh = material.tenhh;
+                    //    item.mahh = material.mahh;
+                    //    item.stt = stt++;
+                    //}
+                    item.soluong_nhanhang = item.soluong;
+                    item.stt = stt++;
+                }
+            }
+            return Json(data, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            });
+        }
         public JsonResult GetUserNhanhang(int muahang_id)
         {
             var data = new List<string>();
@@ -1078,7 +1111,7 @@ namespace it_template.Areas.V1.Controllers
                 {"nam",now.ToString("yyyy") },
             };
             var bophan = "P. HR&GA";
-            if (user_id == "28dc61a5-001d-4c1f-9325-9b9318dc3c59")
+            if (user_id == "28dc61a5-001d-4c1f-9325-9b9318dc3c59" || user_id == "e9ca633b-ac5c-4f64-9485-10cfe5388d16")
             {
                 bophan = "Cung ứng";
             }

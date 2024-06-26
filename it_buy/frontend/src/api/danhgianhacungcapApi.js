@@ -33,6 +33,19 @@ export default {
       )
       .then((res) => res.data);
   },
+  chapnhanDanhgia(id, note) {
+    return repository
+      .post(
+        `/v1/${resoure}/chapnhanDanhgia`,
+        { id: id, note: note },
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      )
+      .then((res) => res.data);
+  },
   saveDinhkem(params) {
     return repository
       .post(`/v1/${resoure}/saveDinhkem`, params, {
@@ -67,6 +80,11 @@ export default {
   get(id) {
     return repository
       .get(`/v1/${resoure}/Get`, { params: { id: id } })
+      .then((res) => res.data);
+  },
+  getDanhgia(id) {
+    return repository
+      .get(`/v1/${resoure}/getDanhgia`, { params: { id: id } })
       .then((res) => res.data);
   },
   getFiles(id) {

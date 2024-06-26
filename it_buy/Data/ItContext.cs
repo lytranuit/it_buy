@@ -56,6 +56,7 @@ namespace Vue.Data
         public DbSet<DanhgianhacungcapModel> DanhgianhacungcapModel { get; set; }
         public DbSet<DanhgianhacungcapCommentModel> DanhgianhacungcapCommentModel { get; set; }
         public DbSet<DanhgianhacungcapDinhkemModel> DanhgianhacungcapDinhkemModel { get; set; }
+        public DbSet<DanhgianhacungcapDanhgiaModel> DanhgianhacungcapDanhgiaModel { get; set; }
         public DbSet<DanhgianhacungcapCommentUserModel> DanhgianhacungcapCommentUserModel { get; set; }
         public DbSet<DanhgianhacungcapCommentFileModel> DanhgianhacungcapCommentFileModel { get; set; }
 
