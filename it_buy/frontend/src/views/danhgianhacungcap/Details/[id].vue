@@ -35,9 +35,7 @@
         <div class="card-body">
           <div class="row mb-2">
             <div class="field col">
-              <label for="name"
-                >Nguyên liệu dự trù <span class="text-danger">*</span></label
-              >
+              <label for="name">Nguyên liệu dự trù</label>
               <div>
                 <dutru-chitiet-tree-select
                   v-model="model.list_dutru_chitiet"

@@ -4,7 +4,11 @@
       <div class="col-md-4">
         <b class="">Loại thanh toán:</b>
         <div class="mt-2">
-          <select class="form-control form-control-sm" v-model="model.loaithanhtoan" :disabled="model.is_dathang">
+          <select
+            class="form-control form-control-sm"
+            v-model="model.loaithanhtoan"
+            :disabled="model.is_dathang"
+          >
             <option value="tra_truoc">Trả trước</option>
             <option value="tra_sau">Trả sau</option>
           </select>
@@ -13,32 +17,54 @@
       <div class="col-md-4">
         <b class="">Phương thức thanh toán:</b>
         <div class="mt-2">
-          <input v-model="model.ptthanhtoan" class="form-control form-control-sm" :disabled="model.is_dathang" />
+          <input
+            v-model="model.ptthanhtoan"
+            class="form-control form-control-sm"
+            :disabled="model.is_dathang"
+          />
         </div>
       </div>
       <div class="col-md-4">
         <b class="">Yêu cầu giao hàng:</b>
         <div class="mt-2">
-          <Calendar v-model="model.date" dateFormat="yy-mm-dd" class="date-custom" :manualInput="false" showIcon
-            :minDate="minDate" :disabled="model.is_dathang" />
+          <Calendar
+            v-model="model.date"
+            dateFormat="yy-mm-dd"
+            class="date-custom"
+            :manualInput="false"
+            showIcon
+            :minDate="minDate"
+            :disabled="model.is_dathang"
+          />
         </div>
       </div>
       <div class="col-md-12 mt-2">
         <b class="">Địa chỉ giao hàng:</b>
         <div class="mt-2">
-          <textarea v-model="model.diachigiaohang" class="form-control form-control-sm"
-            :disabled="model.is_dathang"></textarea>
+          <textarea
+            v-model="model.diachigiaohang"
+            class="form-control form-control-sm"
+            :disabled="model.is_dathang"
+          ></textarea>
         </div>
       </div>
-
     </div>
-    <div class="col-md-12 text-center mt-3" v-if="!model.is_dathang">
-      <Button label="Xuất đơn đặt hàng" icon="pi pi-file" class="p-button p-button-sm mr-2"
-        @click.prevent="xuatdondathang()"></Button>
+    <div class="col-md-12 text-center mt-3">
+      <Button
+        label="Xuất đơn đặt hàng"
+        icon="pi pi-file"
+        class="p-button p-button-sm mr-2"
+        @click.prevent="xuatdondathang()"
+      ></Button>
     </div>
     <div class="col-md-12 mt-3 file-box-content" v-if="model.dondathang">
       <div class="file-box">
-        <a :href="model.dondathang" :download="download(model.dondathang)" class="download-icon-link" target="_blank">
+        <a
+          :href="model.dondathang"
+          :download="download(model.dondathang)"
+          class="download-icon-link"
+          target="_blank"
+        >
           <i class="dripicons-download file-download-icon"></i>
 
           <div class="text-center">
@@ -49,8 +75,12 @@
       </div>
     </div>
     <div class="col-md-12 mt-3" v-if="!model.is_dathang">
-      <Button label="Hoàn thành đặt hàng" icon="fas fa-long-arrow-alt-down" class="p-button-success p-button-sm mr-2"
-        @click.prevent="dathang()"></Button>
+      <Button
+        label="Hoàn thành đặt hàng"
+        icon="fas fa-long-arrow-alt-down"
+        class="p-button-success p-button-sm mr-2"
+        @click.prevent="dathang()"
+      ></Button>
     </div>
   </div>
 </template>
@@ -59,7 +89,7 @@ import { onMounted, ref } from "vue";
 import { useMuahang } from "../../stores/muahang";
 import { storeToRefs } from "pinia";
 import muahangApi from "../../api/muahangApi";
-import Button from 'primevue/button';
+import Button from "primevue/button";
 import { useToast } from "primevue/usetoast";
 import { download } from "../../utilities/util";
 const toast = useToast();
@@ -83,12 +113,17 @@ const xuatdondathang = async () => {
   muahangApi.xuatdondathang(model.value.id).then((response) => {
     waiting.value = false;
     if (response.success) {
-      toast.add({ severity: 'success', summary: 'Thành công!', detail: 'Thay đổi thành công', life: 3000 });
+      toast.add({
+        severity: "success",
+        summary: "Thành công!",
+        detail: "Thay đổi thành công",
+        life: 3000,
+      });
       // location.reload();
       store_muahang.load_data(model.value.id);
     }
   });
-}
+};
 const dathang = async () => {
   if (!model.value.loaithanhtoan) {
     alert("Chưa chọn phương thức thanh toán!");
@@ -104,10 +139,8 @@ const dathang = async () => {
   await muahangApi.save(model.value);
   waiting.value = false;
   emit("next");
-}
-onMounted(() => {
-
-})
+};
+onMounted(() => {});
 </script>
 
 <style lang="scss"></style>

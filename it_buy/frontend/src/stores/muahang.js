@@ -34,15 +34,14 @@ export const useMuahang = defineStore("muahang", () => {
   const load_data = async (id) => {
     waiting.value = true;
     var res = await muahangApi.get(id);
+    var list_ncc = await muahangApi.Getnccs(id);
     var uynhiemchi = res.uynhiemchi;
     var chitiet = res.chitiet;
-    var list_ncc = res.nccs;
     var user = res.user_created_by;
     var muahang_chonmua = res.muahang_chonmua;
     res.date = res.date ? moment(res.date).format("YYYY-MM-DD") : null;
     res.nhacungcap_id = muahang_chonmua ? muahang_chonmua.ncc_id : null;
     delete res.chitiet;
-    delete res.nccs;
     delete res.uynhiemchi;
     delete res.user_created_by;
     delete res.muahang_chonmua;

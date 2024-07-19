@@ -109,6 +109,16 @@
                     }}</span>
                   </div>
                 </template>
+                <template v-else-if="col.data == 'bophan'">
+                  <div
+                    v-for="item in filterBophan(
+                      slotProps.data.DutruChitietModels
+                    )"
+                    :key="item"
+                  >
+                    {{ item }}
+                  </div>
+                </template>
 
                 <div
                   v-else
@@ -214,11 +224,16 @@ const columns = ref([
     data: "created_by",
     className: "text-center",
   },
+  {
+    id: 6,
+    label: "Bộ phận dự trù",
+    data: "bophan",
+    className: "text-center",
+  },
 ]);
 const filters = ref({
   id: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  material_id: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  ncc_id: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  tenhh: { value: null, matchMode: FilterMatchMode.CONTAINS },
   nhasx: { value: null, matchMode: FilterMatchMode.CONTAINS },
   nhacc: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
@@ -233,6 +248,13 @@ const selectedProducts = ref();
 const selectedColumns = computed(() => {
   return columns.value.filter((col) => showing.value.includes(col.id));
 });
+const filterBophan = (d) => {
+  d = d.map((item) => {
+    return item.dutru.bophan.name;
+  });
+  d = [...new Set(d)];
+  return d;
+};
 const lazyParams = computed(() => {
   let data_filters = {};
   for (let key in filters.value) {

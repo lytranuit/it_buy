@@ -33,11 +33,24 @@ export default {
       )
       .then((res) => res.data);
   },
-  chapnhanDanhgia(id, note) {
+  chapnhanDanhgia(params) {
     return repository
       .post(
         `/v1/${resoure}/chapnhanDanhgia`,
-        { id: id, note: note },
+        params,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      )
+      .then((res) => res.data);
+  },
+  saveDanhgia(params) {
+    return repository
+      .post(
+        `/v1/${resoure}/saveDanhgia`,
+        params,
         {
           headers: {
             "Content-Type": "multipart/form-data",

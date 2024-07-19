@@ -4,11 +4,12 @@ import LeftSide from "./LeftSide.vue";
 import Topbar from "./Topbar.vue";
 import DynamicDialog from "primevue/dynamicdialog";
 import { useLayout } from "@/layouts/composables/layout";
-import ConfirmDialog from 'primevue/confirmdialog';
-import Toast from 'primevue/toast';
+import ConfirmDialog from "primevue/confirmdialog";
+import Toast from "primevue/toast";
 
 import { useAuth } from "../../stores/auth";
 import { useRoute } from "vue-router";
+import { getZoom } from "../../utilities/util";
 const store = useAuth();
 const response = await store.getUser();
 if (response.success == false) {
@@ -105,7 +106,11 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="layout-wrapper" :class="containerClass">
+  <div
+    class="layout-wrapper"
+    :class="containerClass"
+    :style="{ zoom: getZoom() }"
+  >
     <Topbar></Topbar>
     <div class="layout-sidebar">
       <LeftSide></LeftSide>

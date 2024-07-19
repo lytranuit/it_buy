@@ -16,6 +16,7 @@ namespace Vue.Models
 
         public string? bophan { get; set; }
         public string? user_id { get; set; }
+        //public string? comment { get; set; }
 
         [ForeignKey("user_id")]
         public UserModel? user { get; set; }

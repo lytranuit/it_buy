@@ -37,27 +37,38 @@
             ><b>{{ item?.user?.FullName }}</b> đã chấp nhận vào lúc
             {{ formatDate(item.date_accept, "YYYY-MM-DD HH:mm:ss") }}
             <p v-if="item.note">
-              <span style="font-size: 14px">Ghi chú: </span>
+              <span style="font-size: 14px">Ý kiến: </span>
               <span class="text-danger">{{ item.note }}</span>
             </p>
           </Message>
-          <div class="col-md-12 d-flex" v-else>
-            <div style="width: 400px">
-              <user-tree-select
-                v-model="item.user_id"
-                placeholder="Người đánh giá"
-                :disabled="!is_CungungNVL"
-              ></user-tree-select>
+          <div class="col-md-12" v-else>
+            <div class="d-flex">
+              <div style="width: 400px">
+                <user-tree-select
+                  v-model="item.user_id"
+                  placeholder="Người đánh giá"
+                  :disabled="!is_CungungNVL"
+                ></user-tree-select>
+              </div>
+              <Button
+                label="Chấp nhận"
+                severity="success"
+                size="small"
+                icon="pi pi-check"
+                class="ml-auto"
+                @click="Chapnhan(item)"
+                v-if="item.user_id == user.id && item.id > 0"
+              ></Button>
             </div>
-            <Button
-              label="Chấp nhận"
-              severity="success"
-              size="small"
-              icon="pi pi-check"
-              class="ml-auto"
-              @click="openChapnhan(item)"
-              v-if="item.user_id == user.id && item.id > 0"
-            ></Button>
+            <div>
+              <textarea
+                v-model="item.note"
+                class="form-control form-control-sm mt-2"
+                placeholder="Ý kiến"
+                :disabled="item.user_id != user.id || !item.id"
+                @blur="saveDanhgia(item)"
+              ></textarea>
+            </div>
           </div>
         </div>
       </div>
@@ -113,7 +124,18 @@ const confirmDelete = (selected) => {
 const openChapnhan = (selected) => {
   store_danhgianhacungcap.openChapnhan(selected);
 };
-
+const saveDanhgia = (selected) => {
+  danhgianhacungcapApi.saveDanhgia(selected).then((res) => {
+    // visibleDanhgia.value = false;
+    store_danhgianhacungcap.getDanhgia(route.params.id);
+  });
+};
+const Chapnhan = (selected) => {
+  danhgianhacungcapApi.chapnhanDanhgia(selected).then((res) => {
+    // visibleDanhgia.value = false;
+    store_danhgianhacungcap.getDanhgia(route.params.id);
+  });
+};
 onMounted(() => {
   store_danhgianhacungcap.getDanhgia(route.params.id);
 });

@@ -187,9 +187,10 @@ namespace it_template.Areas.V1.Controllers
                 .Include(d => d.uynhiemchi)
                 .Include(d => d.muahang_chonmua)
                 .Include(d => d.chitiet).ThenInclude(d => d.user_nhanhang)
-                .Include(d => d.nccs).ThenInclude(d => d.chitiet)
-                .Include(d => d.nccs).ThenInclude(d => d.dinhkem.Where(d => d.deleted_at == null))
-                .Include(d => d.nccs).ThenInclude(d => d.ncc).FirstOrDefault();
+                //.Include(d => d.nccs).ThenInclude(d => d.chitiet)
+                //.Include(d => d.nccs).ThenInclude(d => d.dinhkem.Where(d => d.deleted_at == null))
+                //.Include(d => d.nccs).ThenInclude(d => d.ncc)
+                .FirstOrDefault();
             if (data != null)
             {
                 var stt = 1;
@@ -205,26 +206,48 @@ namespace it_template.Areas.V1.Controllers
                     item.soluong_nhanhang = item.soluong;
                     item.stt = stt++;
                 }
-                foreach (var ncc in data.nccs)
+            }
+            return Json(data, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            });
+        }
+        public JsonResult Getnccs(int id)
+        {
+            var data = _context.MuahangNccModel
+                .Where(d => d.muahang_id == id)
+                .Include(d => d.chitiet)
+                .Include(d => d.dinhkem.Where(d => d.deleted_at == null))
+                .Include(d => d.ncc)
+                .ToList();
+            if (data != null)
+            {
+                foreach (var ncc in data)
                 {
-                    stt = 1;
+                    var stt = 1;
                     //if (data.muahang_chonmua_id == ncc.id)
                     //{
                     //    data.muahang_chonmua = ncc;
                     //}
-                    foreach (var item in ncc.chitiet)
+                    //ncc.chitiet = _context.MuahangNccChitietModel.Where(d => d.muahang_ncc_id == ncc.id).ToList();
+                    if (ncc.chitiet != null)
                     {
-                        //var material = _context.MaterialModel.Where(d => item.hh_id == "m-" + d.id).FirstOrDefault();
-                        //if (material != null)
-                        //{
-                        //    item.tenhh = material.tenhh;
-                        //    item.mahh = material.mahh;
-                        //    item.stt = stt++;
-                        //}
-                        item.stt = stt++;
+                        foreach (var item in ncc.chitiet)
+                        {
+                            //var material = _context.MaterialModel.Where(d => item.hh_id == "m-" + d.id).FirstOrDefault();
+                            //if (material != null)
+                            //{
+                            //    item.tenhh = material.tenhh;
+                            //    item.mahh = material.mahh;
+                            //    item.stt = stt++;
+                            //}
+                            item.stt = stt++;
+                        }
                     }
                 }
             }
+
             return Json(data, new System.Text.Json.JsonSerializerOptions()
             {
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
@@ -1111,7 +1134,7 @@ namespace it_template.Areas.V1.Controllers
                 {"nam",now.ToString("yyyy") },
             };
             var bophan = "P. HR&GA";
-            if (user_id == "28dc61a5-001d-4c1f-9325-9b9318dc3c59" || user_id == "e9ca633b-ac5c-4f64-9485-10cfe5388d16")
+            if (user_id == "28dc61a5-001d-4c1f-9325-9b9318dc3c59" || user_id == "e9ca633b-ac5c-4f64-9485-10cfe5388d16" || user_id == "d2104cc4-10b1-408c-8161-b4df8d6df1b5")
             {
                 bophan = "Cung ứng";
             }

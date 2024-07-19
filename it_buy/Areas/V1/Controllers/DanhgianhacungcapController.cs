@@ -113,6 +113,15 @@ namespace it_template.Areas.V1.Controllers
             var Model = _context.DanhgianhacungcapModel.Where(d => d.id == id).FirstOrDefault();
             Model.deleted_at = DateTime.Now;
             _context.Update(Model);
+
+            var DutruChitietModel = _context.DutruChitietModel.Where(d => d.danhgianhacungcap_id == id).ToList();
+            foreach (var item in DutruChitietModel)
+            {
+                item.danhgianhacungcap_id = null;
+
+            }
+            _context.UpdateRange(DutruChitietModel);
+
             _context.SaveChanges();
             return Json(Model, new System.Text.Json.JsonSerializerOptions()
             {
@@ -361,6 +370,7 @@ namespace it_template.Areas.V1.Controllers
             {
                 return Json(new { success = false });
             }
+            DanhgianhacungcapDanhgiaModel_old.user_id = user_id;
             DanhgianhacungcapDanhgiaModel_old.date_accept = DateTime.Now;
             DanhgianhacungcapDanhgiaModel_old.note = note;
 
@@ -375,12 +385,21 @@ namespace it_template.Areas.V1.Controllers
 
             var users_related_id = new List<string>();
             users_related_id.Add(danhgianhacungcap.created_by);
-            foreach (var comment in comments)
+            foreach (var c in comments)
             {
-                users_related_id.Add(comment.user_id);
-                users_related_id.AddRange(comment.users_related.Select(d => d.user_id).ToList());
+                users_related_id.Add(c.user_id);
+                users_related_id.AddRange(c.users_related.Select(d => d.user_id).ToList());
             }
             users_related_id.AddRange(user_danhgia);
+
+            ///CHECK ALL ĐÃ CHÂP NHẬN
+            var count_not_done = _context.DanhgianhacungcapDanhgiaModel.Where(d => d.danhgianhacungcap_id == DanhgianhacungcapDanhgiaModel_old.danhgianhacungcap_id && d.date_accept == null).Count();
+            if (count_not_done == 0)
+            {
+                users_related_id.Add(danhgianhacungcap.user_chapnhan_id);
+            }
+
+
             users_related_id = users_related_id.Distinct().ToList();
             var itemToRemove = users_related_id.SingleOrDefault(r => r == user_id);
             users_related_id.Remove(itemToRemove);
@@ -414,6 +433,25 @@ namespace it_template.Areas.V1.Controllers
 
 
 
+
+            return Json(new { success = true });
+        }
+        [HttpPost]
+        public async Task<JsonResult> saveDanhgia(int id, string note, string user_id, string bophan)
+        {
+
+
+            var DanhgianhacungcapDanhgiaModel_old = _context.DanhgianhacungcapDanhgiaModel.Where(d => d.id == id).FirstOrDefault();
+            if (DanhgianhacungcapDanhgiaModel_old == null)
+            {
+                return Json(new { success = false });
+            }
+            DanhgianhacungcapDanhgiaModel_old.note = note;
+            DanhgianhacungcapDanhgiaModel_old.user_id = user_id;
+            DanhgianhacungcapDanhgiaModel_old.bophan = bophan;
+
+            _context.Update(DanhgianhacungcapDanhgiaModel_old);
+            _context.SaveChanges();
 
             return Json(new { success = true });
         }
@@ -458,7 +496,10 @@ namespace it_template.Areas.V1.Controllers
                 customerData = customerData.Where(d => d.id == id);
             }
             int recordsFiltered = customerData.Count();
-            var datapost = customerData.OrderByDescending(d => d.id).Skip(skip).Take(pageSize).Include(d => d.user_created_by).ToList();
+            var datapost = customerData.OrderByDescending(d => d.id).Skip(skip).Take(pageSize)
+                .Include(d => d.user_created_by)
+                .Include(d => d.DutruChitietModels).ThenInclude(d => d.dutru).ThenInclude(d => d.bophan)
+                .ToList();
             //var data = new ArrayList();
             //foreach (var record in datapost)
             //{

@@ -29,8 +29,8 @@ const formatDate = (value, fomat = "YYYY-MM-DD") => {
 const printTrigger = (link) => {
   $("body").append(
     '<iframe class="iFramePdf" src="' +
-      link +
-      '" style="display:none;"></iframe>'
+    link +
+    '" style="display:none;"></iframe>'
   );
   var getMyFrame = $(".iFramePdf").last()[0];
   console.log(getMyFrame);
@@ -51,6 +51,23 @@ const download = (name) => {
   }
   return name;
 };
+const isMobile = () => {
+  // console.log(window.innerWidth)
+  if (window.innerWidth <= 760) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+const getZoom = () => {
+  let fixWidth = 1745;
+  let zoom = isMobile() ? 1 : window.innerWidth / fixWidth;
+  if (zoom > 0.9) {
+    zoom = 1;
+  }
+  return zoom;
+}
 export {
   formatSize,
   formatTime,
@@ -58,4 +75,6 @@ export {
   formatDate,
   printTrigger,
   download,
+  isMobile,
+  getZoom
 };

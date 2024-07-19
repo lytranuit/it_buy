@@ -204,6 +204,13 @@ export default {
       .get(`/v1/${resoure}/get`, { params: { id: id } })
       .then((res) => res.data);
   },
+  Getnccs(id) {
+    return repository
+      .get(`/v1/${resoure}/Getnccs`, { params: { id: id } })
+      .then((res) => res.data);
+  },
+
+
   getNhanhang(id) {
     return repository
       .get(`/v1/${resoure}/getNhanhang`, { params: { id: id } })

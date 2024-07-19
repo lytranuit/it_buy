@@ -42,11 +42,9 @@ const route = useRoute();
 const store_danhgianhacungcap = useDanhgianhacungcap();
 const { visibleDanhgia, editRow } = storeToRefs(store_danhgianhacungcap);
 const Chapnhan = () => {
-  danhgianhacungcapApi
-    .chapnhanDanhgia(editRow.value.id, editRow.value.note)
-    .then((res) => {
-      visibleDanhgia.value = false;
-      store_danhgianhacungcap.getDanhgia(route.params.id);
-    });
+  danhgianhacungcapApi.chapnhanDanhgia(editRow.value).then((res) => {
+    visibleDanhgia.value = false;
+    store_danhgianhacungcap.getDanhgia(route.params.id);
+  });
 };
 </script>
