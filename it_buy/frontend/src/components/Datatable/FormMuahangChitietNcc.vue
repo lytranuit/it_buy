@@ -27,7 +27,23 @@
           <template v-if="col.data == 'hh_id'">
             {{ slotProps.data["mahh"] }}
           </template>
-
+          <template v-else-if="col.data == 'tenhh' || col.data == 'dvt'">
+            <InputText
+              v-model="slotProps.data[col.data]"
+              class="p-inputtext-sm"
+              :disabled="readonly"
+            />
+          </template>
+          <template v-else-if="col.data == 'soluong'">
+            <InputNumber
+              v-model="slotProps.data[col.data]"
+              class="p-inputtext-sm"
+              @update:modelValue="changeDongia()"
+              :disabled="readonly"
+              :inputStyle="{ width: '100px' }"
+              :maxFractionDigits="5"
+            />
+          </template>
           <template v-else-if="col.data == 'dongia'">
             <InputNumber
               v-model="slotProps.data[col.data]"
@@ -77,6 +93,7 @@ import { rand } from "../../utilities/rand";
 import { formatPrice } from "../../utilities/util";
 import { useMuahang } from "../../stores/muahang";
 import { useGeneral } from "../../stores/general";
+import InputText from "primevue/inputtext";
 
 const readonly = ref(false);
 const store_muahang = useMuahang();
