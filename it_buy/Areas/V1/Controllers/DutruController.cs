@@ -1006,7 +1006,7 @@ namespace it_template.Areas.V1.Controllers
                     list_tag = record.list_tag,
                     dutru_chitiet_id = record.id,
                     danhgianhacungcap_id = record.danhgianhacungcap_id,
-                    danhgianhacungcap_is_chapnhan = record.danhgianhacungcap?.is_chapnhan,
+                    danhgianhacungcap_is_chapnhan = record.danhgianhacungcap?.status_id == (int)DanhgianhacungcapStatus.SUCCESS,
                     dutru = new DutruModel()
                     {
                         id = dutru.id,

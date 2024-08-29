@@ -147,7 +147,7 @@
               <div class="row">
                 <b class="col">Thành tiền (Chưa VAT):</b>
                 <span class="col text-right"
-                  >{{ formatPrice(item.thanhtien, 0) }} {{ item.tiente }}</span
+                  >{{ formatPrice(item.thanhtien, 2) }} {{ item.tiente }}</span
                 >
               </div>
             </div>
@@ -160,7 +160,7 @@
               <div class="row">
                 <b class="col">Tiền VAT:</b>
                 <span class="col text-right"
-                  >{{ formatPrice(item.tienvat, 0) }} {{ item.tiente }}</span
+                  >{{ formatPrice(item.tienvat, 2) }} {{ item.tiente }}</span
                 >
               </div>
             </div>
@@ -173,7 +173,7 @@
               <div class="row">
                 <b class="col">Thành tiền:</b>
                 <span class="col text-right"
-                  >{{ formatPrice(item.thanhtien_vat, 0) }}
+                  >{{ formatPrice(item.thanhtien_vat, 2) }}
                   {{ item.tiente }}</span
                 >
               </div>
@@ -206,7 +206,7 @@
               <div class="row">
                 <b class="col">Tổng giá trị:</b>
                 <span class="col text-right"
-                  >{{ formatPrice(item.tonggiatri, 0) }} {{ item.tiente }}</span
+                  >{{ formatPrice(item.tonggiatri, 2) }} {{ item.tiente }}</span
                 >
               </div>
             </div>

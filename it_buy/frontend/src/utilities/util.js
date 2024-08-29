@@ -19,8 +19,11 @@ const formatTime = (sec) => {
   return formatted;
 };
 const formatPrice = (value, toFixed = 2) => {
-  let val = (value / 1).toFixed(toFixed).replace(",", ".");
-  return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+  let val = Math.round(value * Math.pow(10, toFixed)) / Math.pow(10, toFixed);
+  val = val.toFixed(toFixed).replace(",", ".");
+  val = val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return val.toString().replace(/\.0+$/, ''); // remove trailing zeros
 };
 const formatDate = (value, fomat = "YYYY-MM-DD") => {
   return moment(value).format(fomat);

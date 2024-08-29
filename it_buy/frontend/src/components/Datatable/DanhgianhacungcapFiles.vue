@@ -16,7 +16,7 @@
         <div
           class="d-inline-flex"
           style="width: 200px"
-          v-if="!model.is_chapnhan"
+          v-if="model.status_id == 1"
         >
           <Button
             label="Thêm"
@@ -88,7 +88,7 @@
               col.data == 'action' &&
               slotProps.data['is_user_upload'] == true &&
               slotProps.data.list_file[0]?.created_by == user.id &&
-              !model.is_chapnhan
+              model.status_id == 1
             "
           >
             <a

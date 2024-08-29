@@ -130,7 +130,7 @@
                     </div>
                   </template>
                   <template v-else-if="col.data == 'tonggiatri'">
-                    {{ formatPrice(slotProps.data[col.data], 0) }}
+                    {{ formatPrice(slotProps.data[col.data], 2) }}
                     {{ slotProps.data["tiente"] }}
                   </template>
                   <template v-else>

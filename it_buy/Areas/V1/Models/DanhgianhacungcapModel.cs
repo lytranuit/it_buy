@@ -26,15 +26,15 @@ namespace Vue.Models
         [ForeignKey("created_by")]
         public virtual UserModel? user_created_by { get; set; }
 
-        public string? user_chapnhan_id { get; set; }
-        [ForeignKey("user_chapnhan_id")]
-        public virtual UserModel? user_chapnhan { get; set; }
+        public string? user_id { get; set; }
+        [ForeignKey("user_id")]
+        public virtual UserModel? user { get; set; }
 
-        public string? note_chapnhan { get; set; }
+        public string? note { get; set; }
         public virtual List<DutruChitietModel> DutruChitietModels { get; set; }
         public bool? is_thongbao { get; set; }
-        public bool? is_chapnhan { get; set; }
-        public DateTime? date_chapnhan { get; set; }     ///Ngày hoàn thành
+        public int? status_id { get; set; }
+        public DateTime? date { get; set; }     ///Ngày hoàn thành
         public DateTime? deleted_at { get; set; }
         public DateTime? updated_at { get; set; }
         public DateTime? created_at { get; set; }
@@ -56,4 +56,13 @@ namespace Vue.Models
         }
     }
 
+    enum DanhgianhacungcapStatus
+    {
+        [Display(Name = "Đang duyệt")]
+        Draft = 1,
+        [Display(Name = "Đã chấp nhận")]
+        SUCCESS = 2,
+        [Display(Name = "Không chấp nhận")]
+        FAILED = 3,
+    }
 }

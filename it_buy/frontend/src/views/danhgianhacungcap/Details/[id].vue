@@ -54,7 +54,7 @@
                 <InputText
                   v-model="model.tenhh"
                   class="form-control form-control-sm"
-                  :disabled="model.is_chapnhan"
+                  :disabled="model.status_id != 1"
                 />
               </div>
             </div>
@@ -64,7 +64,7 @@
                 <InputText
                   v-model="model.dvt"
                   class="form-control form-control-sm"
-                  :disabled="model.is_chapnhan"
+                  :disabled="model.status_id != 1"
                 />
               </div>
             </div>
@@ -74,7 +74,7 @@
                 <InputText
                   v-model="model.grade"
                   class="form-control form-control-sm"
-                  :disabled="model.is_chapnhan"
+                  :disabled="model.status_id != 1"
                 />
               </div>
             </div>
@@ -88,7 +88,7 @@
                 <InputText
                   v-model="model.nhasx"
                   class="form-control form-control-sm"
-                  :disabled="model.is_chapnhan"
+                  :disabled="model.status_id != 1"
                 />
               </div>
             </div>
@@ -100,7 +100,7 @@
                 <InputText
                   v-model="model.nhacc"
                   class="form-control form-control-sm"
-                  :disabled="model.is_chapnhan"
+                  :disabled="model.status_id != 1"
                 />
               </div>
             </div>
@@ -112,7 +112,7 @@
                 <InputText
                   v-model="model.masothietke"
                   class="form-control form-control-sm"
-                  :disabled="model.is_chapnhan"
+                  :disabled="model.status_id != 1"
                 />
               </div>
             </div>
@@ -122,7 +122,7 @@
                 <InputText
                   v-model="model.quicach"
                   class="form-control form-control-sm"
-                  :disabled="model.is_chapnhan"
+                  :disabled="model.status_id != 1"
                 />
               </div>
             </div>
@@ -146,30 +146,67 @@
       <Card>
         <template #title>Chấp nhận</template>
         <template #content>
-          <Message :closable="false" v-if="model.is_chapnhan" severity="success"
-            >{{ model?.user_chapnhan?.FullName }} đã chấp nhận vào lúc
-            {{
-              formatDate(model.date_chapnhan, "YYYY-MM-DD HH:mm:ss")
-            }}</Message
+          <Message
+            :closable="false"
+            v-if="model.status_id == 2"
+            severity="success"
           >
+            <b>{{ model?.user?.FullName }}</b> đã chấp nhận vào lúc
+            <b>{{ formatDate(model.date, "YYYY-MM-DD HH:mm:ss") }}</b>
+            <p v-if="model.note">
+              <span style="font-size: 14px">Ý kiến: </span>
+              <span class="text-danger">{{ model.note }}</span>
+            </p>
+          </Message>
+          <Message
+            :closable="false"
+            v-else-if="model.status_id == 3 && model.date"
+            severity="error"
+            ><p>
+              <b>{{ model?.user?.FullName }}</b> đã không chấp nhận vào lúc
+              <b>{{ formatDate(model.date, "YYYY-MM-DD HH:mm:ss") }}</b>
+            </p>
+            <p v-if="model.note">
+              <span style="font-size: 14px">Ý kiến: </span>
+              <span class="text-danger">{{ model.note }}</span>
+            </p>
+          </Message>
           <div class="mt-2 d-flex" v-else>
             <div style="width: 400px">
               <user-tree-select
-                v-model="model.user_chapnhan_id"
+                v-model="model.user_id"
                 placeholder="Người chấp nhận"
                 :disabled="!is_CungungNVL"
               ></user-tree-select>
             </div>
-            <Button
-              label="Chấp nhận"
-              severity="success"
-              size="small"
-              icon="pi pi-check"
-              class="ml-auto"
-              @click="chapnhan"
-              v-if="checkChapnhan"
-            ></Button></div
-        ></template>
+            <div class="ml-auto" v-if="checkChapnhan">
+              <Button
+                label="Không chấp nhận"
+                severity="danger"
+                size="small"
+                icon="pi pi-times"
+                class="mr-2"
+                @click="khongchapnhan"
+              ></Button>
+              <Button
+                label="Chấp nhận"
+                severity="success"
+                size="small"
+                icon="pi pi-check"
+                class="ml-auto"
+                @click="chapnhan"
+              ></Button>
+            </div>
+          </div>
+          <div v-if="model.status_id == 1">
+            <textarea
+              v-model="model.note"
+              class="form-control form-control-sm mt-2"
+              placeholder="Ý kiến"
+              :disabled="model.user_id != user.id"
+            ></textarea>
+          </div>
+        </template>
       </Card>
     </div>
     <div class="col-12 row mt-5">
@@ -280,7 +317,7 @@ const load_data = (id) => {
   });
 };
 const checkChapnhan = computed(() => {
-  if (model.value.user_chapnhan_id != user.value.id) return false;
+  if (model.value.user_id != user.value.id) return false;
   let danhgia_success = danhgia.value.filter((x) => {
     return x.date_accept != null;
   });
@@ -319,14 +356,42 @@ const chapnhan = () => {
     },
   });
 };
-
+const khongchapnhan = () => {
+  confirm.require({
+    message: "Không chấp nhận!",
+    header: "Xác nhận",
+    icon: "pi pi-exclamation-triangle",
+    accept: () => {
+      waiting.value = true;
+      danhgianhacungcapApi.khongchapnhan(model.value.id).then((response) => {
+        waiting.value = false;
+        if (response.success) {
+          toast.add({
+            severity: "success",
+            summary: "Thành công!",
+            detail: "Thay đổi thành công",
+            life: 3000,
+          });
+          load_data(route.params.id);
+        } else {
+          toast.add({
+            severity: "danger",
+            summary: "Lỗi!",
+            detail: "",
+            life: 3000,
+          });
+        }
+      });
+    },
+  });
+};
 const save = () => {
   if (!valid()) {
     alert("Nhập đầy dủ thông tin!");
     return false;
   }
   // waiting.value = true;
-  model.value.user_chapnhan = null;
+  model.value.user = null;
 
   model.value.list_add = list_add.value;
   model.value.list_update = list_update.value;

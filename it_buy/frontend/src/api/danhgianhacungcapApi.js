@@ -33,6 +33,32 @@ export default {
       )
       .then((res) => res.data);
   },
+  khongchapnhan(id) {
+    return repository
+      .post(
+        `/v1/${resoure}/khongchapnhan`,
+        { id: id },
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      )
+      .then((res) => res.data);
+  },
+  KhongchapnhanDanhgia(params) {
+    return repository
+      .post(
+        `/v1/${resoure}/KhongchapnhanDanhgia`,
+        params,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      )
+      .then((res) => res.data);
+  },
   chapnhanDanhgia(params) {
     return repository
       .post(

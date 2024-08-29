@@ -757,12 +757,12 @@ namespace it_template.Areas.V1.Controllers
                 {
                     var ncc_chon = muahang_chonmua;
                     is_vat = ncc_chon.is_vat;
-                    raw.Add("tonggiatri", ncc_chon.tonggiatri.Value.ToString("#,##0"));
+                    raw.Add("tonggiatri", ncc_chon.tonggiatri.Value.ToString("#,##0.##"));
                     raw.Add("tggh", data.date.Value.ToString("dd/MM/yyyy"));
-                    raw.Add("thanhtien", ncc_chon.thanhtien.Value.ToString("#,##0"));
-                    raw.Add("thanhtien_vat", ncc_chon.thanhtien_vat.Value.ToString("#,##0"));
-                    raw.Add("phigiaohang", ncc_chon.phigiaohang.Value.ToString("#,##0"));
-                    raw.Add("tienvat", ncc_chon.tienvat.Value.ToString("#,##0"));
+                    raw.Add("thanhtien", ncc_chon.thanhtien.Value.ToString("#,##0.##"));
+                    raw.Add("thanhtien_vat", ncc_chon.thanhtien_vat.Value.ToString("#,##0.##"));
+                    raw.Add("phigiaohang", ncc_chon.phigiaohang.Value.ToString("#,##0.##"));
+                    raw.Add("tienvat", ncc_chon.tienvat.Value.ToString("#,##0.##"));
                     //raw.Add("vat", ncc_chon.vat.Value.ToString());
                     raw.Add("tiente", ncc_chon.tiente.ToString());
                     var stt = 1;
@@ -786,7 +786,7 @@ namespace it_template.Areas.V1.Controllers
                             dvt = item.dvt,
                             soluong = item.soluong.Value.ToString("#,##0.##"),
                             dongia = item.dongia.Value.ToString("#,##0.##"),
-                            thanhtien = item.thanhtien.Value.ToString("#,##0"),
+                            thanhtien = item.thanhtien.Value.ToString("#,##0.##"),
                             nhasx = nhasx,
                             tieuchuan = tieuchuan,
                             vat = item.vat,
@@ -1151,11 +1151,11 @@ namespace it_template.Areas.V1.Controllers
                 {
                     is_vat = muahang_chonmua.is_vat;
                     var ncc_chon = muahang_chonmua;
-                    raw.Add("tonggiatri", ncc_chon.tonggiatri.Value.ToString("#,##0"));
-                    raw.Add("thanhtien", ncc_chon.thanhtien.Value.ToString("#,##0"));
-                    raw.Add("thanhtien_vat", ncc_chon.thanhtien_vat.Value.ToString("#,##0"));
-                    raw.Add("phigiaohang", ncc_chon.phigiaohang.Value.ToString("#,##0"));
-                    raw.Add("tienvat", ncc_chon.tienvat.Value.ToString("#,##0"));
+                    raw.Add("tonggiatri", ncc_chon.tonggiatri.Value.ToString("#,##0.##"));
+                    raw.Add("thanhtien", ncc_chon.thanhtien.Value.ToString("#,##0.##"));
+                    raw.Add("thanhtien_vat", ncc_chon.thanhtien_vat.Value.ToString("#,##0.##"));
+                    raw.Add("phigiaohang", ncc_chon.phigiaohang.Value.ToString("#,##0.##"));
+                    raw.Add("tienvat", ncc_chon.tienvat.Value.ToString("#,##0.##"));
                     //raw.Add("vat", ncc_chon.vat.Value.ToString());
                     raw.Add("tiente", ncc_chon.tiente.ToString());
                     var stt = 1;
@@ -1174,7 +1174,7 @@ namespace it_template.Areas.V1.Controllers
                             dvt = item.dvt,
                             soluong = item.soluong.Value.ToString("#,##0.##"),
                             dongia = item.dongia.Value.ToString("#,##0.#####"),
-                            thanhtien = item.thanhtien.Value.ToString("#,##0"),
+                            thanhtien = item.thanhtien.Value.ToString("#,##0.##"),
                             vat = item.vat,
                             note = item.note,
                             //artwork = material.masothietke,
@@ -1191,7 +1191,7 @@ namespace it_template.Areas.V1.Controllers
                         ncc.chonmua = true;
                     }
                     raw.Add("bang_ncc_ten_" + key, ncc.ncc.tenncc);
-                    raw.Add("bang_ncc_tong_" + key, ncc.tonggiatri.Value.ToString("#,##0"));
+                    raw.Add("bang_ncc_tong_" + key, ncc.tonggiatri.Value.ToString("#,##0.##"));
                     raw.Add("bang_ncc_dap_ung_" + key, ncc.dapung == true ? "X" : "");
                     raw.Add("bang_ncc_time_delivery_" + key, ncc.thoigiangiaohang);
                     raw.Add("bang_ncc_policy_" + key, ncc.baohanh);

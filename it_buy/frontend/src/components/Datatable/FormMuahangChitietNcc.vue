@@ -69,7 +69,7 @@
           <template
             v-else-if="col.data == 'thanhtien' || col.data == 'thanhtien_vat'"
           >
-            {{ formatPrice(slotProps.data[col.data], 0) }} {{ modelncc.tiente }}
+            {{ formatPrice(slotProps.data[col.data], 2) }} {{ modelncc.tiente }}
           </template>
 
           <template v-else>

@@ -449,8 +449,8 @@
               </th>
               <th>{{ item.tenhh }}</th>
               <th>{{ item.soluong }}</th>
-              <th>{{ formatPrice(item.dongia, 0) }} {{ item.tiente }}</th>
-              <th>{{ formatPrice(item.thanhtien, 0) }} {{ item.tiente }}</th>
+              <th>{{ formatPrice(item.dongia, 2) }} {{ item.tiente }}</th>
+              <th>{{ formatPrice(item.thanhtien, 2) }} {{ item.tiente }}</th>
             </tr>
           </tbody>
         </table>

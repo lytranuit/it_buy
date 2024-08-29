@@ -25,7 +25,7 @@
             class="text-center"
             :class="{ highlight: model.muahang_chonmua_id == item.id }"
           >
-            {{ formatPrice(item.chitiet[key].thanhtien_vat, 0) }}
+            {{ formatPrice(item.chitiet[key].thanhtien_vat, 2) }}
             {{ item.tiente }}
           </td>
         </tr>
@@ -38,7 +38,7 @@
             class="text-center"
             :class="{ highlight: model.muahang_chonmua_id == item.id }"
           >
-            <b>{{ formatPrice(item.tonggiatri, 0) }} {{ item.tiente }}</b>
+            <b>{{ formatPrice(item.tonggiatri, 2) }} {{ item.tiente }}</b>
           </td>
         </tr>
         <tr>

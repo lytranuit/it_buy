@@ -67,7 +67,7 @@
               v-html="comment.comment"
             ></div>
             <div class="mb-2 attach_file file-box-content">
-              <div class="file-box" v-for="(file, index1) in comment.files">
+              <div class="file-box" v-for="file in comment.files">
                 <a
                   :href="file.url"
                   :download="download(file.name)"

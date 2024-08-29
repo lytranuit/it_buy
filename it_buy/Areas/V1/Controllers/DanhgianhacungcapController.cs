@@ -48,7 +48,7 @@ namespace it_template.Areas.V1.Controllers
             var data = _context.DanhgianhacungcapModel
                 .Where(d => d.id == id)
                 .Include(d => d.user_created_by)
-                .Include(d => d.user_chapnhan)
+                .Include(d => d.user)
                 .Include(d => d.DutruChitietModels)
                 .FirstOrDefault();
 
@@ -208,6 +208,7 @@ namespace it_template.Areas.V1.Controllers
                 {
                     DanhgianhacungcapModel.created_at = DateTime.Now;
                     DanhgianhacungcapModel.created_by = user_id;
+                    DanhgianhacungcapModel.status_id = (int)DanhgianhacungcapStatus.Draft;
 
                     _context.DanhgianhacungcapModel.Add(DanhgianhacungcapModel);
 
@@ -301,9 +302,9 @@ namespace it_template.Areas.V1.Controllers
                 return Json(new { success = false });
             }
             DanhgianhacungcapModel_old.updated_at = DateTime.Now;
-            DanhgianhacungcapModel_old.date_chapnhan = DateTime.Now;
-            DanhgianhacungcapModel_old.is_chapnhan = true;
-            DanhgianhacungcapModel_old.user_chapnhan_id = user_id;
+            DanhgianhacungcapModel_old.date = DateTime.Now;
+            DanhgianhacungcapModel_old.status_id = (int)DanhgianhacungcapStatus.SUCCESS;
+            DanhgianhacungcapModel_old.user_id = user_id;
 
             _context.Update(DanhgianhacungcapModel_old);
             _context.SaveChanges();
@@ -358,6 +359,77 @@ namespace it_template.Areas.V1.Controllers
             return Json(new { success = true });
         }
         [HttpPost]
+        public async Task<JsonResult> khongchapnhan(int id)
+        {
+
+            System.Security.Claims.ClaimsPrincipal currentUser = this.User;
+            var user_id = UserManager.GetUserId(currentUser);
+            var user = await UserManager.GetUserAsync(currentUser);
+
+            var DanhgianhacungcapModel_old = _context.DanhgianhacungcapModel.Where(d => d.id == id).FirstOrDefault();
+            if (DanhgianhacungcapModel_old == null)
+            {
+                return Json(new { success = false });
+            }
+            DanhgianhacungcapModel_old.updated_at = DateTime.Now;
+            DanhgianhacungcapModel_old.date = DateTime.Now;
+            DanhgianhacungcapModel_old.status_id = (int)DanhgianhacungcapStatus.FAILED;
+            DanhgianhacungcapModel_old.user_id = user_id;
+
+            _context.Update(DanhgianhacungcapModel_old);
+            _context.SaveChanges();
+
+
+
+            ///lây user liên quan
+            var danhgianhacungcap = _context.DanhgianhacungcapModel.Where(d => d.id == DanhgianhacungcapModel_old.id).FirstOrDefault();
+            List<string> user_danhgia = _context.DanhgianhacungcapDanhgiaModel.Where(d => d.danhgianhacungcap_id == DanhgianhacungcapModel_old.id).Select(d => d.user_id.ToString()).ToList();
+            var comments = _context.DanhgianhacungcapCommentModel.Where(d => d.danhgianhacungcap_id == DanhgianhacungcapModel_old.id)
+                .Include(d => d.users_related).ToList();
+
+            var users_related_id = new List<string>();
+            users_related_id.Add(danhgianhacungcap.created_by);
+            foreach (var comment in comments)
+            {
+                users_related_id.Add(comment.user_id);
+                users_related_id.AddRange(comment.users_related.Select(d => d.user_id).ToList());
+            }
+            users_related_id.AddRange(user_danhgia);
+            users_related_id = users_related_id.Distinct().ToList();
+            var itemToRemove = users_related_id.SingleOrDefault(r => r == user_id);
+            users_related_id.Remove(itemToRemove);
+            //SEND MAIL
+            if (users_related_id != null && users_related_id.Count() > 0)
+            {
+                var users_related_obj = _context.UserModel.Where(d => users_related_id.Contains(d.Id)).Select(d => d.Email).ToList();
+                var mail_string = string.Join(",", users_related_obj.ToArray());
+                string Domain = (HttpContext.Request.IsHttps ? "https://" : "http://") + HttpContext.Request.Host.Value;
+                //var text = CommentModel.comment;
+                var body = _view.Render("Emails/Accept",
+                    new
+                    {
+                        link_logo = Domain + "/images/clientlogo_astahealthcare.com_f1800.png",
+                        link = Domain + "/danhgianhacungcap/details/" + DanhgianhacungcapModel_old.id,
+                        note = "",
+                        user = user.FullName
+                    });
+
+                var email = new EmailModel
+                {
+                    email_to = mail_string,
+                    subject = "[Không chấp nhận] Đánh giá " + danhgianhacungcap.nhacc + " cho nguyên liệu " + danhgianhacungcap.tenhh,
+                    body = body,
+                    email_type = "dgncc_no_accept",
+                    status = 1,
+                };
+                _context.Add(email);
+            }
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true });
+        }
+
+        [HttpPost]
         public async Task<JsonResult> chapnhanDanhgia(int id, string note)
         {
 
@@ -396,7 +468,7 @@ namespace it_template.Areas.V1.Controllers
             var count_not_done = _context.DanhgianhacungcapDanhgiaModel.Where(d => d.danhgianhacungcap_id == DanhgianhacungcapDanhgiaModel_old.danhgianhacungcap_id && d.date_accept == null).Count();
             if (count_not_done == 0)
             {
-                users_related_id.Add(danhgianhacungcap.user_chapnhan_id);
+                users_related_id.Add(danhgianhacungcap.user_id);
             }
 
 
@@ -425,6 +497,89 @@ namespace it_template.Areas.V1.Controllers
                     subject = "[Chấp nhận] Đánh giá " + danhgianhacungcap.nhacc + " cho nguyên liệu " + danhgianhacungcap.tenhh,
                     body = body,
                     email_type = "dgncc_accept",
+                    status = 1,
+                };
+                _context.Add(email);
+            }
+            await _context.SaveChangesAsync();
+
+
+
+
+            return Json(new { success = true });
+        }
+        [HttpPost]
+        public async Task<JsonResult> khongchapnhanDanhgia(int id, string note)
+        {
+
+            System.Security.Claims.ClaimsPrincipal currentUser = this.User;
+            var user_id = UserManager.GetUserId(currentUser);
+            var user = await UserManager.GetUserAsync(currentUser);
+
+            var DanhgianhacungcapDanhgiaModel_old = _context.DanhgianhacungcapDanhgiaModel.Where(d => d.id == id).FirstOrDefault();
+            if (DanhgianhacungcapDanhgiaModel_old == null)
+            {
+                return Json(new { success = false });
+            }
+            DanhgianhacungcapDanhgiaModel_old.user_id = user_id;
+            DanhgianhacungcapDanhgiaModel_old.date_no_accept = DateTime.Now;
+            DanhgianhacungcapDanhgiaModel_old.note = note;
+
+            _context.Update(DanhgianhacungcapDanhgiaModel_old);
+            _context.SaveChanges();
+
+            ///lây user liên quan
+            var danhgianhacungcap = _context.DanhgianhacungcapModel.Where(d => d.id == DanhgianhacungcapDanhgiaModel_old.danhgianhacungcap_id).FirstOrDefault();
+            ////Chuyển trạng thai
+            ///
+            danhgianhacungcap.status_id = (int)DanhgianhacungcapStatus.FAILED;
+
+            List<string> user_danhgia = _context.DanhgianhacungcapDanhgiaModel.Where(d => d.danhgianhacungcap_id == DanhgianhacungcapDanhgiaModel_old.danhgianhacungcap_id).Select(d => d.user_id.ToString()).ToList();
+            var comments = _context.DanhgianhacungcapCommentModel.Where(d => d.danhgianhacungcap_id == DanhgianhacungcapDanhgiaModel_old.danhgianhacungcap_id)
+                .Include(d => d.users_related).ToList();
+
+            var users_related_id = new List<string>();
+            users_related_id.Add(danhgianhacungcap.created_by);
+            foreach (var c in comments)
+            {
+                users_related_id.Add(c.user_id);
+                users_related_id.AddRange(c.users_related.Select(d => d.user_id).ToList());
+            }
+            users_related_id.AddRange(user_danhgia);
+
+            ///CHECK ALL ĐÃ CHÂP NHẬN
+            var count_not_done = _context.DanhgianhacungcapDanhgiaModel.Where(d => d.danhgianhacungcap_id == DanhgianhacungcapDanhgiaModel_old.danhgianhacungcap_id && d.date_accept == null).Count();
+            if (count_not_done == 0)
+            {
+                users_related_id.Add(danhgianhacungcap.user_id);
+            }
+
+
+            users_related_id = users_related_id.Distinct().ToList();
+            var itemToRemove = users_related_id.SingleOrDefault(r => r == user_id);
+            users_related_id.Remove(itemToRemove);
+            //SEND MAIL
+            if (users_related_id != null && users_related_id.Count() > 0)
+            {
+                var users_related_obj = _context.UserModel.Where(d => users_related_id.Contains(d.Id)).Select(d => d.Email).ToList();
+                var mail_string = string.Join(",", users_related_obj.ToArray());
+                string Domain = (HttpContext.Request.IsHttps ? "https://" : "http://") + HttpContext.Request.Host.Value;
+                //var text = CommentModel.comment;
+                var body = _view.Render("Emails/Accept",
+                    new
+                    {
+                        link_logo = Domain + "/images/clientlogo_astahealthcare.com_f1800.png",
+                        link = Domain + "/danhgianhacungcap/details/" + DanhgianhacungcapDanhgiaModel_old.danhgianhacungcap_id,
+                        note = note,
+                        user = user.FullName
+                    });
+
+                var email = new EmailModel
+                {
+                    email_to = mail_string,
+                    subject = "[Không chấp nhận] Đánh giá " + danhgianhacungcap.nhacc + " cho nguyên liệu " + danhgianhacungcap.tenhh,
+                    body = body,
+                    email_type = "dgncc_no_accept",
                     status = 1,
                 };
                 _context.Add(email);
@@ -470,7 +625,9 @@ namespace it_template.Areas.V1.Controllers
             var nhacc = Request.Form["filters[nhacc]"].FirstOrDefault();
             var nhasx = Request.Form["filters[nhasx]"].FirstOrDefault();
             var tenhh = Request.Form["filters[tenhh]"].FirstOrDefault();
+            var status_id_string = Request.Form["filters[status_id]"].FirstOrDefault();
             int id = id_text != null ? Convert.ToInt32(id_text) : 0;
+            int status_id = status_id_string != null ? Convert.ToInt32(status_id_string) : 0;
             //var tenhh = Request.Form["filters[tenhh]"].FirstOrDefault();
             int skip = start != null ? Convert.ToInt32(start) : 0;
             var customerData = _context.DanhgianhacungcapModel.Where(d => d.deleted_at == null);
@@ -490,6 +647,10 @@ namespace it_template.Areas.V1.Controllers
             if (tenhh != null && tenhh != "")
             {
                 customerData = customerData.Where(d => d.tenhh.Contains(tenhh));
+            }
+            if (status_id != 0)
+            {
+                customerData = customerData.Where(d => d.status_id == status_id);
             }
             if (id != 0)
             {

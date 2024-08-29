@@ -79,7 +79,13 @@
                       label="Đã chấp nhận"
                       class="p-button-success"
                       size="small"
-                      v-if="slotProps.data['is_chapnhan']"
+                      v-if="slotProps.data['status_id'] == 2"
+                    ></Button>
+                    <Button
+                      label="Không chấp nhận"
+                      class="p-button-danger"
+                      size="small"
+                      v-else-if="slotProps.data['status_id'] == 3"
                     ></Button>
                     <Button
                       label="Nháp"
@@ -91,7 +97,7 @@
                       label="Đang duyệt"
                       class="p-button-warning"
                       size="small"
-                      v-else
+                      v-else-if="slotProps.data['status_id'] == 1"
                     ></Button>
                   </div>
                 </template>
@@ -131,11 +137,23 @@
                 #filter="{ filterModel, filterCallback }"
                 v-if="col.filter == true"
               >
+                <template v-if="col.data == 'status_id'">
+                  <select
+                    class="form-control"
+                    v-model="filterModel.value"
+                    @change="filterCallback()"
+                  >
+                    <option value="1">Đang duyệt</option>
+                    <option value="2">Đã chấp nhận</option>
+                    <option value="3">Không chấp nhận</option>
+                  </select>
+                </template>
                 <InputText
                   type="text"
                   v-model="filterModel.value"
                   @keydown.enter="filterCallback()"
                   class="p-column-filter"
+                  v-else
                 />
               </template>
             </Column>
@@ -216,6 +234,7 @@ const columns = ref([
     label: "Trạng thái",
     data: "status_id",
     className: "text-center",
+    filter: true,
   },
 
   {
@@ -236,6 +255,7 @@ const filters = ref({
   tenhh: { value: null, matchMode: FilterMatchMode.CONTAINS },
   nhasx: { value: null, matchMode: FilterMatchMode.CONTAINS },
   nhacc: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  status_id: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
 const totalRecords = ref(0);
 const loading = ref(true);

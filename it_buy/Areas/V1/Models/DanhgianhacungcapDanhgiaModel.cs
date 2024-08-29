@@ -13,6 +13,7 @@ namespace Vue.Models
         public int danhgianhacungcap_id { get; set; }
         public DateTime? date_dealine { get; set; }
         public DateTime? date_accept { get; set; }
+        public DateTime? date_no_accept { get; set; }
 
         public string? bophan { get; set; }
         public string? user_id { get; set; }
