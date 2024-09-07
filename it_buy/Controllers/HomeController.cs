@@ -296,7 +296,10 @@ namespace Vue.Controllers
             }).ToList();
             foreach (var d in data_nhanhang)
             {
-                mail_string = d.user.Email;
+                var user = d.user;
+                if (user.deleted_at != null || (user.LockoutEnd != null && user.LockoutEnd >= DateTime.Now))
+                    continue;
+                mail_string = user.Email;
                 Domain = (HttpContext.Request.IsHttps ? "https://" : "http://") + HttpContext.Request.Host.Value;
                 body = _view.Render("Emails/RemindNhanhang",
                     new

@@ -679,6 +679,23 @@ namespace it_template.Areas.V1.Controllers
                 }
                 _context.AddRange(list_attachment);
 
+                ///Đính kèm từng item
+                var list_chitiet = data.chitiet.Select(d=>d.id).ToList();
+                var list_attachment2 = new List<DocumentAttachmentModel>();
+                var dinhkemchitiet = _context.DutruChitietDinhkemModel.Where(d => list_chitiet.Contains(d.dutru_chitiet_id)).ToList();
+                foreach (var d in dinhkemchitiet)
+                {
+                    list_attachment2.Add(new DocumentAttachmentModel()
+                    {
+                        document_id = DocumentModel.id,
+                        name = d.name,
+                        ext = d.ext,
+                        mimeType = d.mimeType,
+                        url = d.url,
+                        created_at = d.created_at
+                    });
+                }
+                _context.AddRange(list_attachment2);
 
                 ////Signature
                 for (int k = 0; k < 1; ++k)
