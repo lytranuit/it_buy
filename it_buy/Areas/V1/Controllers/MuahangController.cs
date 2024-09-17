@@ -524,6 +524,7 @@ namespace it_template.Areas.V1.Controllers
                     thanhtien_vat = 0,
                     tonggiatri = 0,
                     phigiaohang = 0,
+                    ck = 0,
                     tienvat = 0,
                     vat = 0,
                     tiente = "VND",
@@ -762,6 +763,7 @@ namespace it_template.Areas.V1.Controllers
                     raw.Add("thanhtien", ncc_chon.thanhtien.Value.ToString("#,##0.##"));
                     raw.Add("thanhtien_vat", ncc_chon.thanhtien_vat.Value.ToString("#,##0.##"));
                     raw.Add("phigiaohang", ncc_chon.phigiaohang.Value.ToString("#,##0.##"));
+                    raw.Add("ck", ncc_chon.ck.Value.ToString("#,##0.##"));
                     raw.Add("tienvat", ncc_chon.tienvat.Value.ToString("#,##0.##"));
                     //raw.Add("vat", ncc_chon.vat.Value.ToString());
                     raw.Add("tiente", ncc_chon.tiente.ToString());
@@ -1155,6 +1157,7 @@ namespace it_template.Areas.V1.Controllers
                     raw.Add("thanhtien", ncc_chon.thanhtien.Value.ToString("#,##0.##"));
                     raw.Add("thanhtien_vat", ncc_chon.thanhtien_vat.Value.ToString("#,##0.##"));
                     raw.Add("phigiaohang", ncc_chon.phigiaohang.Value.ToString("#,##0.##"));
+                    raw.Add("ck", ncc_chon.ck.Value.ToString("#,##0.##"));
                     raw.Add("tienvat", ncc_chon.tienvat.Value.ToString("#,##0.##"));
                     //raw.Add("vat", ncc_chon.vat.Value.ToString());
                     raw.Add("tiente", ncc_chon.tiente.ToString());

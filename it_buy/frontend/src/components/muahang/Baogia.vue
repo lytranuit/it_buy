@@ -204,6 +204,25 @@
 
             <div class="col-md-4">
               <div class="row">
+                <b class="col">Chiết khấu:</b>
+                <span class="col text-right">
+                  <InputNumber
+                    v-model="item.ck"
+                    class="p-inputtext-sm"
+                    :suffix="' ' + item.tiente"
+                    @update:modelValue="changetien(key)"
+                    :disabled="readonly"
+                    :maxFractionDigits="2"
+                  />
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="row col-12 mt-2">
+            <div class="col-md-8"></div>
+
+            <div class="col-md-4">
+              <div class="row">
                 <b class="col">Tổng giá trị:</b>
                 <span class="col text-right"
                   >{{ formatPrice(item.tonggiatri, 2) }} {{ item.tiente }}</span
@@ -368,6 +387,7 @@ const addNCC = () => {
   ncc.is_vat = true;
   ncc.tienvat = 0;
   ncc.phigiaohang = 0;
+  ncc.ck = 0;
   ncc.thanhtien = 0;
   ncc.thanhtien_vat = 0;
   ncc.tonggiatri = 0;
@@ -381,7 +401,7 @@ const addNCC = () => {
 
 const changetien = (index) => {
   var ncc = nccs.value[index];
-  var tonggiatri = ncc.thanhtien + ncc.tienvat + ncc.phigiaohang;
+  var tonggiatri = ncc.thanhtien + ncc.tienvat + ncc.phigiaohang - ncc.ck;
   ncc.tonggiatri = tonggiatri;
 };
 const removeNCC = (ncc) => {
@@ -448,6 +468,10 @@ const submit1 = () => {
     delete ncc.dinhkem;
     if (ncc.phigiaohang == null) {
       alert("Chưa nhập phí giao hàng!");
+      return false;
+    }
+    if (ncc.ck == null) {
+      alert("Chưa nhập chiết khấu!");
       return false;
     }
     for (var c of ncc.chitiet) {

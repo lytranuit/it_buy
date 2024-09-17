@@ -21,6 +21,7 @@ namespace Vue.Models
         public decimal? thanhtien_vat { get; set; }
         public decimal? tonggiatri { get; set; }
         public decimal? phigiaohang { get; set; }
+        public decimal? ck { get; set; }
         public decimal? tienvat { get; set; }
         public int? vat { get; set; }
         public bool? is_vat { get; set; }

@@ -178,7 +178,7 @@ const changeDongia = () => {
   ncc.thanhtien = thanhtien;
   ncc.thanhtien_vat = thanhtien_vat;
   ncc.tienvat = tienvat;
-  var tonggiatri = ncc.thanhtien + ncc.tienvat + ncc.phigiaohang;
+  var tonggiatri = ncc.thanhtien + ncc.tienvat + ncc.phigiaohang - ncc.ck;
   ncc.tonggiatri = tonggiatri;
 };
 const props = defineProps({
