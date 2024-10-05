@@ -38,14 +38,13 @@
           <span>Đề nghị thanh toán</span>
         </router-link>
       </li>
-      <li>
+      <!-- <li>
         <router-link class="nav-link" to="/danhgianhacungcap">
-          <!-- <i class="fas fa-truck-moving"></i> -->
           <i class="fab fa-product-hunt"></i>
 
           <span>Đánh giá nguyên liệu</span>
         </router-link>
-      </li>
+      </li> -->
       <li v-if="is_admin">
         <a href="javascript: void(0);">
           <i class="fas fa-wrench"></i>

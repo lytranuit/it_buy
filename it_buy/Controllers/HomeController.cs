@@ -8,8 +8,8 @@ using System.Net.Mime;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
-using System;
-using iText.StyledXmlParser.Jsoup.Nodes;
+using Spire.Xls;
+using System.Data;
 
 namespace Vue.Controllers
 {
@@ -322,6 +322,124 @@ namespace Vue.Controllers
             }
 
             return Json(new { success = true });
+        }
+
+        public async Task<JsonResult> export()
+        {
+            var muahang_ncc = _context.MuahangNccModel.Include(d => d.ncc).Include(d => d.muahang).Where(d => d.muahang.deleted_at == null && d.muahang.type_id == 3).ToList();
+            var ncc = muahang_ncc.GroupBy(d => d.ncc).Select(d => d.Key).ToList();
+
+            var chitiet_dutru = _context.DutruChitietModel.Include(d => d.dutru).Where(d => d.dutru.deleted_at == null && d.dutru.type_id == 3)
+                .Include(d => d.muahang_chitiet).ThenInclude(d => d.muahang)
+                .Include(d => d.muahang_chitiet).ThenInclude(d => d.muahang_ncc_chitiet).ThenInclude(d => d.muahang_ncc).ThenInclude(d => d.ncc).OrderBy(d => d.dutru.created_at).ToList();
+
+            var viewPath = "wwwroot/report/excel/Book1.xlsx";
+            var documentPath = "/tmp/" + DateTime.Now.ToFileTimeUtc() + ".xlsx";
+            string Domain = (HttpContext.Request.IsHttps ? "https://" : "http://") + HttpContext.Request.Host.Value;
+
+            Workbook workbook = new Workbook();
+            workbook.LoadFromFile(viewPath);
+
+            Worksheet sheet = workbook.Worksheets[0];
+            sheet.InsertColumn(18, ncc.Count() * 7, InsertOptionsType.FormatAsAfter);
+            var start_c = 18;
+            var stt = 0;
+            foreach (var item in ncc)
+            {
+                //if (stt >= (ncc.Count() - 5))
+                //    continue;
+                item.start_c = start_c;
+                var nRow = sheet.Rows[0];
+                CellRange range = sheet.Range[1, start_c, 1, start_c + 6];  // Hàng 1, cột 5 đến hàng cuối cùng, cột 7
+
+                range.Merge();
+
+                var cell = nRow.Columns[start_c - 1];
+                cell.Value = item.tenncc;
+                var nRow2 = sheet.Rows[1];
+                nRow2.Columns[start_c - 1].Value = "Code";
+                nRow2.Columns[start_c].Value = "Mô tả";
+                nRow2.Columns[start_c + 1].Value = "NSX";
+                nRow2.Columns[start_c + 2].Value = "Đơn vị tính";
+                nRow2.Columns[start_c + 3].Value = "Đơn giá";
+                nRow2.Columns[start_c + 4].Value = "Dự kiến thời gian giao hàng";
+                nRow2.Columns[start_c + 5].Value = "Ghi chú";
+
+                start_c = start_c + 7;
+            }
+            start_c = 18;
+            var start_r = 2;
+            sheet.InsertRow(start_r + 1, chitiet_dutru.Count(), InsertOptionsType.FormatAsAfter);
+            foreach (var item in chitiet_dutru)
+            {
+                stt++;
+                var nRow = sheet.Rows[start_r];
+                nRow.Columns[0].NumberValue = stt;
+                nRow.Columns[1].Value = item.tenhh;
+                nRow.Columns[2].Value = item.note;
+                nRow.Columns[3].NumberValue = (double)item.soluong;
+                nRow.Columns[4].Value = item.dvt;
+                nRow.Columns[6].Value = item.dutru.note;
+                nRow.Columns[7].Value = "Chưa mua";
+                var muahang_chitiet = item.muahang_chitiet;
+                if (muahang_chitiet.Count() > 0)
+                {
+                    nRow.Columns[7].Value = "Đang làm đề nghị mua hàng";
+                    var muahang = muahang_chitiet[0].muahang;
+                    var is_dathang = muahang.is_dathang;
+                    if (is_dathang == true)
+                    {
+                        nRow.Columns[7].Value = "Đang đặt hàng";
+                    }
+                    var is_nhanhang = muahang.is_nhanhang;
+                    if (is_nhanhang == true)
+                    {
+                        nRow.Columns[7].Value = "Đã nhận hàng";
+                    }
+                }
+
+                foreach (var item1 in muahang_chitiet)
+                {
+                    foreach (var item2 in item1.muahang_ncc_chitiet)
+                    {
+                        var dongia = item2.dongia;
+                        var dvt = item2.dvt;
+                        var muahang_ncc1 = item2.muahang_ncc;
+                        var ncc_id = muahang_ncc1.ncc_id;
+                        var giaohang = muahang_ncc1.thoigiangiaohang;
+                        var findncc = ncc.Where(d => d.id == ncc_id).FirstOrDefault();
+                        var start_c1 = findncc.start_c.Value;
+
+                        nRow.Columns[start_c1 + 2].Value = dvt;
+                        nRow.Columns[start_c1 + 3].NumberValue = (double)dongia;
+                        nRow.Columns[start_c1 + 3].NumberFormat = "#,##0";
+                        nRow.Columns[start_c1 + 4].Value = giaohang;
+
+                    }
+                }
+                //nRow.Columns[start_c + 2].Value
+
+
+
+                start_r++;
+            }
+            //sheet.InsertRow(5, 10, InsertOptionsType.FormatAsBefore);
+            //var start_r = 5;
+            //var stt = 0;
+            //foreach (var d in muahang_ncc)
+            //{
+
+            //    var nRow = sheet.Rows[start_r];
+
+            //    nRow.Cells[0].NumberValue = ++stt;
+            //    //start_r++;
+            //}
+
+            workbook.SaveToFile("./wwwroot" + documentPath, ExcelVersion.Version2013);
+
+            //var congthuc_ct = _QLSXcontext.Congthuc_CTModel.Where()
+            var jsonData = new { success = true, link = documentPath };
+            return Json(jsonData);
         }
     }
     class SuccesMail

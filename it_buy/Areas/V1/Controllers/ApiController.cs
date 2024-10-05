@@ -91,8 +91,18 @@ namespace it_template.Areas.V1.Controllers
         {
             System.Security.Claims.ClaimsPrincipal currentUser = this.User;
             var user_id = UserManager.GetUserId(currentUser);
-            var list_department = _context.UserDepartmentModel.Where(d => d.user_id == user_id).Select(d => d.department_id).ToList();
-            var departments = _context.DepartmentModel.Where(d => d.deleted_at == null && d.parent == 0 && list_department.Contains(d.id)).ToList();
+
+            var list_departments = _context.UserDepartmentModel.Where(d => d.user_id == user_id).Select(d => (int)d.department_id).ToList();
+            var is_CungungNVL = list_departments.Contains(29) == true;
+            var is_CungungGiantiep = list_departments.Contains(14) == true;
+            var is_CungungHCTT = list_departments.Contains(30) == true;
+
+
+            var departments = _context.DepartmentModel.Where(d => d.deleted_at == null && d.parent == 0).ToList();
+            if (!is_CungungGiantiep && !is_CungungHCTT && !is_CungungHCTT)
+            {
+                departments = departments.Where(d => list_departments.Contains(d.id)).ToList();
+            }
             return Json(departments, new System.Text.Json.JsonSerializerOptions()
             {
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,

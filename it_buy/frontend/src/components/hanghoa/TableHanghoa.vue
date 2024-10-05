@@ -51,22 +51,7 @@
             @change="loadLazyData"
           />
         </div>
-        <div
-          style="width: 200px; margin-left: 10px; font-size: 12px"
-          v-if="!is_CungungGiantiep && !is_CungungNVL && !is_CungungHCTT"
-        >
-          <DepartmentOfUserTreeSelect
-            v-model="department_id"
-            @update:model-value="loadLazyData"
-          >
-          </DepartmentOfUserTreeSelect>
-        </div>
-        <div
-          class="ml-3"
-          v-if="
-            !dutru_id && (is_CungungGiantiep || is_CungungNVL || is_CungungHCTT)
-          "
-        >
+        <div class="ml-3">
           <SelectButton
             v-model="filterTable"
             :options="list_filterTable"
@@ -74,7 +59,7 @@
             :pt="{ button: 'form-control-sm' }"
             @change="changeFilterTable"
             optionValue="value"
-            :allowEmpty="false"
+            :allowEmpty="true"
           >
             <template #option="slotProps">
               {{ slotProps.option.label }}
@@ -213,6 +198,9 @@
           {{ slotProps.data[col.data] }} {{ slotProps.data["dvt"] }}
         </template>
 
+        <template v-else-if="col.data == 'bophan'">
+          {{ bophan(slotProps.data.dutru.bophan_id) }}
+        </template>
         <template v-else-if="col.data == 'soluong_mua'">
           {{ slotProps.data[col.data] }} {{ slotProps.data["dvt"] }}
         </template>
@@ -255,36 +243,6 @@
                 ></Tag>
               </div>
             </div>
-            <span
-              class="ml-auto text-center"
-              style="min-width: 100px"
-              v-if="slotProps.data.dutru.type_id == 1"
-            >
-              <div>
-                <Tag
-                  v-if="!slotProps.data.danhgianhacungcap_id"
-                  severity="danger"
-                  value="Chưa đánh giá"
-                />
-                <router-link
-                  :to="
-                    '/danhgianhacungcap/details/' +
-                    slotProps.data.danhgianhacungcap_id
-                  "
-                  v-else
-                >
-                  <Tag
-                    v-if="!slotProps.data.danhgianhacungcap_is_chapnhan"
-                    severity="warning"
-                    value="Đang đánh giá"
-                  /><Tag
-                    v-else-if="slotProps.data.danhgianhacungcap_is_chapnhan"
-                    severity="success"
-                    value="Chấp nhận"
-                  />
-                </router-link>
-              </div>
-            </span>
           </div>
         </template>
         <template v-else>
@@ -320,6 +278,13 @@
               />
             </div>
           </div>
+        </div>
+        <div v-else-if="col.data == 'bophan'" style="width: 200px">
+          <DepartmentOfUserTreeSelect
+            v-model="filterModel.value"
+            @update:model-value="filterCallback()"
+          >
+          </DepartmentOfUserTreeSelect>
         </div>
         <div v-else>
           <InputText
@@ -490,6 +455,7 @@ import { useAuth } from "../../stores/auth";
 import DepartmentOfUserTreeSelect from "../TreeSelect/DepartmentOfUserTreeSelect.vue";
 import PopupAdd from "../danhgianhacungcap/PopupAdd.vue";
 import { useDanhgianhacungcap } from "../../stores/danhgianhacungcap";
+import Api from "../../api/Api";
 
 const store = useAuth();
 const {
@@ -568,48 +534,61 @@ const columns = ref([
     className: "text-center",
     filter: true,
   },
-
+  {
+    id: 2,
+    label: "Tên sản phẩm",
+    data: "tensp",
+    className: "text-center",
+    filter: true,
+  },
   {
     id: 3,
+    label: "Bộ phận dự trù",
+    data: "bophan",
+    className: "text-center",
+    filter: true,
+  },
+  {
+    id: 4,
     label: "Số lượng dự trù",
     data: "soluong_dutru",
     className: "text-center",
   },
 
   {
-    id: 4,
+    id: 5,
     label: "Mã dự trù",
     data: "list_dutru",
     className: "text-center",
     filter: true,
   },
   {
-    id: 5,
+    id: 6,
     label: "Hạn giao hàng",
     data: "ngayhethan",
     className: "text-center",
   },
 
   {
-    id: 6,
+    id: 7,
     label: "DNMH",
     data: "list_muahang",
     className: "text-center",
   },
   {
-    id: 7,
+    id: 8,
     label: "Số lượng mua",
     data: "soluong_mua",
     className: "text-center",
   },
   {
-    id: 8,
+    id: 9,
     label: "Còn lại",
     data: "soluong",
     className: "text-center",
   },
   {
-    id: 9,
+    id: 10,
     label: "Tổng tiền",
     data: "thanhtien",
     className: "text-center",
@@ -619,6 +598,8 @@ const filters = ref({
   id: { value: null, matchMode: FilterMatchMode.CONTAINS },
   mahh: { value: null, matchMode: FilterMatchMode.CONTAINS },
   tenhh: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  tensp: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  bophan: { value: null, matchMode: FilterMatchMode.CONTAINS },
   list_dutru: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
 const customFilter = ref({
@@ -652,7 +633,6 @@ const lazyParams = computed(() => {
     type_id: filterTable.value,
     dutru_id: props.dutru_id,
     filterTable: filterTable1.value,
-    department_id: department_id.value,
   };
 });
 const dt = ref(null);
@@ -698,7 +678,7 @@ const taodenghimuahang = () => {
   });
   router.push("/muahang/add?no_reset=1");
 };
-
+const departments = ref([]);
 const visiblePhancong = ref();
 const visibleTag = ref();
 const cm = ref();
@@ -815,6 +795,10 @@ const changeMahh = async () => {
   modelDialog.value.to = res.to;
   modelDialog.value.history = res.data;
 };
+const bophan = (id) => {
+  var d = departments.value.find((x) => x.id == id);
+  return d ? d.name : "";
+};
 onMounted(() => {
   let cache = localStorage.getItem(column_cache);
   if (!cache) {
@@ -826,22 +810,17 @@ onMounted(() => {
   }
   fill();
   loadLazyData();
+  Api.departmentsofuser().then((res) => {
+    departments.value = res;
+  });
 });
 const fill = () => {
   if (props.dutru_id > 0) return;
-  if (is_CungungGiantiep.value) {
-    list_filterTable.value.push({ label: "Mua hàng gián tiếp", value: 2 });
+  list_filterTable.value.push({ label: "Mua hàng gián tiếp", value: 2 });
 
-    // { label: "Nguyên vật liệu", value: 1 },
-    // { label: "Hóa chất,thuốc thử QC", value: 3 },
-  }
+  list_filterTable.value.push({ label: "Hóa chất,thuốc thử QC", value: 3 });
 
-  if (is_CungungHCTT.value) {
-    list_filterTable.value.push({ label: "Hóa chất,thuốc thử QC", value: 3 });
-  }
-  if (is_CungungNVL.value) {
-    list_filterTable.value.push({ label: "Nguyên vật liệu", value: 1 });
-  }
+  list_filterTable.value.push({ label: "Nguyên vật liệu", value: 1 });
 
   if (list_filterTable.value.length > 0) {
     filterTable.value = list_filterTable.value[0].value;

@@ -1,31 +1,21 @@
 ﻿
 
-using iText.Barcodes.Dmcode;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using NuGet.Packaging.Signing;
-using Org.BouncyCastle.Utilities;
-using Spire.Xls;
-using System;
 using System.Collections;
 using System.Data;
 using System.Diagnostics;
-using System.Drawing.Imaging;
 using System.Reflection;
-using System.Security.Policy;
 using System.Text.Json.Serialization;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Vue.Data;
 using Vue.Models;
-using QRCoder;
-using static QRCoder.PayloadGenerator;
-using NuGet.Packaging;
 using Vue.Services;
 using Microsoft.CodeAnalysis;
+using LinqKit;
+using System.Linq.Expressions;
+using System.Linq;
 
 namespace it_template.Areas.V1.Controllers
 {
@@ -680,7 +670,7 @@ namespace it_template.Areas.V1.Controllers
                 _context.AddRange(list_attachment);
 
                 ///Đính kèm từng item
-                var list_chitiet = data.chitiet.Select(d=>d.id).ToList();
+                var list_chitiet = data.chitiet.Select(d => d.id).ToList();
                 var list_attachment2 = new List<DocumentAttachmentModel>();
                 var dinhkemchitiet = _context.DutruChitietDinhkemModel.Where(d => list_chitiet.Contains(d.dutru_chitiet_id)).ToList();
                 foreach (var d in dinhkemchitiet)
@@ -756,41 +746,65 @@ namespace it_template.Areas.V1.Controllers
             var id_text = Request.Form["filters[id]"].FirstOrDefault();
             int id = id_text != null ? Convert.ToInt32(id_text) : 0;
             int priority_id = priority_id_string != null ? Convert.ToInt32(priority_id_string) : 0;
-            var department_id_string = Request.Form["department_id"].FirstOrDefault();
+            var department_id_string = Request.Form["filters[bophan_id]"].FirstOrDefault();
             int department_id = department_id_string != null ? Convert.ToInt32(department_id_string) : 0;
             var type_id_string = Request.Form["type_id"].FirstOrDefault();
+            var type1_string = Request.Form["type1"].FirstOrDefault();
             int type_id = type_id_string != null ? Convert.ToInt32(type_id_string) : 0;
+            int type1 = type1_string != null ? Convert.ToInt32(type1_string) : 0;
             //var tenhh = Request.Form["filters[tenhh]"].FirstOrDefault();
             int skip = start != null ? Convert.ToInt32(start) : 0;
             var customerData = _context.DutruModel.Where(d => d.deleted_at == null);
 
-            if (type_id == 100)
+            var departments = _context.UserDepartmentModel.Where(d => d.user_id == user_id).Select(d => (int)d.department_id).ToList();
+            var is_CungungNVL = departments.Contains(29) == true;
+            var is_CungungGiantiep = departments.Contains(14) == true;
+            var is_CungungHCTT = departments.Contains(30) == true;
+
+            Expression<Func<DutruModel, bool>> filter = p => p.created_by == user_id; // Biểu thức ban đầu là true (chấp nhận tất cả)
+
+            filter = filter.Or(d => departments.Contains((int)d.bophan_id));
+            if (is_CungungNVL)
+            {
+                filter = filter.Or(d => d.type_id == 1);
+            }
+            if (is_CungungGiantiep)
+            {
+                filter = filter.Or(d => d.type_id == 2);
+            }
+            if (is_CungungHCTT)
+            {
+                filter = filter.Or(d => d.type_id == 3);
+            }
+            customerData = customerData.Where(filter);
+
+
+
+            if (type_id > 0)
+            {
+                customerData = customerData.Where(d => d.type_id == type_id);
+            }
+
+            if (type1 == 1)
+            {
+                customerData = customerData.Where(d => d.created_by == user_id);
+            }
+            else if (type1 == 2)
             {
                 //Phan cho toi
                 var list_dutru_1 = _context.DutruChitietModel.Where(d => d.user_id == user_id).Select(d => d.dutru_id).ToList();
                 customerData = customerData.Where(d => list_dutru_1.Contains(d.id));
             }
-            else if (type_id > 0)
-            {
-                customerData = customerData.Where(d => d.type_id == type_id);
-            }
 
 
 
+
+            int recordsTotal = customerData.Count();
 
             if (department_id > 0)
             {
                 customerData = customerData.Where(d => d.bophan_id == department_id);
             }
-
-            if (department_id == 0 && type_id == 0)
-            {
-                customerData = customerData.Where(d => d.created_by == user_id);
-            }
-
-
-
-            int recordsTotal = customerData.Count();
             if (code != null && code != "")
             {
                 customerData = customerData.Where(d => d.code.Contains(code));
@@ -836,6 +850,7 @@ namespace it_template.Areas.V1.Controllers
                     status_id = record.status_id,
                     created_at = record.created_at,
                     priority_id = record.priority_id,
+                    bophan_id = record.bophan_id,
                     list_muahang = muahang
                 };
                 data.Add(data1);
@@ -863,19 +878,21 @@ namespace it_template.Areas.V1.Controllers
             var filter_user_id = Request.Form["filters[user_id]"].FirstOrDefault();
             var filter_tags = Request.Form["filters[tags]"].FirstOrDefault();
             var list_dutru = Request.Form["filters[list_dutru]"].FirstOrDefault();
+            var tensp = Request.Form["filters[tensp]"].FirstOrDefault();
             var orderById = Request.Form["orderBy[id]"].FirstOrDefault();
 
             var filterTable = Request.Form["filterTable"].FirstOrDefault();
             var dutru_id_string = Request.Form["dutru_id"].FirstOrDefault();
-            var department_id_string = Request.Form["department_id"].FirstOrDefault();
+            var department_id_string = Request.Form["filters[bophan]"].FirstOrDefault();
             int dutru_id = dutru_id_string != null ? Convert.ToInt32(dutru_id_string) : 0;
             int department_id = department_id_string != null ? Convert.ToInt32(department_id_string) : 0;
 
-            var departments = _context.UserDepartmentModel.Where(d => d.user_id == user_id).Select(d => d.department_id).ToList();
+            var departments = _context.UserDepartmentModel.Where(d => d.user_id == user_id).Select(d => (int)d.department_id).ToList();
             var is_CungungNVL = departments.Contains(29) == true;
             var is_CungungGiantiep = departments.Contains(14) == true;
             var is_CungungHCTT = departments.Contains(30) == true;
 
+            //var 
 
             //var tenhh = Request.Form["filters[tenhh]"].FirstOrDefault();
             int skip = start != null ? Convert.ToInt32(start) : 0;
@@ -883,24 +900,24 @@ namespace it_template.Areas.V1.Controllers
                 .Include(d => d.muahang_chitiet).ThenInclude(d => d.muahang)
                 .Include(d => d.dutru).Where(d => d.dutru.status_id == (int)Status.EsignSuccess && d.date_huy == null);
 
-            if (!is_CungungNVL && !is_CungungGiantiep && !is_CungungHCTT)
+            Expression<Func<DutruChitietModel, bool>> filter = p => p.dutru.created_by == user_id; // Biểu thức ban đầu là true (chấp nhận tất cả)
+
+            filter = filter.Or(d => departments.Contains((int)d.dutru.bophan_id));
+            if (is_CungungNVL)
             {
-                if (department_id != null && department_id != 0)
-                {
-                    customerData = customerData.Where(d => d.dutru.bophan_id == department_id);
-                }
-                else
-                {
-                    customerData = customerData.Where(d => d.dutru.created_by == user_id);
-                }
+                filter = filter.Or(d => d.dutru.type_id == 1);
             }
-            else
+            if (is_CungungGiantiep)
             {
-                if (type_id != null && type_id != 0)
-                {
-                    customerData = customerData.Where(d => d.dutru.type_id == type_id);
-                }
+                filter = filter.Or(d => d.dutru.type_id == 2);
             }
+            if (is_CungungHCTT)
+            {
+                filter = filter.Or(d => d.dutru.type_id == 3);
+            }
+            customerData = customerData.Where(filter);
+
+
 
             if (filterTable != null && filterTable == "Chưa xử lý")
             {
@@ -922,6 +939,14 @@ namespace it_template.Areas.V1.Controllers
             }
 
             int recordsTotal = customerData.Count();
+            if (type_id != null && type_id != 0)
+            {
+                customerData = customerData.Where(d => d.dutru.type_id == type_id);
+            }
+            if (department_id != null && department_id != 0)
+            {
+                customerData = customerData.Where(d => d.dutru.bophan_id == department_id);
+            }
             if (mahh != null && mahh != "")
             {
                 customerData = customerData.Where(d => d.mahh.Contains(mahh));
@@ -937,6 +962,10 @@ namespace it_template.Areas.V1.Controllers
             if (filter_tags != null && filter_tags != "")
             {
                 customerData = customerData.Where(d => d.tags.Contains(filter_tags));
+            }
+            if (tensp != null && tensp != "")
+            {
+                customerData = customerData.Where(d => d.tensp.Contains(tensp));
             }
             if (list_dutru != null && list_dutru != "")
             {
@@ -1021,6 +1050,7 @@ namespace it_template.Areas.V1.Controllers
                     soluong = soluong,
                     user = record.user,
                     list_tag = record.list_tag,
+                    tensp = record.tensp,
                     dutru_chitiet_id = record.id,
                     danhgianhacungcap_id = record.danhgianhacungcap_id,
                     danhgianhacungcap_is_chapnhan = record.danhgianhacungcap?.status_id == (int)DanhgianhacungcapStatus.SUCCESS,
@@ -1031,9 +1061,11 @@ namespace it_template.Areas.V1.Controllers
                         code = dutru.code,
                         type_id = dutru.type_id,
                         priority_id = dutru.priority_id,
+                        bophan_id = dutru.bophan_id,
+
                     },
                     list_muahang = list_muahang
-                });
+                }); ;
             }
 
             var jsonData = new { draw = draw, recordsFiltered = recordsFiltered, recordsTotal = recordsTotal, data = data };

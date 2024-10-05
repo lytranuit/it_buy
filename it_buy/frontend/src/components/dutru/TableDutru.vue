@@ -3,16 +3,6 @@
     <div class="card-body" style="overflow: auto; position: relative">
       <div class="card-header d-md-flex align-items-center">
         <PopupDutru></PopupDutru>
-        <div class="ml-auto d-flex align-items-center">
-          <span>Bộ phận:</span>
-          <div style="width: 200px; margin-left: 10px">
-            <DepartmentOfUserTreeSelect
-              v-model="department_id"
-              @update:model-value="loadLazyData"
-            >
-            </DepartmentOfUserTreeSelect>
-          </div>
-        </div>
       </div>
       <div class="card-body">
         <DataTable
@@ -56,7 +46,22 @@
                   :pt="{ button: 'form-control-sm' }"
                   @change="loadLazyData"
                   optionValue="value"
-                  :allowEmpty="false"
+                  :allowEmpty="true"
+                >
+                  <template #option="slotProps">
+                    {{ slotProps.option.label }}
+                  </template>
+                </SelectButton>
+              </div>
+              <div class="ml-3">
+                <SelectButton
+                  v-model="filterTable1"
+                  :options="list_filterTable1"
+                  aria-labelledby="basic"
+                  :pt="{ button: 'form-control-sm' }"
+                  @change="loadLazyData"
+                  optionValue="value"
+                  :allowEmpty="true"
                 >
                   <template #option="slotProps">
                     {{ slotProps.option.label }}
@@ -212,6 +217,9 @@
                   </div>
                 </template>
 
+                <template v-else-if="col.data == 'bophan_id'">
+                  {{ bophan(slotProps.data.bophan_id) }}
+                </template>
                 <template v-else-if="col.data == 'status_id'">
                   <div class="text-center">
                     <Tag
@@ -272,6 +280,13 @@
                   <option value="3">Gấp</option>
                 </select>
               </template>
+              <div v-else-if="col.data == 'bophan_id'" style="width: 200px">
+                <DepartmentOfUserTreeSelect
+                  v-model="filterModel.value"
+                  @update:model-value="filterCallback()"
+                >
+                </DepartmentOfUserTreeSelect>
+              </div>
               <template v-else>
                 <InputText
                   type="text"
@@ -313,6 +328,7 @@ import { useAuth } from "../../stores/auth";
 import { storeToRefs } from "pinia";
 import PopupDutru from "./PopupDutru.vue";
 import DepartmentOfUserTreeSelect from "../TreeSelect/DepartmentOfUserTreeSelect.vue";
+import Api from "../../api/Api";
 const store = useAuth();
 const {
   is_admin,
@@ -330,8 +346,10 @@ const {
 const confirm = useConfirm();
 const datatable = ref();
 const department_id = ref();
-const list_filterTable = ref([{ label: "Tôi tạo", value: null }]);
-const filterTable = ref();
+const list_filterTable = ref([{ label: "Tôi tạo", value: 1 }]);
+const list_filterTable1 = ref([]);
+const filterTable = ref(1);
+const filterTable1 = ref();
 const columns = ref([
   {
     id: 0,
@@ -357,19 +375,26 @@ const columns = ref([
   },
   {
     id: 3,
+    label: "Bộ phận dự trù",
+    data: "bophan_id",
+    className: "text-center",
+    filter: true,
+  },
+  {
+    id: 4,
     label: "Độ ưu tiên",
     data: "priority_id",
     className: "text-center",
     filter: true,
   },
   {
-    id: 4,
+    id: 5,
     label: "Trạng thái",
     data: "status_id",
     className: "text-center",
   },
   {
-    id: 5,
+    id: 6,
     label: "DNMH",
     data: "list_muahang",
     className: "text-center",
@@ -379,8 +404,10 @@ const filters = ref({
   id: { value: null, matchMode: FilterMatchMode.CONTAINS },
   code: { value: null, matchMode: FilterMatchMode.CONTAINS },
   name: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  bophan_id: { value: null, matchMode: FilterMatchMode.CONTAINS },
   priority_id: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
+const departments = ref([]);
 const totalRecords = ref(0);
 const loading = ref(true);
 const showing = ref([]);
@@ -402,8 +429,8 @@ const lazyParams = computed(() => {
     start: first.value,
     length: rows.value,
     filters: data_filters,
-    type_id: filterTable.value,
-    department_id: department_id.value,
+    type_id: filterTable1.value,
+    type1: filterTable.value,
   };
 });
 const dt = ref(null);
@@ -437,6 +464,10 @@ const confirmDelete = (id) => {
     },
   });
 };
+const bophan = (id) => {
+  var d = departments.value.find((x) => x.id == id);
+  return d ? d.name : "";
+};
 onMounted(() => {
   let cache = localStorage.getItem(column_cache);
   if (!cache) {
@@ -448,31 +479,22 @@ onMounted(() => {
   }
   fill();
   loadLazyData();
+
+  Api.departmentsofuser().then((res) => {
+    departments.value = res;
+  });
 });
 const fill = () => {
   if (is_Cungung.value) {
-    list_filterTable.value.push({ label: "Phân công cho tôi", value: 100 });
-  }
-  if (is_CungungGiantiep.value) {
-    list_filterTable.value.push({ label: "Mua hàng gián tiếp", value: 2 });
-
-    // { label: "Nguyên vật liệu", value: 1 },
-    // { label: "Hóa chất,thuốc thử QC", value: 3 },
+    list_filterTable.value.push({ label: "Phân công cho tôi", value: 2 });
+    filterTable.value = 2;
   }
 
-  if (is_CungungHCTT.value) {
-    list_filterTable.value.push({ label: "Hóa chất,thuốc thử QC", value: 3 });
-  }
-  if (is_CungungNVL.value) {
-    list_filterTable.value.push({ label: "Nguyên vật liệu", value: 1 });
-  }
+  list_filterTable1.value.push({ label: "Mua hàng gián tiếp", value: 2 });
 
-  if (list_filterTable.value.length > 0) {
-    filterTable.value = list_filterTable.value[0].value;
-    if (is_Cungung.value) {
-      filterTable.value = 100;
-    }
-  }
+  list_filterTable1.value.push({ label: "Hóa chất,thuốc thử QC", value: 3 });
+
+  list_filterTable1.value.push({ label: "Nguyên vật liệu", value: 1 });
 };
 const waiting = ref();
 watch(filters, async (newa, old) => {

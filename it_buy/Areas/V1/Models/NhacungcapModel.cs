@@ -45,5 +45,8 @@ namespace Vue.Models
 
         //public virtual List<MaterialModel> Materials { get; set; }
 
+        [NotMapped]
+        public int? start_c { get; set; }
+
     }
 }
