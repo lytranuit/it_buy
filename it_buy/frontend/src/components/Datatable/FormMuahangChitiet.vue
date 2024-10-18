@@ -27,7 +27,7 @@
         <div class="text-center">Không có dữ liệu.</div>
       </template>
       <Column
-        v-for="(col, index) in selectedColumns"
+        v-for="col in selectedColumns"
         :field="col.data"
         :header="col.label"
         :key="col.data"
@@ -56,8 +56,17 @@
               @click="openOp($event, slotProps.data)"
             ></i>
           </template>
-          <template v-else-if="col.data == 'hh_id'">
-            {{ slotProps.data["mahh"] }}
+          <template v-else-if="col.data == 'mahh' && model.status_id == 1">
+            <div class="d-flex align-items-center">
+              <material-auto-complete
+                v-model="slotProps.data[col.data]"
+                :type_id="model.type_id"
+                @item-select="select($event, slotProps.data)"
+              >
+              </material-auto-complete>
+              <!-- <span class="fas fa-plus ml-3 text-success" style="cursor: pointer;"
+                                @click="openNew(slotProps.index)" v-if="model.type_id != 1"></span> -->
+            </div>
           </template>
           <template v-else>
             {{ slotProps.data[col.data] }}
@@ -87,6 +96,7 @@
 <script setup>
 import { onMounted, ref, watch, computed } from "vue";
 import Materials from "../../components/TreeSelect/MaterialTreeSelect.vue";
+import MaterialAutoComplete from "../AutoComplete/MaterialAutoComplete.vue";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
 import Button from "primevue/button";
@@ -104,6 +114,7 @@ import { useGeneral } from "../../stores/general";
 const store_muahang = useMuahang();
 const store_general = useGeneral();
 const { datatable, model } = storeToRefs(store_muahang);
+const { materials } = storeToRefs(store_general);
 const editingRow = ref();
 
 const loading = ref(false);
@@ -116,7 +127,7 @@ const columns = ref([
   },
   {
     label: "Mã(*)",
-    data: "hh_id",
+    data: "mahh",
     className: "text-center",
   },
   {
@@ -149,10 +160,18 @@ const openOp = (event, row) => {
   editingRow.value = row;
   op.value.toggle(event);
 };
-onMounted(() => {});
+const select = (event, row) => {
+  //   console.log(event);
+  var id = event.value.id;
+  row.mahh = id;
+  // store_general.changeMaterial(row);
+};
+onMounted(async () => {
+  // await store_general.fetchMaterials();
+});
 </script>
 <style>
-.hh_id {
+.mahh {
   max-width: 300px;
 }
 </style>

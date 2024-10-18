@@ -214,12 +214,12 @@ namespace it_template.Areas.V1.Controllers
         //    return Json(list);
         //}
 
-        public JsonResult GetFiles(int id)
+        public JsonResult GetFiles(string mahh)
         {
             var data = new List<RawFileMaterial>();
 
             ///File up
-            var files_up = _context.MaterialDinhkemModel.Where(d => d.hh_id == id && d.deleted_at == null).Include(d => d.user_created_by).ToList();
+            var files_up = _context.MaterialDinhkemModel.Where(d => d.mahh == mahh && d.deleted_at == null).Include(d => d.user_created_by).ToList();
             if (files_up.Count > 0)
             {
                 data.AddRange(files_up.GroupBy(d => new { d.note, d.created_at }).Select(d => new RawFileMaterial
@@ -254,7 +254,7 @@ namespace it_template.Areas.V1.Controllers
 
         [HttpPost]
 
-        public async Task<JsonResult> SaveDinhkem(string note, int hh_id)
+        public async Task<JsonResult> SaveDinhkem(string note, string mahh)
         {
             System.Security.Claims.ClaimsPrincipal currentUser = this.User;
             var user_id = UserManager.GetUserId(currentUser);
@@ -276,11 +276,11 @@ namespace it_template.Areas.V1.Controllers
                     string ext = Path.GetExtension(name);
                     string mimeType = file.ContentType;
                     //var fileName = Path.GetFileName(name);
-                    var newName = timeStamp + "-" + hh_id + "-" + name;
+                    var newName = timeStamp + "-" + mahh + "-" + name;
                     //var muahang_id = MuahangModel_old.id;
                     newName = newName.Replace("+", "_");
                     newName = newName.Replace("%", "_");
-                    var dir = _configuration["Source:Path_Private"] + "\\materials\\" + hh_id;
+                    var dir = _configuration["Source:Path_Private"] + "\\materials\\" + mahh;
                     bool exists = Directory.Exists(dir);
 
                     if (!exists)
@@ -289,7 +289,7 @@ namespace it_template.Areas.V1.Controllers
 
                     var filePath = dir + "\\" + newName;
 
-                    string url = "/private/materials/" + hh_id + "/" + newName;
+                    string url = "/private/materials/" + mahh + "/" + newName;
                     items.Add(new MaterialDinhkemModel
                     {
                         note = note,
@@ -297,7 +297,7 @@ namespace it_template.Areas.V1.Controllers
                         url = url,
                         name = name,
                         mimeType = mimeType,
-                        hh_id = hh_id,
+                        mahh = mahh,
                         created_at = now,
                         created_by = user_id
                     });

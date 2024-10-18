@@ -53,7 +53,7 @@
             <div class="d-flex align-items-center">
               <material-auto-complete
                 v-model="slotProps.data[col.data]"
-                :disabled="slotProps.data['hh_id'] != null"
+                :disabled="slotProps.data['mahh'] != null"
                 :type_id="model.type_id"
                 @item-select="select($event, slotProps.data)"
               >
@@ -257,7 +257,7 @@ const editRow = ref({});
 const huyitem = (item) => {
   editRow.value = item;
   visible.value = item;
-  console.log(item);
+  // console.log(item);
 };
 const HuyChitiet = () => {
   if (!editRow.value.note_huy.trim()) {
@@ -327,10 +327,10 @@ const label = (row) => {
 const select = (event, row) => {
   //   console.log(event);
   var id = event.value.id;
-  row.hh_id = "m-" + id;
+  row.mahh = id;
   row.is_new = false;
+  // console.log(row);
   store_general.changeMaterial(row);
-  // console.log(row)
 };
 const store_dutru = useDutru();
 const store_general = useGeneral();
@@ -477,14 +477,12 @@ const confirmDeleteSelected = () => {
   });
 };
 onMounted(async () => {
-  await store_general.fetchMaterials();
-
   // if(items)
 });
 </script>
 
 <style>
-.hh_id {
+.mahh {
   min-width: 300px;
 }
 

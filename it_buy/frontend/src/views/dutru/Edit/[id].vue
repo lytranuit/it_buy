@@ -570,7 +570,7 @@ const xuatpdf = async () => {
   await submit();
   waiting.value = true;
   var response = await dutruApi.xuatpdf(model.value.id);
-  waiting.value = false;
+
   if (response.success) {
     toast.add({
       severity: "success",
@@ -580,6 +580,7 @@ const xuatpdf = async () => {
     });
     load_data(model.value.id);
   }
+  waiting.value = false;
 };
 const savenhanhang = async () => {
   // console.log(list_nhanhang);

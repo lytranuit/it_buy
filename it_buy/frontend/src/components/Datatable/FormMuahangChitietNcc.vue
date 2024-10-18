@@ -24,8 +24,15 @@
         :className="col.className"
       >
         <template #body="slotProps">
-          <template v-if="col.data == 'hh_id'">
-            {{ slotProps.data["mahh"] }}
+          <template v-if="col.data == 'mahh'">
+            <div class="d-flex align-items-center">
+              <material-auto-complete
+                v-model="slotProps.data[col.data]"
+                @item-select="select($event, slotProps.data)"
+                :disabled="readonly"
+              >
+              </material-auto-complete>
+            </div>
           </template>
           <template v-else-if="col.data == 'tenhh' || col.data == 'dvt'">
             <InputText
@@ -88,6 +95,7 @@ import Column from "primevue/column";
 import InputNumber from "primevue/inputnumber";
 import { storeToRefs } from "pinia";
 
+import MaterialAutoComplete from "../AutoComplete/MaterialAutoComplete.vue";
 import { useConfirm } from "primevue/useconfirm";
 import { rand } from "../../utilities/rand";
 import { formatPrice } from "../../utilities/util";
@@ -99,6 +107,7 @@ const readonly = ref(false);
 const store_muahang = useMuahang();
 const store_general = useGeneral();
 const { nccs, nccs_chitiet, model } = storeToRefs(store_muahang);
+const { materials } = storeToRefs(store_general);
 const confirm = useConfirm();
 
 const loading = ref(false);
@@ -117,7 +126,7 @@ const columns = ref([
   },
   {
     label: "Mã",
-    data: "hh_id",
+    data: "mahh",
     className: "text-center",
   },
   {
@@ -184,11 +193,19 @@ const changeDongia = () => {
 const props = defineProps({
   index: Number,
 });
-onMounted(() => {
+
+const select = (event, row) => {
+  //   console.log(event);
+  var id = event.value.id;
+  row.mahh = id;
+  // store_general.changeMaterial(row);
+};
+onMounted(async () => {
   if ([9, 10, 11].indexOf(model.value.status_id) != -1) {
     readonly.value = true;
   }
-  // console.log(props.index)
+  // await store_general.fetchMaterials();
+  // console.log(selectedColumns);
   // console.log(modelncc.value)
 });
 
@@ -205,7 +222,7 @@ watch(
         },
         {
           label: "Mã",
-          data: "hh_id",
+          data: "mahh",
           className: "text-center",
         },
         {
@@ -253,7 +270,7 @@ watch(
         },
         {
           label: "Mã",
-          data: "hh_id",
+          data: "mahh",
           className: "text-center",
         },
         {

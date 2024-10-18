@@ -313,14 +313,14 @@ namespace it_template.Areas.V1.Controllers
         [HttpPost]
         public async Task<JsonResult> chiphi(DateTime? tungay, DateTime? denngay, string timetype = "Month")
         {
-            var cusdata = _context.MuahangModel.Where(d => d.deleted_at == null && d.date_finish != null);
+            var cusdata = _context.MuahangModel.Where(d => d.deleted_at == null && d.is_multiple_ncc != true && d.pay_at != null);
             if (tungay != null && tungay.HasValue)
             {
                 if (tungay.Value.Kind == DateTimeKind.Utc)
                 {
                     tungay = tungay.Value.ToLocalTime();
                 }
-                cusdata = cusdata.Where(d => d.date_finish >= tungay.Value);
+                cusdata = cusdata.Where(d => d.pay_at >= tungay.Value);
             }
             if (denngay != null && denngay.HasValue)
             {
@@ -328,17 +328,18 @@ namespace it_template.Areas.V1.Controllers
                 {
                     denngay = denngay.Value.ToLocalTime();
                 }
-                cusdata = cusdata.Where(d => d.date_finish <= denngay.Value);
+                cusdata = cusdata.Where(d => d.pay_at <= denngay.Value);
             }
             var data = cusdata.Include(d => d.muahang_chonmua)
                 .ThenInclude(d => d.chitiet)
                 .ThenInclude(d => d.muahang_chitiet)
                 .ThenInclude(d => d.dutru_chitiet).ThenInclude(d => d.dutru)
                 .ToList();
+            data = data.Where(d => d.muahang_chonmua != null).ToList();
             var list = new List<Chart1>();
             if (timetype == "Year")
             {
-                list = data.GroupBy(d => new { d.date_finish.Value.Year }).Select(group => new Chart1
+                list = data.GroupBy(d => new { d.pay_at.Value.Year }).Select(group => new Chart1
                 {
                     sort = group.Key.Year.ToString(),
                     label = group.Key.Year.ToString(),
@@ -352,7 +353,7 @@ namespace it_template.Areas.V1.Controllers
             }
             else if (timetype == "Month")
             {
-                list = data.GroupBy(d => new { year = d.date_finish.Value.Year, month = d.date_finish.Value.Month }).Select(group => new Chart1
+                list = data.GroupBy(d => new { year = d.pay_at.Value.Year, month = d.pay_at.Value.Month }).Select(group => new Chart1
                 {
                     sort = group.Key.year + "-" + group.Key.month.ToString("d2"),
                     label = group.Key.month.ToString("d2") + "/" + group.Key.year,
@@ -374,7 +375,7 @@ namespace it_template.Areas.V1.Controllers
             //}
             else
             {
-                list = data.GroupBy(d => new { date = d.date_finish.Value.Date }).Select(group => new Chart1
+                list = data.GroupBy(d => new { date = d.pay_at.Value.Date }).Select(group => new Chart1
                 {
                     sort = group.Key.date.ToString("yyyy-MM-dd"),
                     label = group.Key.date.ToString("yyyy-MM-dd"),
@@ -405,24 +406,26 @@ namespace it_template.Areas.V1.Controllers
             return Json(new
             {
                 data = dulieu,
-                list = list
+                //list = list
             }, new System.Text.Json.JsonSerializerOptions()
             {
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                 ReferenceHandler = ReferenceHandler.IgnoreCycles,
             });
+
+
         }
         [HttpPost]
         public async Task<JsonResult> chiphibophan(DateTime? tungay, DateTime? denngay)
         {
-            var cusdata = _context.MuahangModel.Where(d => d.deleted_at == null && d.date_finish != null);
+            var cusdata = _context.MuahangModel.Where(d => d.deleted_at == null && d.is_multiple_ncc != true && d.pay_at != null);
             if (tungay != null && tungay.HasValue)
             {
                 if (tungay.Value.Kind == DateTimeKind.Utc)
                 {
                     tungay = tungay.Value.ToLocalTime();
                 }
-                cusdata = cusdata.Where(d => d.date_finish >= tungay.Value);
+                cusdata = cusdata.Where(d => d.pay_at >= tungay.Value);
             }
             if (denngay != null && denngay.HasValue)
             {
@@ -430,13 +433,14 @@ namespace it_template.Areas.V1.Controllers
                 {
                     denngay = denngay.Value.ToLocalTime();
                 }
-                cusdata = cusdata.Where(d => d.date_finish <= denngay.Value);
+                cusdata = cusdata.Where(d => d.pay_at <= denngay.Value);
             }
             var data = cusdata.Include(d => d.muahang_chonmua)
                 .ThenInclude(d => d.chitiet)
                 .ThenInclude(d => d.muahang_chitiet)
                 .ThenInclude(d => d.dutru_chitiet).ThenInclude(d => d.dutru).ThenInclude(d => d.bophan)
                 .ToList();
+            data = data.Where(d => d.muahang_chonmua != null).ToList();
             var listbophan = new List<Chartbophan>();
             foreach (var d in data)
             {

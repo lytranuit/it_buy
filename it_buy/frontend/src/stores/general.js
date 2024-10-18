@@ -17,7 +17,8 @@ export const useGeneral = defineStore("general", () => {
   };
 
   const changeMaterial = (row) => {
-    var material = materials.value.find((item) => "m-" + item.id == row.hh_id);
+    // console.log(materials);
+    var material = materials.value.find((item) => item.mahh == row.mahh);
     if (material) {
       var temp = Object.assign({}, material);
       delete temp.id;
@@ -28,7 +29,7 @@ export const useGeneral = defineStore("general", () => {
           key == "ids" ||
           key == "stt" ||
           key == "soluong" ||
-          key == "hh_id"
+          key == "mahh"
         ) {
         } else {
           row[key] = material[key];
@@ -72,6 +73,7 @@ export const useGeneral = defineStore("general", () => {
     });
   }
   async function fetchMaterialGroup() {
+    // console.log(materialGroup.value.length);
     if (materialGroup.value.length) return materialGroup.value;
     return Api.group_materials().then((response) => {
       materialGroup.value = response;

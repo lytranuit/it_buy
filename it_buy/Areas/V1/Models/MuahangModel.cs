@@ -29,6 +29,8 @@ namespace Vue.Models
         public bool? is_nhanhang { get; set; }
         public bool? is_sample { get; set; }
 
+        public bool? is_multiple_ncc { get; set; }
+        public int? parent_id { get; set; }
 
 
         public string? dondathang { get; set; }
@@ -42,6 +44,7 @@ namespace Vue.Models
         public virtual List<MuahangNccModel>? nccs { get; set; }
         public virtual List<MuahangUynhiemchiModel>? uynhiemchi { get; set; }
 
+        public DateTime? pay_at { get; set; }     ///Ngày thanh toán
         public DateTime? date_finish { get; set; }     ///Ngày hoàn thành
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         [DataType(DataType.Date)]

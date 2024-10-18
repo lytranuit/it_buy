@@ -117,6 +117,7 @@ import { storeToRefs } from "pinia";
 import { useToast } from "primevue/usetoast";
 import { rand } from "../../../utilities/rand";
 import DepartmentTreeSelect from "../../../components/TreeSelect/DepartmentTreeSelect.vue";
+import { useGeneral } from "../../../stores/general";
 const toast = useToast();
 const minDate = new Date();
 const route = useRoute();
@@ -124,10 +125,14 @@ const storeDutru = useDutru();
 const router = useRouter();
 const messageError = ref();
 const store = useAuth();
+const store_general = useGeneral();
 const buttonDisabled = ref();
 const { model, datatable, list_add } = storeToRefs(storeDutru);
 onMounted(() => {
   storeDutru.reset();
+  store_general.fetchMaterialGroup();
+  store_general.fetchMaterials();
+
   model.value.type_id = route.params.id;
   model.value.status_id = 1;
   model.value.priority_id = 1;

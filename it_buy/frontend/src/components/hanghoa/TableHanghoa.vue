@@ -35,12 +35,10 @@
           @click="taodenghimuahang()"
         ></Button>
         <Button
-          label="Tạo đánh giá"
-          icon="pi pi-plus"
-          class="p-button-success p-button-sm ml-2"
-          :disabled="checkdanhgia"
-          v-if="is_CungungNVL"
-          @click="taodanhgia()"
+          label="Xuất excel"
+          icon="pi pi-download"
+          class="p-button-sm ml-2"
+          @click="xuatexcel"
         ></Button>
         <div class="ml-auto">
           <SelectButton
@@ -75,7 +73,36 @@
             v-else-if="type == 'chitiet'"></Button> -->
       </div>
     </template>
-
+    <template #footer>
+      <div style="text-align: center">
+        <div class="row mb-2">
+          <div class="col-md">Các loại trạng thái DNMH</div>
+        </div>
+        <div class="row justify-content-center" style="gap: 20px">
+          <div class="col-md">
+            <Tag value="Đang thực hiện" severity="secondary" />
+          </div>
+          <div class="col-md">
+            <Tag value="Đang trình ký" severity="warning" />
+          </div>
+          <div class="col-md">
+            <Tag value="Không duyệt" severity="danger" />
+          </div>
+          <div class="col-md">
+            <Tag value="Đang đặt hàng" />
+          </div>
+          <div class="col-md">
+            <Tag value="Chờ nhận hàng" severity="info" />
+          </div>
+          <div class="col-md">
+            <Tag value="Chờ thanh toán" severity="info" />
+          </div>
+          <div class="col-md">
+            <Tag value="Hoàn thành" severity="success" />
+          </div>
+        </div>
+      </div>
+    </template>
     <template #empty>
       <div class="text-center">Không có dữ liệu.</div>
     </template>
@@ -92,6 +119,7 @@
           <RouterLink
             :to="'/dutru/edit/' + slotProps.data.dutru.id"
             class="text-primary"
+            target="_blank"
             >{{ slotProps.data.dutru.code }}</RouterLink
           >
           <Tag
@@ -121,6 +149,7 @@
             <RouterLink
               :to="'/muahang/edit/' + item.id"
               class="text-primary mr-2"
+              target="_blank"
               v-if="is_CungungGiantiep || is_CungungNVL || is_CungungHCTT"
               >{{ item.id }} - {{ item.code }}
             </RouterLink>
@@ -153,29 +182,19 @@
             <Tag
               value="Đang thực hiện"
               severity="secondary"
-              v-else-if="item['status_id'] == 1"
+              v-else-if="
+                item['status_id'] == 1 ||
+                item['status_id'] == 6 ||
+                item['status_id'] == 7
+              "
             />
-            <Tag
-              value="Đang gửi và nhận báo giá"
-              severity="warning"
-              v-else-if="item['status_id'] == 6"
-            />
-            <Tag
-              value="So sánh giá"
-              severity="warning"
-              v-else-if="item['status_id'] == 7"
-            />
+
             <Tag
               value="Đang trình ký"
               severity="warning"
-              v-else-if="item['status_id'] == 8"
-            />
-            <Tag
-              value="Chờ ký duyệt"
-              severity="warning"
               v-else-if="item['status_id'] == 9"
             />
-            <Tag value="Đã duyệt" v-else-if="item['status_id'] == 10" />
+            <Tag value="Đang đặt hàng" v-else-if="item['status_id'] == 10" />
             <Tag
               value="Không duyệt"
               severity="danger"
@@ -506,7 +525,17 @@ const customClearFilter = (col, callback) => {
   if (col == "tenhh") customFilter.value.user_id = null;
   callback();
 };
-
+const xuatexcel = () => {
+  loading.value = true;
+  dutruApi.xuatexcel(lazyParams.value).then((res) => {
+    loading.value = false;
+    if (res.success) {
+      window.open(res.link, "_blank");
+    } else {
+      alert(res.message);
+    }
+  });
+};
 const filterTable = ref();
 const props = defineProps({
   type: Number,
@@ -664,7 +693,10 @@ const taodenghimuahang = () => {
       }
     }
   }
-  datatable.value = selected.value.map((item, key) => {
+
+  router.push("/muahang/add?no_reset=1");
+  var clonedSelected = JSON.parse(JSON.stringify(selected.value));
+  datatable.value = clonedSelected.map((item, key) => {
     item.type_id = item.dutru.type_id;
     item.dvt_dutru = item.dvt;
     item.quidoi = 1;
@@ -676,7 +708,6 @@ const taodenghimuahang = () => {
     delete item.id;
     return item;
   });
-  router.push("/muahang/add?no_reset=1");
 };
 const departments = ref([]);
 const visiblePhancong = ref();
@@ -755,14 +786,14 @@ const openNew = async (row) => {
   visibleDialog.value = true;
   modelDialog.value.id = row.id;
   modelDialog.value.from_hh = row.mahh;
-  modelDialog.value.to_id = row.hh_id;
+  modelDialog.value.to_id = row.mahh;
   changeMahh();
 };
 const savedoima = async () => {
   visibleDialog.value = false;
   var res = await dutruApi.savedoima({
     dutru_chitiet_id: modelDialog.value.id,
-    hh_id: modelDialog.value.to_id,
+    mahh: modelDialog.value.to_id,
   });
   if (res.success) {
     toast.add({
@@ -778,7 +809,7 @@ const thongbaodoima = async () => {
   // visibleDialog.value = false;
   var res = await dutruApi.thongbaodoima({
     dutru_chitiet_id: modelDialog.value.id,
-    hh_id: modelDialog.value.to_id,
+    mahh: modelDialog.value.to_id,
   });
   if (res.success) {
     toast.add({

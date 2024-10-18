@@ -127,6 +127,15 @@ export default {
       })
       .then((res) => res.data);
   },
+  xuatexcel(params) {
+    return repository
+      .post(`/v1/${resoure}/xuatexcel`, params, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => res.data);
+  },
   get(id) {
     return repository
       .get(`/v1/${resoure}/Get`, { params: { id: id } })

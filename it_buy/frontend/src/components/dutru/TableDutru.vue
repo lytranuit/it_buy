@@ -165,29 +165,22 @@
                     <Tag
                       value="Đang thực hiện"
                       severity="secondary"
-                      v-else-if="item['status_id'] == 1"
+                      v-else-if="
+                        item['status_id'] == 1 ||
+                        item['status_id'] == 6 ||
+                        item['status_id'] == 7
+                      "
                     />
-                    <Tag
-                      value="Đang gửi và nhận báo giá"
-                      severity="warning"
-                      v-else-if="item['status_id'] == 6"
-                    />
-                    <Tag
-                      value="So sánh giá"
-                      severity="warning"
-                      v-else-if="item['status_id'] == 7"
-                    />
+
                     <Tag
                       value="Đang trình ký"
                       severity="warning"
-                      v-else-if="item['status_id'] == 8"
-                    />
-                    <Tag
-                      value="Chờ ký duyệt"
-                      severity="warning"
                       v-else-if="item['status_id'] == 9"
                     />
-                    <Tag value="Đã duyệt" v-else-if="item['status_id'] == 10" />
+                    <Tag
+                      value="Đang đặt hàng"
+                      v-else-if="item['status_id'] == 10"
+                    />
                     <Tag
                       value="Không duyệt"
                       severity="danger"

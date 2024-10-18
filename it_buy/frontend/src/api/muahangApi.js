@@ -194,9 +194,9 @@ export default {
       })
       .then((res) => res.data);
   },
-  getHistory(hh_id) {
+  getHistory(mahh) {
     return repository
-      .get(`/v1/${resoure}/getHistory`, { params: { hh_id: hh_id } })
+      .get(`/v1/${resoure}/getHistory`, { params: { mahh: mahh } })
       .then((res) => res.data);
   },
   get(id) {
@@ -209,7 +209,11 @@ export default {
       .get(`/v1/${resoure}/Getnccs`, { params: { id: id } })
       .then((res) => res.data);
   },
-
+  getDonhang(id) {
+    return repository
+      .get(`/v1/${resoure}/getDonhang`, { params: { id: id } })
+      .then((res) => res.data);
+  },
 
   getNhanhang(id) {
     return repository

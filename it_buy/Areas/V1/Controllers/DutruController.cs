@@ -16,6 +16,9 @@ using Microsoft.CodeAnalysis;
 using LinqKit;
 using System.Linq.Expressions;
 using System.Linq;
+using Spire.Xls;
+using static iText.Svg.SvgConstants;
+using System.ComponentModel.DataAnnotations;
 
 namespace it_template.Areas.V1.Controllers
 {
@@ -997,7 +1000,7 @@ namespace it_template.Areas.V1.Controllers
                 //{
                 var nhasx = record.nhasx;
                 var nhacc = "";
-                var material = _context.MaterialModel.Where(d => record.hh_id == "m-" + d.id).Include(d => d.nhacungcap).FirstOrDefault();
+                var material = _context.MaterialModel.Where(d => record.mahh == d.mahh).Include(d => d.nhacungcap).FirstOrDefault();
                 if (material != null)
                 {
                     nhacc = material.nhacungcap != null ? material.nhacungcap.tenncc : "";
@@ -1019,6 +1022,10 @@ namespace it_template.Areas.V1.Controllers
                 foreach (var m in muahang_chitiet)
                 {
                     var muahang = m.muahang;
+                    if(muahang.parent_id > 0)
+                    {
+                        continue;
+                    }
                     list_muahang.Add(new MuahangModel()
                     {
                         id = muahang.id,
@@ -1035,7 +1042,7 @@ namespace it_template.Areas.V1.Controllers
                 data.Add(new
                 {
                     id = record.id,
-                    hh_id = record.hh_id,
+                    //hh_id = record.hh_id,
                     soluong_dutru = soluong_dutru,
                     soluong_mua = soluong_mua,
                     thanhtien = thanhtien,
@@ -1074,6 +1081,272 @@ namespace it_template.Areas.V1.Controllers
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                 ReferenceHandler = ReferenceHandler.IgnoreCycles,
             });
+        }
+        [HttpPost]
+        public async Task<JsonResult> xuatexcel()
+        {
+            System.Security.Claims.ClaimsPrincipal currentUser = this.User;
+            var user_id = UserManager.GetUserId(currentUser);
+            var type_id_string = Request.Form["type_id"].FirstOrDefault();
+            int type_id = type_id_string != null ? Convert.ToInt32(type_id_string) : 0;
+            var mahh = Request.Form["filters[mahh]"].FirstOrDefault();
+            var tenhh = Request.Form["filters[tenhh]"].FirstOrDefault();
+            var filter_user_id = Request.Form["filters[user_id]"].FirstOrDefault();
+            var filter_tags = Request.Form["filters[tags]"].FirstOrDefault();
+            var list_dutru = Request.Form["filters[list_dutru]"].FirstOrDefault();
+            var tensp = Request.Form["filters[tensp]"].FirstOrDefault();
+            var orderById = Request.Form["orderBy[id]"].FirstOrDefault();
+
+            var filterTable = Request.Form["filterTable"].FirstOrDefault();
+            var dutru_id_string = Request.Form["dutru_id"].FirstOrDefault();
+            var department_id_string = Request.Form["filters[bophan]"].FirstOrDefault();
+            int dutru_id = dutru_id_string != null ? Convert.ToInt32(dutru_id_string) : 0;
+            int department_id = department_id_string != null ? Convert.ToInt32(department_id_string) : 0;
+
+            var departments = _context.UserDepartmentModel.Where(d => d.user_id == user_id).Select(d => (int)d.department_id).ToList();
+            var is_CungungNVL = departments.Contains(29) == true;
+            var is_CungungGiantiep = departments.Contains(14) == true;
+            var is_CungungHCTT = departments.Contains(30) == true;
+
+            //var 
+
+            var customerData = _context.DutruChitietModel
+                .Include(d => d.muahang_chitiet).ThenInclude(d => d.muahang)
+                .Include(d => d.dutru).ThenInclude(d => d.bophan)
+                .Include(d => d.dutru).ThenInclude(d => d.user_created_by).Where(d => d.dutru.status_id == (int)Status.EsignSuccess && d.date_huy == null);
+
+            Expression<Func<DutruChitietModel, bool>> filter = p => p.dutru.created_by == user_id; // Biểu thức ban đầu là true (chấp nhận tất cả)
+
+            filter = filter.Or(d => departments.Contains((int)d.dutru.bophan_id));
+            if (is_CungungNVL)
+            {
+                filter = filter.Or(d => d.dutru.type_id == 1);
+            }
+            if (is_CungungGiantiep)
+            {
+                filter = filter.Or(d => d.dutru.type_id == 2);
+            }
+            if (is_CungungHCTT)
+            {
+                filter = filter.Or(d => d.dutru.type_id == 3);
+            }
+            customerData = customerData.Where(filter);
+
+
+
+            if (filterTable != null && filterTable == "Chưa xử lý")
+            {
+                customerData = customerData.Where(d => d.muahang_chitiet.Count() == 0);
+            }
+            else if (filterTable != null && filterTable == "Đã xử lý")
+            {
+                customerData = customerData.Where(d => d.muahang_chitiet.Count() > 0);
+            }
+
+
+
+
+
+
+            if (dutru_id != null && dutru_id != 0)
+            {
+                customerData = customerData.Where(d => d.dutru_id == dutru_id);
+            }
+
+            int recordsTotal = customerData.Count();
+            if (type_id != null && type_id != 0)
+            {
+                customerData = customerData.Where(d => d.dutru.type_id == type_id);
+            }
+            if (department_id != null && department_id != 0)
+            {
+                customerData = customerData.Where(d => d.dutru.bophan_id == department_id);
+            }
+            if (mahh != null && mahh != "")
+            {
+                customerData = customerData.Where(d => d.mahh.Contains(mahh));
+            }
+            if (tenhh != null && tenhh != "")
+            {
+                customerData = customerData.Where(d => d.tenhh.Contains(tenhh));
+            }
+            if (filter_user_id != null && filter_user_id != "")
+            {
+                customerData = customerData.Where(d => d.user_id == filter_user_id);
+            }
+            if (filter_tags != null && filter_tags != "")
+            {
+                customerData = customerData.Where(d => d.tags.Contains(filter_tags));
+            }
+            if (tensp != null && tensp != "")
+            {
+                customerData = customerData.Where(d => d.tensp.Contains(tensp));
+            }
+            if (list_dutru != null && list_dutru != "")
+            {
+                var list_dt = list_dutru.Split(",").ToList();
+                var listdutru = _context.DutruModel.Where(d => list_dt.Contains(d.code)).Select(d => d.id).ToList();
+                customerData = customerData.Where(d => listdutru.Contains(d.dutru_id));
+            }
+            int recordsFiltered = customerData.Count();
+
+            if (orderById != null && orderById == "Asc")
+            {
+                customerData = customerData.OrderBy(d => d.id);
+            }
+            else
+            {
+                customerData = customerData.OrderByDescending(d => d.id);
+            }
+            var datapost = customerData
+                .Include(d => d.user)
+                .ToList();
+            var data = new ArrayList();
+
+            var viewPath = _configuration["Source:Path_Private"] + "\\buy\\templates\\Dutru.xlsx";
+            var documentPath = "/tmp/Rawdata_" + DateTime.Now.ToFileTimeUtc() + ".xlsx";
+            string Domain = (HttpContext.Request.IsHttps ? "https://" : "http://") + HttpContext.Request.Host.Value;
+            Workbook workbook = new Workbook();
+            workbook.LoadFromFile(viewPath);
+            Worksheet sheet = workbook.Worksheets[0];
+            int stt = 0;
+            var start_r = 2;
+
+            DataTable dt = new DataTable();
+            //dt.Columns.Add("stt", typeof(int));
+            dt.Columns.Add("code", typeof(string));
+            dt.Columns.Add("name", typeof(string));
+            dt.Columns.Add("mahh", typeof(string));
+            dt.Columns.Add("tenhh", typeof(string));
+            dt.Columns.Add("tensp", typeof(string));
+            dt.Columns.Add("bophan", typeof(string));
+            dt.Columns.Add("soluong", typeof(decimal));
+            dt.Columns.Add("dvt", typeof(string));
+            dt.Columns.Add("is_new", typeof(string));
+            dt.Columns.Add("grade", typeof(string));
+            dt.Columns.Add("dangbaoche", typeof(string));
+            dt.Columns.Add("masothietke", typeof(string));
+            dt.Columns.Add("mansx", typeof(string));
+            dt.Columns.Add("tennsx", typeof(string));
+            dt.Columns.Add("priority", typeof(string));
+            dt.Columns.Add("created_at", typeof(DateTime));
+            dt.Columns.Add("created_by", typeof(string));
+            dt.Columns.Add("date", typeof(DateTime));
+            dt.Columns.Add("status", typeof(string));
+
+            var stt_cell = 2;
+
+
+
+            sheet.InsertRow(start_r, datapost.Count(), InsertOptionsType.FormatAsAfter);
+            foreach (var record in datapost)
+            {
+                var dutru = record.dutru;
+                var tenhh1 = record.tenhh;
+                var mahh1 = record.mahh;
+                //if (dutru.type_id == 1)
+                //{
+                //var nhasx = record.nhasx;
+                //var nhacc = "";
+                //var material = _context.MaterialModel.Where(d => record.mahh == d.mahh).Include(d => d.nhacungcap).FirstOrDefault();
+                //if (material != null)
+                //{
+                //    nhacc = material.nhacungcap != null ? material.nhacungcap.tenncc : "";
+                //}
+                //}
+                var list_muahang_ncc_id = record.muahang_chitiet.Select(d => d.muahang.muahang_chonmua_id).ToList();
+                var list_muahang_chitiet_id = record.muahang_chitiet.Select(d => d.id).ToList();
+
+                var thanhtien1 = _context.MuahangNccChitietModel.Include(d => d.muahang_ncc).ThenInclude(d => d.muahang)
+                    .Where(d => d.muahang_ncc.muahang.deleted_at == null && d.muahang_ncc.muahang.status_id != (int)Status.MuahangEsignError && list_muahang_ncc_id.Contains(d.muahang_ncc_id) && list_muahang_chitiet_id.Contains(d.muahang_chitiet_id))
+                    .ToList();
+                var thanhtien = thanhtien1.Sum(d => d.thanhtien_vat * d.muahang_ncc.quidoi);
+                var muahang_chitiet = record.muahang_chitiet.Where(d => d.muahang.deleted_at == null && d.muahang.status_id != (int)Status.MuahangEsignError).ToList();
+                //var soluong_dutru = record.soluong;
+                //var soluong_mua = muahang_chitiet.Sum(d => d.soluong * d.quidoi);
+
+                //var soluong = soluong_mua < soluong_dutru ? soluong_dutru - soluong_mua : 0;
+                //var list_muahang = new List<MuahangModel>();
+                //foreach (var m in muahang_chitiet)
+                //{
+                //    var muahang = m.muahang;
+                //    list_muahang.Add(new MuahangModel()
+                //    {
+                //        id = muahang.id,
+                //        name = muahang.name,
+                //        code = muahang.code,
+                //        date_finish = muahang.date_finish,
+                //        is_dathang = muahang.is_dathang,
+                //        is_thanhtoan = muahang.is_thanhtoan,
+                //        is_nhanhang = muahang.is_nhanhang,
+                //        loaithanhtoan = muahang.loaithanhtoan,
+                //        status_id = muahang.status_id,
+                //    });
+                //}
+                //data.Add(new
+                //{
+                //    id = record.id,
+                //    //hh_id = record.hh_id,
+                //    //soluong_dutru = soluong_dutru,
+                //    //soluong_mua = soluong_mua,
+                //    thanhtien = thanhtien,
+                //    nhacc = nhacc,
+                //    nhasx = nhasx,
+                //    mahh = mahh1,
+                //    tenhh = tenhh1,
+                //    is_new = record.is_new,
+                //    grade = record.grade,
+                //    masothietke = record.masothietke,
+                //    dvt = record.dvt,
+                //    //soluong = soluong,
+                //    user = record.user,
+                //    list_tag = record.list_tag,
+                //    tensp = record.tensp,
+                //    dutru_chitiet_id = record.id,
+                //    danhgianhacungcap_id = record.danhgianhacungcap_id,
+                //    danhgianhacungcap_is_chapnhan = record.danhgianhacungcap?.status_id == (int)DanhgianhacungcapStatus.SUCCESS,
+                //    dutru = new DutruModel()
+                //    {
+                //        id = dutru.id,
+                //        name = dutru.name,
+                //        code = dutru.code,
+                //        type_id = dutru.type_id,
+                //        priority_id = dutru.priority_id,
+                //        bophan_id = dutru.bophan_id,
+
+                //    },
+                //    //list_muahang = list_muahang
+                //});
+                DataRow dr1 = dt.NewRow();
+                //dr1["stt"] = (++stt);
+                dr1["code"] = dutru.code;
+                dr1["name"] = dutru.name;
+                dr1["mahh"] = record.mahh;
+                dr1["tenhh"] = record.tenhh;
+                dr1["tensp"] = record.tensp;
+                dr1["bophan"] = dutru.bophan.name;
+                dr1["soluong"] = record.soluong;
+                dr1["dvt"] = record.dvt;
+                dr1["is_new"] = record.is_new == true ? "Unactive" : "Active";
+                dr1["grade"] = record.grade;
+                dr1["dangbaoche"] = record.dangbaoche;
+                dr1["masothietke"] = record.masothietke;
+                dr1["mansx"] = record.mansx;
+                dr1["tennsx"] = record.nhasx;
+                dr1["priority"] = dutru.priority_id != null ? GetEnumDisplayName((Priority)dutru.priority_id) : "";
+                dr1["created_at"] = dutru.created_at;
+                dr1["created_by"] = dutru.user_created_by.FullName;
+                dr1["date"] = dutru.date;
+                dr1["status"] = muahang_chitiet.Count() > 0 ? "Đã xử lý" : "Chưa xử lý";
+                dt.Rows.Add(dr1);
+                start_r++;
+
+            }
+            sheet.InsertDataTable(dt, false, 2, 1);
+
+            workbook.SaveToFile("./wwwroot" + documentPath, ExcelVersion.Version2013);
+
+            return Json(new { success = true, link = Domain + documentPath });
         }
         [HttpPost]
         public async Task<IActionResult> AddComment(DutruCommentModel CommentModel, List<string> users_related)
@@ -1231,14 +1504,14 @@ namespace it_template.Areas.V1.Controllers
             });
         }
         [HttpPost]
-        public async Task<IActionResult> thongbaodoima(int dutru_chitiet_id, string hh_id)
+        public async Task<IActionResult> thongbaodoima(int dutru_chitiet_id, string mahh)
         {
             System.Security.Claims.ClaimsPrincipal currentUser = this.User;
             var user_id = UserManager.GetUserId(currentUser);
             var user_doima = await UserManager.GetUserAsync(currentUser);
 
             var data = _context.DutruChitietModel.Where(d => d.id == dutru_chitiet_id).Include(d => d.dutru).ThenInclude(d => d.user_created_by).FirstOrDefault();
-            var hh = _context.MaterialModel.Where(d => "m-" + d.id == hh_id).FirstOrDefault();
+            var hh = _context.MaterialModel.Where(d => d.mahh == mahh).FirstOrDefault();
             //SEND MAIL
             if (hh != null && data != null)
             {
@@ -1273,7 +1546,7 @@ namespace it_template.Areas.V1.Controllers
             });
         }
         [HttpPost]
-        public async Task<IActionResult> savedoima(int dutru_chitiet_id, string hh_id)
+        public async Task<IActionResult> savedoima(int dutru_chitiet_id, string mahh)
         {
             System.Security.Claims.ClaimsPrincipal currentUser = this.User;
             var user_id = UserManager.GetUserId(currentUser);
@@ -1283,11 +1556,11 @@ namespace it_template.Areas.V1.Controllers
                 .Include(d => d.dutru).ThenInclude(d => d.user_created_by)
                 .Include(d => d.muahang_chitiet).ThenInclude(d => d.muahang_ncc_chitiet)
                 .FirstOrDefault();
-            var hh = _context.MaterialModel.Where(d => "m-" + d.id == hh_id).FirstOrDefault();
+            var hh = _context.MaterialModel.Where(d => d.mahh == mahh).FirstOrDefault();
 
             if (hh != null && data != null)
             {
-                data.hh_id = hh_id;
+                //data.hh_id = hh_id;
                 data.mahh = hh.mahh;
 
                 _context.Update(data);
@@ -1295,7 +1568,7 @@ namespace it_template.Areas.V1.Controllers
                 foreach (var d in data.muahang_chitiet)
                 {
 
-                    d.hh_id = hh_id;
+                    //d.hh_id = hh_id;
                     d.mahh = hh.mahh;
 
                     _context.Update(d);
@@ -1303,7 +1576,7 @@ namespace it_template.Areas.V1.Controllers
 
                     foreach (var c in d.muahang_ncc_chitiet)
                     {
-                        c.hh_id = hh_id;
+                        //c.hh_id = hh_id;
                         c.mahh = hh.mahh;
                         _context.Update(c);
                         _context.SaveChanges();
@@ -1315,7 +1588,24 @@ namespace it_template.Areas.V1.Controllers
                 success = true,
             });
         }
+        private static string GetEnumDisplayName(Priority status)
+        {
+            // Lấy thông tin thuộc tính của enum
+            var enumType = status.GetType();
+            var enumValue = enumType.GetMember(status.ToString()).FirstOrDefault();
 
+            if (enumValue != null)
+            {
+                // Lấy attribute Display
+                var displayAttribute = enumValue.GetCustomAttribute<DisplayAttribute>();
+                if (displayAttribute != null)
+                {
+                    return displayAttribute.Name; // Trả về giá trị của Display(Name)
+                }
+            }
+            // Nếu không có Display(Name) thì trả về tên của enum
+            return status.ToString();
+        }
         private void CopyValues<T>(T target, T source)
         {
             Type t = typeof(T);

@@ -170,15 +170,152 @@ namespace Vue.Controllers
                 else if (type == "esign_muahang_success")
                 {
                     var muahang_tmp = queue.valueQ.muahang;
-                    var model = _context.MuahangModel.Where(d => d.id == muahang_tmp.id).Include(d => d.chitiet).FirstOrDefault();
+                    var model = _context.MuahangModel.Where(d => d.id == muahang_tmp.id).FirstOrDefault();
                     if (model != null)
                     {
                         model.status_id = (int)Status.MuahangEsignSuccess;
                         model.pdf = muahang_tmp.pdf;
+                        model.pay_at = DateTime.Now;
                         _context.Update(model);
                         queue.status_id = 2;
                         _context.Update(queue);
                         await _context.SaveChangesAsync();
+
+                        ////Tạo DNMH con
+                        if (model.is_multiple_ncc == true)
+                        {
+
+                            var nccs = _context.MuahangNccModel.Where(d => d.muahang_id == model.id && d.chonmua == true).Include(d => d.chitiet).Include(d => d.dinhkem).ToList();
+                            foreach (var ncc in nccs)
+                            {
+                                ///MUAHANG
+                                var muahang_data = new MuahangModel()
+                                {
+                                    name = model.name,
+                                    status_id = (int)Status.MuahangEsignSuccess,
+                                    code = model.code,
+                                    type_id = model.type_id,
+                                    created_by = model.created_by,
+                                    created_at = DateTime.Now,
+                                    note = model.note,
+                                    note_chonmua = model.note_chonmua,
+                                    pdf = model.pdf,
+                                    esign_id = model.esign_id,
+                                    date = model.date,
+                                    parent_id = model.id
+                                };
+                                _context.Add(muahang_data);
+                                await _context.SaveChangesAsync();
+                                var list_chitiet = new Dictionary<int, int>();
+                                var model_chitiet = _context.MuahangChitietModel.Where(d => d.muahang_id == model.id).ToList();
+                                foreach (var item in model_chitiet)
+                                {
+
+                                    var muahang_chitiet_data = new MuahangChitietModel()
+                                    {
+                                        muahang_id = muahang_data.id,
+                                        dutru_chitiet_id = item.dutru_chitiet_id,
+                                        //hh_id = item.hh_id,
+                                        quidoi = item.quidoi,
+                                        soluong = item.soluong,
+                                        note = item.note,
+                                        mahh = item.mahh,
+                                        tenhh = item.tenhh,
+                                        dvt = item.dvt,
+                                        dvt_dutru = item.dvt_dutru,
+                                    };
+                                    _context.Add(muahang_chitiet_data);
+                                    await _context.SaveChangesAsync();
+                                    list_chitiet.Add(item.id, muahang_chitiet_data.id);
+                                }
+                                ////MUAHANG DINHKEM
+                                var model_dinhkem = _context.MuahangDinhkemModel.Where(d => d.muahang_id == model.id && d.deleted_at == null).ToList();
+                                foreach (var item in model_dinhkem)
+                                {
+
+                                    var muahang_dinhkem_data = new MuahangDinhkemModel()
+                                    {
+                                        muahang_id = muahang_data.id,
+                                        name = item.name,
+                                        ext = item.ext,
+                                        url = item.url,
+                                        mimeType = item.mimeType,
+                                        created_at = DateTime.Now,
+                                        created_by = item.created_by,
+                                    };
+                                    _context.Add(muahang_dinhkem_data);
+                                    await _context.SaveChangesAsync();
+                                }
+                                ////NCC
+                                var muahang_ncc = new MuahangNccModel()
+                                {
+                                    muahang_id = muahang_data.id,
+                                    ncc_id = ncc.ncc_id,
+                                    chonmua = true,
+                                    thoigiangiaohang = ncc.thoigiangiaohang,
+                                    dapung = ncc.dapung,
+                                    baohanh = ncc.baohanh,
+                                    thanhtoan = ncc.thanhtoan,
+                                    tonggiatri = ncc.tonggiatri,
+                                    thanhtien = ncc.thanhtien,
+                                    thanhtien_vat = ncc.thanhtien_vat,
+                                    tienvat = ncc.tienvat,
+                                    phigiaohang = ncc.phigiaohang,
+                                    vat = ncc.vat,
+                                    tiente = ncc.tiente,
+                                    quidoi = ncc.quidoi,
+                                    is_vat = ncc.is_vat,
+                                    ck = ncc.ck,
+                                };
+                                _context.Add(muahang_ncc);
+                                await _context.SaveChangesAsync();
+
+
+                                muahang_data.muahang_chonmua_id = muahang_ncc.id;
+                                _context.Update(muahang_data);
+                                await _context.SaveChangesAsync();
+
+                                var chitiet = ncc.chitiet;
+                                foreach (var item in chitiet)
+                                {
+                                    int muahang_chitiet_id = list_chitiet[item.muahang_chitiet_id];
+                                    var muahang_chitiet_data = new MuahangNccChitietModel()
+                                    {
+                                        muahang_ncc_id = muahang_ncc.id,
+                                        muahang_chitiet_id = muahang_chitiet_id,
+                                        //hh_id = item.hh_id,
+                                        soluong = item.soluong,
+                                        dongia = item.dongia,
+                                        thanhtien = item.thanhtien,
+                                        thanhtien_vat = item.thanhtien_vat,
+                                        vat = item.vat,
+                                        note = item.note,
+                                        mahh = item.mahh,
+                                        tenhh = item.tenhh,
+                                        dvt = item.dvt,
+                                    };
+                                    _context.Add(muahang_chitiet_data);
+                                    await _context.SaveChangesAsync();
+                                }
+                                var dinhkems = ncc.dinhkem.Where(d => d.deleted_at == null).ToList();
+                                foreach (var item in dinhkems)
+                                {
+                                    var muahang_ncc_dinhkem_data = new MuahangNccDinhkemModel()
+                                    {
+                                        muahang_ncc_id = muahang_ncc.id,
+                                        name = item.name,
+                                        url = item.url,
+                                        ext = item.ext,
+                                        mimeType = item.mimeType,
+                                        created_at = DateTime.Now,
+                                        created_by = item.created_by,
+                                    };
+                                    _context.Add(muahang_ncc_dinhkem_data);
+                                    await _context.SaveChangesAsync();
+                                }
+
+                            }
+                        }
                     }
                 }
             }

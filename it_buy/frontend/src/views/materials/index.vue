@@ -338,7 +338,7 @@ const confirmDeleteProduct = (m) => {
 };
 const deleteProduct = () => {
   waiting.value = true;
-  materialApi.remove({ item: [model.value.id] }).then((res) => {
+  materialApi.remove({ item: [model.value.mahh] }).then((res) => {
     waiting.value = false;
     if (res.success) {
       toast.add({
@@ -363,7 +363,7 @@ const deleteProduct = () => {
 const deleteSelectedProducts = () => {
   // datatable.value = datatable.value.filter(val => !selectedProducts.value.includes(val));
   let list = selectedProducts.value.map((item) => {
-    return item.id;
+    return item.mahh;
   });
   waiting.value = true;
   materialApi.remove({ item: list }).then((res) => {

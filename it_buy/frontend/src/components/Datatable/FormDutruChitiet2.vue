@@ -101,29 +101,19 @@
               <Tag
                 value="Đang thực hiện"
                 severity="secondary"
-                v-else-if="item['status_id'] == 1"
+                v-else-if="
+                  item['status_id'] == 1 ||
+                  item['status_id'] == 6 ||
+                  item['status_id'] == 7
+                "
               />
-              <Tag
-                value="Đang gửi và nhận báo giá"
-                severity="warning"
-                v-else-if="item['status_id'] == 6"
-              />
-              <Tag
-                value="So sánh giá"
-                severity="warning"
-                v-else-if="item['status_id'] == 7"
-              />
+
               <Tag
                 value="Đang trình ký"
                 severity="warning"
-                v-else-if="item['status_id'] == 8"
-              />
-              <Tag
-                value="Chờ ký duyệt"
-                severity="warning"
                 v-else-if="item['status_id'] == 9"
               />
-              <Tag value="Đã duyệt" v-else-if="item['status_id'] == 10" />
+              <Tag value="Đang đặt hàng" v-else-if="item['status_id'] == 10" />
               <Tag
                 value="Không duyệt"
                 severity="danger"
@@ -427,14 +417,14 @@ const openNew = async (row) => {
   visibleDialog.value = true;
   modelDialog.value.id = row.id;
   modelDialog.value.from_hh = row.mahh;
-  modelDialog.value.to_id = row.hh_id;
+  modelDialog.value.to_id = row.mahh;
   changeMahh();
 };
 const savedoima = async () => {
   visibleDialog.value = false;
   var res = await dutruApi.savedoima({
     dutru_chitiet_id: modelDialog.value.id,
-    hh_id: modelDialog.value.to_id,
+    mahh: modelDialog.value.to_id,
   });
   if (res.success) {
     toast.add({
@@ -450,7 +440,7 @@ const thongbaodoima = async () => {
   // visibleDialog.value = false;
   var res = await dutruApi.thongbaodoima({
     dutru_chitiet_id: modelDialog.value.id,
-    hh_id: modelDialog.value.to_id,
+    mahh: modelDialog.value.to_id,
   });
   if (res.success) {
     toast.add({

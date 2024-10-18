@@ -96,30 +96,20 @@
                       <Tag
                         value="Đang thực hiện"
                         severity="secondary"
-                        v-else-if="slotProps.data[col.data] == 1"
-                      />
-                      <Tag
-                        value="Đang gửi và nhận báo giá"
-                        severity="warning"
-                        v-else-if="slotProps.data[col.data] == 6"
-                      />
-                      <Tag
-                        value="So sánh giá"
-                        severity="warning"
-                        v-else-if="slotProps.data[col.data] == 7"
+                        v-else-if="
+                          slotProps.data[col.data] == 1 ||
+                          slotProps.data[col.data] == 6 ||
+                          slotProps.data[col.data] == 7
+                        "
                       />
                       <Tag
                         value="Đang trình ký"
                         severity="warning"
-                        v-else-if="slotProps.data[col.data] == 8"
-                      />
-                      <Tag
-                        value="Chờ ký duyệt"
-                        severity="warning"
                         v-else-if="slotProps.data[col.data] == 9"
                       />
+
                       <Tag
-                        value="Đã duyệt"
+                        value="Đang đặt hàng"
                         v-else-if="slotProps.data[col.data] == 10"
                       />
                       <Tag

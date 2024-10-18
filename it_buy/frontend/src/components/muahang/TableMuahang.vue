@@ -60,7 +60,10 @@
     >
       <template #body="slotProps">
         <template v-if="col.data == 'id'">
-          <RouterLink :to="'/muahang/edit/' + slotProps.data[col.data]">
+          <RouterLink
+            :to="'/muahang/edit/' + slotProps.data[col.data]"
+            target="_blank"
+          >
             <i class="fas fa-pencil-alt mr-2"></i>
             {{ slotProps.data[col.data] }}
           </RouterLink>
@@ -72,6 +75,7 @@
               <RouterLink
                 :to="'/muahang/edit/' + slotProps.data.id"
                 class="text-blue"
+                target="_blank"
                 >{{ slotProps.data.name }}
               </RouterLink>
             </div>
@@ -120,29 +124,22 @@
             <Tag
               value="Đang thực hiện"
               severity="secondary"
-              v-else-if="slotProps.data[col.data] == 1"
-            />
-            <Tag
-              value="Đang gửi và nhận báo giá"
-              severity="warning"
-              v-else-if="slotProps.data[col.data] == 6"
-            />
-            <Tag
-              value="So sánh giá"
-              severity="warning"
-              v-else-if="slotProps.data[col.data] == 7"
+              v-else-if="
+                slotProps.data[col.data] == 1 ||
+                slotProps.data[col.data] == 6 ||
+                slotProps.data[col.data] == 7
+              "
             />
             <Tag
               value="Đang trình ký"
               severity="warning"
-              v-else-if="slotProps.data[col.data] == 8"
-            />
-            <Tag
-              value="Chờ ký duyệt"
-              severity="warning"
               v-else-if="slotProps.data[col.data] == 9"
             />
-            <Tag value="Đã duyệt" v-else-if="slotProps.data[col.data] == 10" />
+
+            <Tag
+              value="Đang đặt hàng"
+              v-else-if="slotProps.data[col.data] == 10"
+            />
             <Tag
               value="Không duyệt"
               severity="danger"

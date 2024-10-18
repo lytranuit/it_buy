@@ -126,24 +126,46 @@
             class="text-center chonmua"
             :class="{ highlight: model.muahang_chonmua_id == item.id }"
           >
-            <div class="form-check" v-if="readonly == false">
-              <input
-                class="form-check-input"
-                type="radio"
-                name="exampleRadios"
-                :id="'exampleRadios' + key"
-                v-model="model.muahang_chonmua_id"
-                :value="item.id"
-              />
-              <label class="form-check-label" :for="'exampleRadios' + key">
-              </label>
-            </div>
-            <div v-else>
-              <i
-                class="fas fa-check text-success"
-                v-if="model.muahang_chonmua_id == item.id"
-              ></i>
-            </div>
+            <template v-if="!model.is_multiple_ncc">
+              <div class="form-check" v-if="readonly == false">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="exampleRadios"
+                  :id="'exampleRadios' + key"
+                  v-model="model.muahang_chonmua_id"
+                  :value="item.id"
+                />
+                <label class="form-check-label" :for="'exampleRadios' + key">
+                </label>
+              </div>
+              <div v-else>
+                <i
+                  class="fas fa-check text-success"
+                  v-if="model.muahang_chonmua_id == item.id"
+                ></i>
+              </div>
+            </template>
+            <template v-if="model.is_multiple_ncc == true">
+              <div class="form-check" v-if="readonly == false">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  name="exampleRadios"
+                  :id="'exampleRadios' + key"
+                  v-model="item.chonmua"
+                  :value="item.id"
+                />
+                <label class="form-check-label" :for="'exampleRadios' + key">
+                </label>
+              </div>
+              <div v-else>
+                <i
+                  class="fas fa-check text-success"
+                  v-if="item.chonmua == true"
+                ></i>
+              </div>
+            </template>
           </td>
         </tr>
       </tbody>
@@ -198,7 +220,7 @@
 
     <div
       class="d-flex align-items-center justify-content-center"
-      v-if="readonly == false && model.type_id == 1"
+      v-if="readonly == false && model.type_id == 1 && !model.is_multiple_ncc"
     >
       <span class="mr-2">Mẫu mua NVL cũ:</span>
       <Button
@@ -235,7 +257,7 @@ const view = async (loaimau = 0) => {
     alert("Chưa nhập tiêu đề!");
     return false;
   }
-  if (!model.value.muahang_chonmua_id) {
+  if (!model.value.is_multiple_ncc && !model.value.muahang_chonmua_id) {
     alert("Chưa chọn mua nhà cung cấp nào!");
     return false;
   }
@@ -244,20 +266,65 @@ const view = async (loaimau = 0) => {
     return false;
   }
   await muahangApi.save(model.value);
+  ////
+  if (model.value.is_multiple_ncc == true) {
+    if (!nccs.value.length) {
+      alert("Chưa chọn nhà cung cấp!");
+      return false;
+    }
+    var params = { nccs: nccs.value };
+    // console.log(params)
+    for (var ncc of params.nccs) {
+      delete ncc.ncc;
+      delete ncc.dinhkem;
+      if (ncc.phigiaohang == null) {
+        alert("Chưa nhập phí giao hàng!");
+        return false;
+      }
+      if (ncc.ck == null) {
+        alert("Chưa nhập chiết khấu!");
+        return false;
+      }
+      for (var c of ncc.chitiet) {
+        delete c.muahang_chitiet;
+        if (c.dongia == null) {
+          alert("Chưa nhập đơn giá!");
+          return false;
+        }
+        if (c.vat == null) {
+          alert("Chưa nhập vat!");
+          return false;
+        }
+      }
+    }
+    $(".custom-file-input").each(function (index) {
+      // console.log(this)
+      var files = $(this)[0].files;
+      var key = $(this).data("key");
+      for (var stt = 0; stt < files.length; stt++) {
+        var file = files[stt];
+        params["file_" + key + "_" + stt] = file;
+      }
+    });
+
+    await muahangApi.saveNcc(params);
+  }
   waiting.value = true;
   muahangApi.xuatpdf(model.value.id, true, loaimau).then((response) => {
     waiting.value = false;
     if (response.success) {
       window.open(response.link, "_blank").focus();
+      store_muahang.load_data(model.value.id);
     }
   });
 };
+
 const xuatpdf = async (loaimau = 0) => {
   if (!model.value.name) {
     alert("Chưa nhập tiêu đề!");
     return false;
   }
-  if (!model.value.muahang_chonmua_id) {
+  if (!model.value.is_multiple_ncc && !model.value.muahang_chonmua_id) {
     alert("Chưa chọn mua nhà cung cấp nào!");
     return false;
   }
@@ -266,6 +333,49 @@ const xuatpdf = async (loaimau = 0) => {
     return false;
   }
   await muahangApi.save(model.value);
+  ////
+  if (model.value.is_multiple_ncc == true) {
+    if (!nccs.value.length) {
+      alert("Chưa chọn nhà cung cấp!");
+      return false;
+    }
+    var params = { nccs: nccs.value };
+    // console.log(params)
+    for (var ncc of params.nccs) {
+      delete ncc.ncc;
+      delete ncc.dinhkem;
+      if (ncc.phigiaohang == null) {
+        alert("Chưa nhập phí giao hàng!");
+        return false;
+      }
+      if (ncc.ck == null) {
+        alert("Chưa nhập chiết khấu!");
+        return false;
+      }
+      for (var c of ncc.chitiet) {
+        delete c.muahang_chitiet;
+        if (c.dongia == null) {
+          alert("Chưa nhập đơn giá!");
+          return false;
+        }
+        if (c.vat == null) {
+          alert("Chưa nhập vat!");
+          return false;
+        }
+      }
+    }
+    $(".custom-file-input").each(function (index) {
+      // console.log(this)
+      var files = $(this)[0].files;
+      var key = $(this).data("key");
+      for (var stt = 0; stt < files.length; stt++) {
+        var file = files[stt];
+        params["file_" + key + "_" + stt] = file;
+      }
+    });
+
+    await muahangApi.saveNcc(params);
+  }
   waiting.value = true;
   muahangApi.xuatpdf(model.value.id, false, loaimau).then((response) => {
     waiting.value = false;

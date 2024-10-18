@@ -1,10 +1,25 @@
 <template>
   <div id="TableMaterialsFiles">
-    <DataTable showGridlines :value="files" ref="dt" class="p-datatable-ct" :rowHover="true" :loading="loading"
-      responsiveLayout="scroll" :resizableColumns="true" columnResizeMode="expand" v-model:selection="selected">
+    <DataTable
+      showGridlines
+      :value="files"
+      ref="dt"
+      class="p-datatable-ct"
+      :rowHover="true"
+      :loading="loading"
+      responsiveLayout="scroll"
+      :resizableColumns="true"
+      columnResizeMode="expand"
+      v-model:selection="selected"
+    >
       <template #header>
         <div class="d-inline-flex" style="width: 200px">
-          <Button label="Thêm" icon="pi pi-plus" class="p-button-success p-button-sm mr-2" @click="openNew"></Button>
+          <Button
+            label="Thêm"
+            icon="pi pi-plus"
+            class="p-button-success p-button-sm mr-2"
+            @click="openNew"
+          ></Button>
         </div>
         <div class="d-inline-flex float-right"></div>
       </template>
@@ -12,37 +27,69 @@
       <template #empty>
         <div class="text-center">Không có dữ liệu.</div>
       </template>
-      <Column v-for="(col, index) in selectedColumns" :field="col.data" :header="col.label" :key="col.data"
-        :showFilterMatchModes="false" :class="col.data">
+      <Column
+        v-for="col in selectedColumns"
+        :field="col.data"
+        :header="col.label"
+        :key="col.data"
+        :showFilterMatchModes="false"
+        :class="col.data"
+      >
         <template #body="slotProps">
           <template v-if="col.data == 'note'">
-            <a target="_blank" :href="slotProps.data['link']" :class="{ 'text-blue': slotProps.data['link'] }">{{
-              slotProps.data[col.data] }}</a>
+            <a
+              target="_blank"
+              :href="slotProps.data['link']"
+              :class="{ 'text-blue': slotProps.data['link'] }"
+              >{{ slotProps.data[col.data] }}</a
+            >
           </template>
           <template v-else-if="col.data == 'file'">
-            <div class="mt-2" v-for="(item, index) in slotProps.data['list_file']">
-              <a target="_blank" :href="item.url" class="text-blue" :download="download(item.name)">{{ item.name }}</a>
+            <div
+              class="mt-2"
+              v-for="item in slotProps.data['list_file']"
+              :key="item.id"
+            >
+              <a
+                target="_blank"
+                :href="item.url"
+                class="text-blue"
+                :download="download(item.name)"
+                >{{ item.name }}</a
+              >
             </div>
           </template>
           <template v-else-if="col.data == 'created_at'">
             {{ formatDate(slotProps.data[col.data]) }}
           </template>
           <template v-else-if="col.data == 'created_by'">
-            <div v-if="slotProps.data.list_file[0]?.user_created_by" class="d-flex">
-              <Avatar :image="slotProps.data.list_file[0]?.user_created_by?.image_url"
-                :title="slotProps.data.list_file[0]?.user_created_by?.FullName" size="small" shape="circle" />
+            <div
+              v-if="slotProps.data.list_file[0]?.user_created_by"
+              class="d-flex"
+            >
+              <Avatar
+                :image="slotProps.data.list_file[0]?.user_created_by?.image_url"
+                :title="slotProps.data.list_file[0]?.user_created_by?.FullName"
+                size="small"
+                shape="circle"
+              />
               <span class="align-self-center ml-2">{{
                 slotProps.data.list_file[0]?.user_created_by?.FullName
               }}</span>
             </div>
           </template>
-          <template v-else-if="
-            col.data == 'action' &&
-            slotProps.data['is_user_upload'] == true &&
-            slotProps.data.list_file[0]?.created_by == user.id
-          ">
-            <a class="p-link text-danger font-16" @click="confirmDeleteDinhkem(slotProps.data)"><i
-                class="pi pi-trash"></i></a>
+          <template
+            v-else-if="
+              col.data == 'action' &&
+              slotProps.data['is_user_upload'] == true &&
+              slotProps.data.list_file[0]?.created_by == user.id
+            "
+          >
+            <a
+              class="p-link text-danger font-16"
+              @click="confirmDeleteDinhkem(slotProps.data)"
+              ><i class="pi pi-trash"></i
+            ></a>
           </template>
           <template v-else>
             {{ slotProps.data[col.data] }}
@@ -50,27 +97,57 @@
         </template>
       </Column>
     </DataTable>
-    <Dialog v-model:visible="visibleDialog" header="Tạo mới" :modal="true" class="p-fluid">
+    <Dialog
+      v-model:visible="visibleDialog"
+      header="Tạo mới"
+      :modal="true"
+      class="p-fluid"
+    >
       <div class="row mb-2">
         <div class="field col">
           <label for="name">Mô tả:<span class="text-danger">*</span></label>
-          <InputText id="name" class="p-inputtext-sm" v-model.trim="modelfile.note" required="true"
-            :class="{ 'p-invalid': submitted && !modelfile.note }" />
-          <small class="p-error" v-if="submitted && !modelfile.note">Required.</small>
+          <InputText
+            id="name"
+            class="p-inputtext-sm"
+            v-model.trim="modelfile.note"
+            required="true"
+            :class="{ 'p-invalid': submitted && !modelfile.note }"
+          />
+          <small class="p-error" v-if="submitted && !modelfile.note"
+            >Required.</small
+          >
         </div>
       </div>
       <div class="row mb-2">
         <div class="field col">
           <label for="name">Files:<span class="text-danger">*</span></label>
           <div class="custom-file mt-2">
-            <input type="file" class="file-input" :id="'customFileup'" :multiple="true" @change="fileChange($event)" />
-            <label class="custom-file-label" :for="'customFileup'">Choose file</label>
+            <input
+              type="file"
+              class="file-input"
+              :id="'customFileup'"
+              :multiple="true"
+              @change="fileChange($event)"
+            />
+            <label class="custom-file-label" :for="'customFileup'"
+              >Choose file</label
+            >
           </div>
         </div>
       </div>
       <template #footer>
-        <Button label="Cancel" icon="pi pi-times" class="p-button-text" @click="hideDialog"></Button>
-        <Button label="Save" icon="pi pi-check" class="p-button-text" @click="save"></Button>
+        <Button
+          label="Cancel"
+          icon="pi pi-times"
+          class="p-button-text"
+          @click="hideDialog"
+        ></Button>
+        <Button
+          label="Save"
+          icon="pi pi-check"
+          class="p-button-text"
+          @click="save"
+        ></Button>
       </template>
     </Dialog>
   </div>
@@ -163,7 +240,7 @@ const save = () => {
     return false;
   }
   var params = modelfile.value;
-  params.hh_id = model.value.id;
+  params.mahh = model.value.mahh;
   var files = $(".file-input")[0].files;
   for (var stt = 0; stt < files.length; stt++) {
     var file = files[stt];
@@ -203,7 +280,7 @@ const selectedColumns = computed(() => {
   return columns.value.filter((col) => col.hide != true);
 });
 const load = async () => {
-  var res = await materialsApi.getFiles(model.value.id);
+  var res = await materialsApi.getFiles(model.value.mahh);
   files.value = res;
 };
 onMounted(() => {

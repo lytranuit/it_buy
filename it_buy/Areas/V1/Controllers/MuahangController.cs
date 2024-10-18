@@ -8,6 +8,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using NuGet.Packaging;
 using QRCoder;
+using Spire.Doc.Reporting;
 using System;
 using System.Collections;
 using System.Data;
@@ -17,6 +18,7 @@ using System.Net.WebSockets;
 using System.Reflection;
 using System.Security.Policy;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 using Vue.Data;
 using Vue.Models;
 using Vue.Services;
@@ -69,7 +71,7 @@ namespace it_template.Areas.V1.Controllers
             var list_hh = _context.MuahangChitietModel.Where(d => d.muahang_id == id).ToList();
             foreach (var hh in list_hh)
             {
-                var files_up1 = _context.MaterialDinhkemModel.Where(d => "m-" + d.hh_id == hh.hh_id && d.deleted_at == null).Include(d => d.user_created_by).ToList();
+                var files_up1 = _context.MaterialDinhkemModel.Where(d => d.mahh == hh.mahh && d.deleted_at == null).Include(d => d.user_created_by).ToList();
                 if (files_up1.Count > 0)
                 {
                     data.AddRange(files_up1.GroupBy(d => new { d.note, d.created_at }).Select(d => new RawFile
@@ -254,6 +256,18 @@ namespace it_template.Areas.V1.Controllers
                 ReferenceHandler = ReferenceHandler.IgnoreCycles,
             });
         }
+        public JsonResult getDonhang(int id)
+        {
+
+            var data = _context.MuahangModel.Where(d => d.deleted_at == null && d.parent_id == id).Include(d => d.muahang_chonmua).ThenInclude(d => d.ncc).ToList();
+
+
+            return Json(data, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            });
+        }
         public JsonResult GetNhanhang(int id)
         {
             System.Security.Claims.ClaimsPrincipal currentUser = this.User;
@@ -302,11 +316,11 @@ namespace it_template.Areas.V1.Controllers
                 ReferenceHandler = ReferenceHandler.IgnoreCycles,
             });
         }
-        public JsonResult getHistory(string hh_id)
+        public JsonResult getHistory(string mahh)
         {
-            var hh = _context.MaterialModel.Where(d => "m-" + d.id == hh_id).FirstOrDefault();
+            var hh = _context.MaterialModel.Where(d => d.mahh == mahh).FirstOrDefault();
             var muahang_chitiet = _context.MuahangChitietModel.Include(d => d.muahang).ThenInclude(d => d.muahang_chonmua).ThenInclude(d => d.chitiet)
-                .Where(d => d.muahang.deleted_at == null && d.muahang.is_dathang == true && d.hh_id == hh_id)
+                .Where(d => d.muahang.deleted_at == null && d.muahang.is_dathang == true && d.mahh == mahh)
                 .ToList();
             var to = hh != null ? hh.mahh + "-" + hh.tenhh : "";
 
@@ -545,7 +559,7 @@ namespace it_template.Areas.V1.Controllers
                         id = 0,
                         muahang_ncc_id = MuahangNccModel.id,
                         muahang_chitiet_id = item.id,
-                        hh_id = item.hh_id,
+                        //hh_id = item.hh_id,
                         soluong = item.soluong,
                         dongia = 0,
                         thanhtien = 0,
@@ -772,7 +786,7 @@ namespace it_template.Areas.V1.Controllers
                     {
 
 
-                        var material = _context.MaterialModel.Where(d => item.hh_id == "m-" + d.id).Include(d => d.nhasanxuat).FirstOrDefault();
+                        var material = _context.MaterialModel.Where(d => item.mahh == d.mahh).Include(d => d.nhasanxuat).FirstOrDefault();
                         var tieuchuan = "";
                         var nhasx = "";
                         if (material != null)
@@ -1054,7 +1068,7 @@ namespace it_template.Areas.V1.Controllers
             //var filter_thanhtoan = Request.Form["filter_thanhtoan"].FirstOrDefault();
             //var tenhh = Request.Form["filters[tenhh]"].FirstOrDefault();
             int skip = start != null ? Convert.ToInt32(start) : 0;
-            var customerData = _context.MuahangModel.Where(d => d.deleted_at == null);
+            var customerData = _context.MuahangModel.Where(d => d.deleted_at == null && d.parent_id == null);
             if (filter_thanhtoan == true)
             {
                 customerData = customerData.Where(d => d.is_dathang == true && (d.loaithanhtoan == "tra_truoc" || (d.loaithanhtoan == "tra_sau" && d.is_nhanhang == true)));
@@ -1230,7 +1244,12 @@ namespace it_template.Areas.V1.Controllers
             //Creates Document instance
             Spire.Doc.Document document = new Spire.Doc.Document();
             //Loads the word document
-            if (loaimau == 1 && is_vat == false)
+            if (data.is_multiple_ncc == true)
+            {
+                document.LoadFromFile(_configuration["Source:Path_Private"] + "/buy/templates/denghimuahangnvlmoi_multiple_ncc.docx", Spire.Doc.FileFormat.Docx);
+
+            }
+            else if (loaimau == 1 && is_vat == false)
             {
                 document.LoadFromFile(_configuration["Source:Path_Private"] + "/buy/templates/denghimuahangnvlmoi.docx", Spire.Doc.FileFormat.Docx);
             }
@@ -1257,6 +1276,7 @@ namespace it_template.Areas.V1.Controllers
 
 
 
+
             string[] fieldName = raw.Keys.ToArray();
             string[] fieldValue = raw.Values.ToArray();
 
@@ -1264,9 +1284,86 @@ namespace it_template.Areas.V1.Controllers
             string[] GroupNames = document.MailMerge.GetMergeGroupNames();
 
             document.MailMerge.Execute(fieldName, fieldValue);
-            document.MailMerge.ExecuteWidthRegion(datatable_details);
+            if (data.is_multiple_ncc == true)
+            {
+                //raw.Add("tonggiatri", ncc_chon.tonggiatri.Value.ToString("#,##0.##"));
+                //raw.Add("thanhtien", ncc_chon.thanhtien.Value.ToString("#,##0.##"));
+                //raw.Add("thanhtien_vat", ncc_chon.thanhtien_vat.Value.ToString("#,##0.##"));
+                //raw.Add("phigiaohang", ncc_chon.phigiaohang.Value.ToString("#,##0.##"));
+                //raw.Add("ck", ncc_chon.ck.Value.ToString("#,##0.##"));
+                //raw.Add("tienvat", ncc_chon.tienvat.Value.ToString("#,##0.##"));
+
+                // Tạo dữ liệu mẫu cho nhà cung cấp (nccs - bảng cha)
+                var nccs = data.nccs.Where(d => d.chonmua == true).ToList();
+                //var nccs_id = nccs.Select(d => d.id).ToList();
+                //var parent = nccs.Select(d => new
+                //{
+                //    id = d.id,
+                //    tiente = d.tiente,
+                //    thanhtien = d.thanhtien.Value.ToString("#,##0.##"),
+                //    thanhtien_vat = d.thanhtien_vat.Value.ToString("#,##0.##"),
+                //    phigiaohang = d.phigiaohang.Value.ToString("#,##0.##"),
+                //    tonggiatri = d.tonggiatri.Value.ToString("#,##0.##"),
+                //    tienvat = d.tienvat.Value.ToString("#,##0.##"),
+                //    ck = d.ck.Value.ToString("#,##0.##"),
+                //    tenncc = d.ncc.tenncc
+                //}).ToList();
+                var parent = new List<object>();
+                var details = new List<object>();
+                foreach (var item in nccs)
+                {
+                    var stt = 1;
+                    var chitiet = _context.MuahangNccChitietModel.Where(d => d.muahang_ncc_id == item.id).ToList();
+                    foreach (var e in chitiet)
+                    {
+                        details.Add(new
+                        {
+                            stt = stt++,
+                            muahang_ncc_id = e.muahang_ncc_id,
+                            tenhh = e.tenhh,
+                            mahh = e.mahh,
+                            dvt = e.dvt,
+                            soluong = e.soluong.Value.ToString("#,##0.##"),
+                            dongia = e.dongia.Value.ToString("#,##0.#####"),
+                            thanhtien = e.thanhtien.Value.ToString("#,##0.##"),
+                            vat = e.vat,
+                            note = e.note,
+                        });
+                    }
+                    parent.Add(new
+                    {
+                        id = item.id,
+                        tiente = item.tiente,
+                        thanhtien = item.thanhtien.Value.ToString("#,##0.##"),
+                        thanhtien_vat = item.thanhtien_vat.Value.ToString("#,##0.##"),
+                        phigiaohang = item.phigiaohang.Value.ToString("#,##0.##"),
+                        tonggiatri = item.tonggiatri.Value.ToString("#,##0.##"),
+                        tienvat = item.tienvat.Value.ToString("#,##0.##"),
+                        ck = item.ck.Value.ToString("#,##0.##"),
+                        tenncc = item.ncc.tenncc
+                    });
+                }
 
 
+
+                // Tạo MailMergeDataSet cho nccs và details
+                MailMergeDataSet mailMergeDataSet = new MailMergeDataSet();
+                mailMergeDataSet.Add(new MailMergeDataTable("nccs", parent));
+                mailMergeDataSet.Add(new MailMergeDataTable("details", details));
+
+                // Thiết lập quan hệ giữa bảng cha (nccs) và bảng con (details)
+                List<DictionaryEntry> relationsList = new List<DictionaryEntry>();
+                relationsList.Add(new DictionaryEntry("nccs", string.Empty));
+                relationsList.Add(new DictionaryEntry("details", "muahang_ncc_id = %nccs.id%"));
+
+                // Thực hiện MailMerge với vùng dữ liệu lồng nhau
+                document.MailMerge.ExecuteWidthNestedRegion(mailMergeDataSet, relationsList);
+
+            }
+            else
+            {
+                document.MailMerge.ExecuteWidthRegion(datatable_details);
+            }
             var timeStamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
             if (Directory.Exists(_configuration["Source:Path_Private"] + "\\buy\\muahang\\" + id))
             {

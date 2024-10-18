@@ -11,6 +11,7 @@ namespace Vue.Models
         [Key]
         public int id { get; set; }
         public int hh_id { get; set; }
+        public string? mahh { get; set; }
         public string? name { get; set; }
         public string? url { get; set; }
         public string? ext { get; set; }
