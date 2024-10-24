@@ -26,6 +26,9 @@ const formatPrice = (value, toFixed = 2) => {
   return val.toString().replace(/\.0+$/, ''); // remove trailing zeros
 };
 const formatDate = (value, fomat = "YYYY-MM-DD") => {
+  if (value == null) {
+    return "";
+  }
   return moment(value).format(fomat);
 };
 

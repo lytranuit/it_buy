@@ -83,6 +83,17 @@
               ><i class="ti-control-record"></i>Nhà sản xuất</router-link
             >
           </li>
+          <li class="nav-item" v-if="is_KHSX || is_RD || is_admin">
+            <router-link class="nav-link" to="/product"
+              ><i class="ti-control-record"></i>Danh mục sản phẩm
+            </router-link>
+          </li>
+
+          <li class="nav-item" v-if="is_BOM || is_admin">
+            <router-link class="nav-link" to="/bom"
+              ><i class="ti-control-record"></i>BOM
+            </router-link>
+          </li>
         </ul>
       </li>
     </ul>
@@ -108,6 +119,9 @@ const {
   is_Qa,
   is_CungungGiantiep,
   is_CungungHCTT,
+  is_KHSX,
+  is_RD,
+  is_BOM,
 } = storeToRefs(store);
 onMounted(() => {
   initMetisMenu();

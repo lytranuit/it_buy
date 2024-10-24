@@ -54,7 +54,7 @@ namespace it_template.Areas.V1.Controllers
                     }
                     else
                     {
-                        var count_muahang = _context.MuahangChitietModel.Include(d => d.muahang).Where(d => d.dutru_chitiet_id == item.id && (d.muahang.deleted_at == null || d.muahang.status_id != (int)Status.MuahangEsignError)).Count();
+                        var count_muahang = _context.MuahangChitietModel.Include(d => d.muahang).Where(d => d.dutru_chitiet_id == item.id && (d.muahang.deleted_at == null && d.muahang.status_id != (int)Status.MuahangEsignError)).Count();
                         if (count_muahang > 0)
                         {
                             item.can_huy = false;

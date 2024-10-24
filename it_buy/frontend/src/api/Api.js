@@ -14,6 +14,12 @@ export default {
   materials() {
     return repository.get(`/v1/${resoure}/materials`).then((res) => res.data);
   },
+  products() {
+    return repository.get(`/v1/${resoure}/products`).then((res) => res.data);
+  },
+  khuvuc() {
+    return repository.get(`/v1/${resoure}/khuvuc`).then((res) => res.data);
+  },
   group_materials() {
     return repository
       .get(`/v1/${resoure}/group_materials`)

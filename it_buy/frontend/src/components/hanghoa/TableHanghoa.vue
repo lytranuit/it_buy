@@ -146,13 +146,13 @@
 
         <template v-else-if="col.data == 'list_muahang'">
           <div v-for="item of slotProps.data[col.data]" :key="item.id">
-            <RouterLink
-              :to="'/muahang/edit/' + item.id"
+            <a
+              :href="'/muahang/edit/' + item.id"
               class="text-primary mr-2"
               target="_blank"
               v-if="is_CungungGiantiep || is_CungungNVL || is_CungungHCTT"
               >{{ item.id }} - {{ item.code }}
-            </RouterLink>
+            </a>
             <span class="mr-2" v-else>{{ item.id }} - {{ item.code }}</span>
             <Tag
               value="Hoàn thành"

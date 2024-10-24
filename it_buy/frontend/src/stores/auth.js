@@ -31,6 +31,15 @@ export const useAuth = defineStore("auth", () => {
   const is_manager = computed(() => {
     return in_groups(["Manager Task"]);
   });
+  const is_KHSX = computed(() => {
+    return in_groups(["KHSX"]);
+  });
+  const is_BOM = computed(() => {
+    return in_groups(["Manager BOM"]);
+  })
+  const is_RD = computed(() => {
+    return in_groups(["RD"]);
+  })
   const is_Cungung = computed(() => {
     return in_departments([14, 29, 30]);
   });
@@ -154,6 +163,9 @@ export const useAuth = defineStore("auth", () => {
     is_Ketoan,
     is_CungungHCTT,
     is_LeadQa,
+    is_KHSX,
+    is_BOM,
+    is_RD,
     list_users,
     getUser,
     logout,

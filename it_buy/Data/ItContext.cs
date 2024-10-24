@@ -11,6 +11,8 @@ using Microsoft.Extensions.DiagnosticAdapter;
 using System.Data.Common;
 using workflow.Models;
 using System.Reflection.Metadata;
+using System.Xml;
+using it_report.QLSX.Models;
 
 namespace Vue.Data
 {
@@ -39,7 +41,12 @@ namespace Vue.Data
         //public DbSet<NhacungcapQLSXModel> NhacungcapQLSXModel { get; set; }
         public DbSet<NVLQLSXModel> NVLQLSXModel { get; set; }
         //public DbSet<NVLRDQLSXModel> NVLRDQLSXModel { get; set; }
+        public DbSet<KhuvucModel> KhuvucModel { get; set; }
         public DbSet<NsxModel> NsxModel { get; set; }
+        public DbSet<BomModel> BomModel { get; set; }
+        public DbSet<PackageModel> PackageModel { get; set; }
+        public DbSet<BomThaytheModel> BomThaytheModel { get; set; }
+        public DbSet<ProductModel> ProductModel { get; set; }
 
         public DbSet<MaterialGroupModel> MaterialGroupModel { get; set; }
         public DbSet<MaterialModel> MaterialModel { get; set; }
@@ -91,6 +98,11 @@ namespace Vue.Data
                 table.RoleId,
                 table.UserId
             });
+
+            modelBuilder.Entity<BomModel>()
+                .HasKey(e => new { e.mahh, e.colo, e.manvl, e.stt });
+            modelBuilder.Entity<BomThaytheModel>()
+                .HasKey(e => new { e.mahh, e.colo, e.manvl, e.stt_thaythe });
 
             modelBuilder.Entity<UserModel>().HasMany(e => e.list_users).WithOne(e => e.user).HasForeignKey(e => e.userId);
 
@@ -218,7 +230,7 @@ namespace Vue.Data
             }
             var list_talbe2 = new List<string>()
             {
-                "dm_hanghoa","TBL_DANHMUCNHACC","TBL_DANHMUCHANGHOA_MUAHANG","TBL_DANHMUCHANGHOA_DINHKEM","TBL_DANHMUCNHASX","TBL_DANHMUCNHOMHANG"
+                "dm_hanghoa","TBL_DANHMUCNHACC","TBL_DANHMUCHANGHOA_MUAHANG","TBL_DANHMUCHANGHOA_DINHKEM","TBL_DANHMUCNHASX","TBL_DANHMUCNHOMHANG","TBL_DANHMUCTHANHPHAM","TBL_DANHMUCKHUVUC","TBL_DANHMUCBOM","TBL_DANHMUCBOM_THAYTHE","TBL_DANHMUCKIENHANG"
             };
             //var tableName = "AspNetUsers";
             foreach (var tableName in list_talbe2)
