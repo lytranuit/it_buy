@@ -103,7 +103,7 @@
             :href="'/dutru/edit/' + item.id"
             class="text-primary"
             target="_blank"
-            >{{ item.code }}</a
+            >{{ item.id }} - {{ item.code }}</a
           >
           <Tag
             value="Đã duyệt"
