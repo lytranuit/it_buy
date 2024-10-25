@@ -18,7 +18,6 @@
       </h5>
       <section class="card card-fluid">
         <div class="card-body" style="overflow: auto; position: relative">
-          <ConfirmDialog></ConfirmDialog>
           <DataTable
             class="p-datatable-customers"
             showGridlines
