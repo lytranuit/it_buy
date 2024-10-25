@@ -271,6 +271,28 @@ namespace it_template.Areas.V1.Controllers
             }
             int recordsFiltered = customerData.Count();
             var datapost = customerData.OrderBy(d => d.mahh).Skip(skip).Take(pageSize).ToList();
+
+            var dutru_all = _context.DutruChitietModel.Where(d => d.mahh != null).Include(d => d.dutru).Where(d => d.dutru.deleted_at == null).Select(d => new
+            {
+                mahh = d.mahh,
+                created_at = d.dutru.created_at,
+                id = d.dutru.id,
+                code = d.dutru.code,
+                status_id = d.dutru.status_id
+            }).ToList();
+            var muahang_all = _context.MuahangChitietModel.Where(d => d.mahh != null).Include(d => d.muahang).Where(d => d.muahang.deleted_at == null).Select(d => new
+            {
+                mahh = d.mahh,
+                created_at = d.muahang.created_at,
+                id = d.muahang.id,
+                code = d.muahang.code,
+                status_id = d.muahang.status_id,
+                is_dathang = d.muahang.is_dathang,
+                is_nhanhang = d.muahang.is_nhanhang,
+                is_thanhtoan = d.muahang.is_thanhtoan,
+                date_finish = d.muahang.date_finish,
+                loaithanhtoan = d.muahang.loaithanhtoan
+            }).ToList();
             //var data = new ArrayList();
             foreach (var record in datapost)
             {
@@ -306,22 +328,19 @@ namespace it_template.Areas.V1.Controllers
                         item.status = item1.tonkho >= item1.soluong;
                     }
 
-
                     ////Du tru
-                    var dutru = _context.DutruChitietModel.Where(d => d.mahh == item.manvl).Include(d => d.dutru).Where(d => d.dutru.deleted_at == null && d.dutru.created_at >= date0 && d.dutru.created_at <= date1).Select(d => d.dutru).ToList();
-
-                    item.dutru = dutru.OrderBy(d => d.created_at).Select(d => new DUTRU_DETAILS()
+                    var dutru = dutru_all.Where(d => d.mahh == item.manvl && d.created_at >= date0 && d.created_at <= date1).OrderBy(d => d.created_at).Select(d => new DUTRU_DETAILS()
                     {
                         id = d.id,
                         code = d.code,
                         status_id = d.status_id.Value
                     }).ToList();
 
+                    item.dutru = dutru;
+
 
                     ////Muahang
-                    var muahang = _context.MuahangChitietModel.Where(d => d.mahh == item.manvl).Include(d => d.muahang).Where(d => d.muahang.deleted_at == null && d.muahang.created_at >= date0 && d.muahang.created_at <= date1).Select(d => d.muahang).ToList();
-
-                    item.muahang = muahang.OrderBy(d => d.created_at).Select(d => new MUAHANG_DETAILS()
+                    var muahang = muahang_all.Where(d => d.mahh == item.manvl && d.created_at >= date0 && d.created_at <= date1).OrderBy(d => d.created_at).Select(d => new MUAHANG_DETAILS()
                     {
                         id = d.id,
                         code = d.code,
@@ -331,7 +350,9 @@ namespace it_template.Areas.V1.Controllers
                         is_thanhtoan = d.is_thanhtoan,
                         date_finish = d.date_finish,
                         loaithanhtoan = d.loaithanhtoan
-                    }).ToList(); ;
+                    }).ToList();
+
+                    item.muahang = muahang;
                 }
             }
             var jsonData = new { draw = draw, recordsFiltered = recordsFiltered, recordsTotal = recordsTotal, data = datapost };
