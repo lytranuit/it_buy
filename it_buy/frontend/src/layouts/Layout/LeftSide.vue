@@ -68,17 +68,17 @@
         </a>
 
         <ul class="nav-second-level" aria-expanded="false">
-          <li class="nav-item">
+          <!-- <li class="nav-item">
             <router-link class="nav-link" to="/materials"
               ><i class="ti-control-record"></i>Danh mục hàng hóa</router-link
             >
-          </li>
+          </li> -->
           <li class="nav-item" v-if="is_Cungung">
             <router-link class="nav-link" to="/supplier"
               ><i class="ti-control-record"></i>Nhà cung cấp</router-link
             >
           </li>
-          <li class="nav-item" v-if="is_Cungung">
+          <!-- <li class="nav-item" v-if="is_Cungung">
             <router-link class="nav-link" to="/producer"
               ><i class="ti-control-record"></i>Nhà sản xuất</router-link
             >
@@ -87,13 +87,13 @@
             <router-link class="nav-link" to="/product"
               ><i class="ti-control-record"></i>Danh mục sản phẩm
             </router-link>
-          </li>
+          </li> -->
 
-          <li class="nav-item" v-if="is_BOM || is_admin">
+          <!-- <li class="nav-item" v-if="is_BOM || is_admin">
             <router-link class="nav-link" to="/bom"
               ><i class="ti-control-record"></i>BOM
             </router-link>
-          </li>
+          </li> -->
         </ul>
       </li>
     </ul>
