@@ -210,23 +210,7 @@ namespace Vue.Controllers
                                 var model_chitiet = _context.MuahangChitietModel.Where(d => d.muahang_id == model.id).ToList();
                                 foreach (var item in model_chitiet)
                                 {
-
-                                    var muahang_chitiet_data = new MuahangChitietModel()
-                                    {
-                                        muahang_id = muahang_data.id,
-                                        dutru_chitiet_id = item.dutru_chitiet_id,
-                                        //hh_id = item.hh_id,
-                                        quidoi = item.quidoi,
-                                        soluong = item.soluong,
-                                        note = item.note,
-                                        mahh = item.mahh,
-                                        tenhh = item.tenhh,
-                                        dvt = item.dvt,
-                                        dvt_dutru = item.dvt_dutru,
-                                    };
-                                    _context.Add(muahang_chitiet_data);
-                                    await _context.SaveChangesAsync();
-                                    list_chitiet.Add(item.id, muahang_chitiet_data.id);
+                                    list_chitiet.Add(item.id, item.dutru_chitiet_id);
                                 }
                                 ////MUAHANG DINHKEM
                                 var model_dinhkem = _context.MuahangDinhkemModel.Where(d => d.muahang_id == model.id && d.deleted_at == null).ToList();
@@ -278,12 +262,30 @@ namespace Vue.Controllers
                                 var chitiet = ncc.chitiet;
                                 foreach (var item in chitiet)
                                 {
-                                    int muahang_chitiet_id = list_chitiet[item.muahang_chitiet_id];
+                                    var dutru_chitiet_id = list_chitiet[item.muahang_chitiet_id];
+                                    var muahang_chitiet_data1 = new MuahangChitietModel()
+                                    {
+                                        muahang_id = muahang_data.id,
+                                        dutru_chitiet_id = dutru_chitiet_id,
+                                        //hh_id = item.hh_id,
+                                        quidoi = item.quidoi,
+                                        soluong = item.soluong,
+                                        note = item.note,
+                                        mahh = item.mahh,
+                                        tenhh = item.tenhh,
+                                        dvt = item.dvt,
+                                        dvt_dutru = item.dvt_dutru,
+                                    };
+                                    _context.Add(muahang_chitiet_data1);
+                                    await _context.SaveChangesAsync();
+
                                     var muahang_chitiet_data = new MuahangNccChitietModel()
                                     {
                                         muahang_ncc_id = muahang_ncc.id,
-                                        muahang_chitiet_id = muahang_chitiet_id,
+                                        muahang_chitiet_id = muahang_chitiet_data1.id,
                                         //hh_id = item.hh_id,
+                                        quidoi = item.quidoi,
+                                        dvt_dutru = item.dvt_dutru,
                                         soluong = item.soluong,
                                         dongia = item.dongia,
                                         thanhtien = item.thanhtien,

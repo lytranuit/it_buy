@@ -19,9 +19,9 @@ namespace Vue.Models
         public decimal? thanhtien_vat { get; set; }
         public int? vat { get; set; }
 
-		public string? note { get; set; }
+        public string? note { get; set; }
 
-		[ForeignKey("muahang_ncc_id")]
+        [ForeignKey("muahang_ncc_id")]
         public virtual MuahangNccModel? muahang_ncc { get; set; }
         [ForeignKey("muahang_chitiet_id")]
         public virtual MuahangChitietModel? muahang_chitiet { get; set; }
@@ -31,6 +31,8 @@ namespace Vue.Models
         public string? tenhh { get; set; }
         //[NotMapped]
         public string? dvt { get; set; }
+        public string? dvt_dutru { get; set; }
+        public decimal? quidoi { get; set; }
         [NotMapped]
 
         public int? stt { get; set; }

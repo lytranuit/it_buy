@@ -34,13 +34,21 @@
               </material-auto-complete>
             </div>
           </template>
-          <template v-else-if="col.data == 'tenhh' || col.data == 'dvt'">
+          <template v-else-if="col.data == 'tenhh'">
             <InputText
               v-model="slotProps.data[col.data]"
               class="p-inputtext-sm"
               :disabled="readonly"
             />
           </template>
+          <template v-else-if="col.data == 'dvt'">
+            {{ slotProps.data["dvt"] }}
+            <i
+              class="fas fa-sync-alt"
+              style="cursor: pointer"
+              @click="openOp($event, slotProps.data)"
+            ></i
+          ></template>
           <template v-else-if="col.data == 'soluong'">
             <InputNumber
               v-model="slotProps.data[col.data]"
@@ -85,6 +93,23 @@
         </template>
       </Column>
     </DataTable>
+    <OverlayPanel ref="op">
+      <div>
+        Qui đổi từ 1
+        <input
+          class="form-control form-control-sm d-inline-block"
+          style="width: 60px"
+          v-model="editingRow.dvt"
+        />
+        =
+        <input
+          class="form-control form-control-sm d-inline-block"
+          style="width: 60px"
+          v-model="editingRow.quidoi"
+        />
+        <b>{{ editingRow.dvt_dutru }}</b>
+      </div>
+    </OverlayPanel>
   </div>
 </template>
 
@@ -102,6 +127,7 @@ import { formatPrice } from "../../utilities/util";
 import { useMuahang } from "../../stores/muahang";
 import { useGeneral } from "../../stores/general";
 import InputText from "primevue/inputtext";
+import OverlayPanel from "primevue/overlaypanel";
 
 const readonly = ref(false);
 const store_muahang = useMuahang();
@@ -110,6 +136,7 @@ const { nccs, nccs_chitiet, model } = storeToRefs(store_muahang);
 const { materials } = storeToRefs(store_general);
 const confirm = useConfirm();
 
+const editingRow = ref({});
 const loading = ref(false);
 const selected = ref();
 const modelncc = computed(() => {
@@ -166,6 +193,13 @@ const columns = ref([
   },
 ]);
 
+const op = ref();
+const openOp = (event, row) => {
+  console.log(event);
+  console.log(op.value);
+  editingRow.value = row;
+  op.value.toggle(event);
+};
 const selectedColumns = computed(() => {
   return columns.value.filter((col) => col.hide != true);
 });

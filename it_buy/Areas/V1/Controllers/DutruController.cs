@@ -881,6 +881,8 @@ namespace it_template.Areas.V1.Controllers
             var filter_user_id = Request.Form["filters[user_id]"].FirstOrDefault();
             var filter_tags = Request.Form["filters[tags]"].FirstOrDefault();
             var list_dutru = Request.Form["filters[list_dutru]"].FirstOrDefault();
+            var priority_id_string = Request.Form["filters[priority_id]"].FirstOrDefault();
+            int priority_id = priority_id_string != null ? Convert.ToInt32(priority_id_string) : 0;
             var tensp = Request.Form["filters[tensp]"].FirstOrDefault();
             var orderById = Request.Form["orderBy[id]"].FirstOrDefault();
 
@@ -946,6 +948,10 @@ namespace it_template.Areas.V1.Controllers
             {
                 customerData = customerData.Where(d => d.dutru.type_id == type_id);
             }
+            if (priority_id != null && priority_id != 0)
+            {
+                customerData = customerData.Where(d => d.dutru.priority_id == priority_id);
+            }
             if (department_id != null && department_id != 0)
             {
                 customerData = customerData.Where(d => d.dutru.bophan_id == department_id);
@@ -987,7 +993,6 @@ namespace it_template.Areas.V1.Controllers
                 customerData = customerData.OrderByDescending(d => d.id);
             }
             var datapost = customerData.Skip(skip).Take(pageSize)
-                .Include(d => d.danhgianhacungcap)
                 .Include(d => d.user)
                 .ToList();
             var data = new ArrayList();
@@ -1015,14 +1020,14 @@ namespace it_template.Areas.V1.Controllers
                 var thanhtien = thanhtien1.Sum(d => d.thanhtien_vat * d.muahang_ncc.quidoi);
                 var muahang_chitiet = record.muahang_chitiet.Where(d => d.muahang.deleted_at == null && d.muahang.status_id != (int)Status.MuahangEsignError).ToList();
                 var soluong_dutru = record.soluong;
-                var soluong_mua = muahang_chitiet.Sum(d => d.soluong * d.quidoi);
+                var soluong_mua = muahang_chitiet.Where(d => d.muahang.parent_id == null).Sum(d => d.soluong * d.quidoi);
 
                 var soluong = soluong_mua < soluong_dutru ? soluong_dutru - soluong_mua : 0;
                 var list_muahang = new List<MuahangModel>();
                 foreach (var m in muahang_chitiet)
                 {
                     var muahang = m.muahang;
-                    if(muahang.parent_id > 0)
+                    if (muahang.parent_id > 0)
                     {
                         continue;
                     }
@@ -1059,8 +1064,6 @@ namespace it_template.Areas.V1.Controllers
                     list_tag = record.list_tag,
                     tensp = record.tensp,
                     dutru_chitiet_id = record.id,
-                    danhgianhacungcap_id = record.danhgianhacungcap_id,
-                    danhgianhacungcap_is_chapnhan = record.danhgianhacungcap?.status_id == (int)DanhgianhacungcapStatus.SUCCESS,
                     dutru = new DutruModel()
                     {
                         id = dutru.id,
@@ -1069,6 +1072,7 @@ namespace it_template.Areas.V1.Controllers
                         type_id = dutru.type_id,
                         priority_id = dutru.priority_id,
                         bophan_id = dutru.bophan_id,
+                        date = dutru.date,
 
                     },
                     list_muahang = list_muahang

@@ -121,6 +121,8 @@ namespace Vue
             app.UseStaticFiles();
             if (!app.Environment.IsDevelopment())
             {
+                GC.Collect();
+                GC.WaitForPendingFinalizers(); // Đợi cho các finalizers hoàn tất
                 app.UseSpaStaticFiles();
             }
             app.UseRouting();

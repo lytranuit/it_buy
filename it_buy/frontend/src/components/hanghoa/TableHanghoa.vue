@@ -76,7 +76,7 @@
     <template #footer>
       <div style="text-align: center">
         <div class="row mb-2">
-          <div class="col-md">Các loại trạng thái DNMH</div>
+          <div class="col-md">Các loại trạng thái ĐNMH</div>
         </div>
         <div class="row justify-content-center" style="gap: 20px">
           <div class="col-md">
@@ -122,26 +122,6 @@
             target="_blank"
             >{{ slotProps.data.dutru.code }}</RouterLink
           >
-          <Tag
-            value="Bình thường"
-            size="small"
-            class="ml-2"
-            v-if="slotProps.data.dutru['priority_id'] == 1"
-          />
-          <Tag
-            value="Ưu tiên"
-            severity="warning"
-            size="small"
-            class="ml-2"
-            v-else-if="slotProps.data.dutru['priority_id'] == 2"
-          />
-          <Tag
-            value="Gấp"
-            severity="danger"
-            size="small"
-            class="ml-2"
-            v-else-if="slotProps.data.dutru['priority_id'] == 3"
-          />
         </template>
 
         <template v-else-if="col.data == 'list_muahang'">
@@ -202,7 +182,28 @@
             />
           </div>
         </template>
-
+        <template v-else-if="col.data == 'priority_id'">
+          <Tag
+            value="Bình thường"
+            size="small"
+            class="ml-2"
+            v-if="slotProps.data.dutru['priority_id'] == 1"
+          />
+          <Tag
+            value="Ưu tiên"
+            severity="warning"
+            size="small"
+            class="ml-2"
+            v-else-if="slotProps.data.dutru['priority_id'] == 2"
+          />
+          <Tag
+            value="Gấp"
+            severity="danger"
+            size="small"
+            class="ml-2"
+            v-else-if="slotProps.data.dutru['priority_id'] == 3"
+          />
+        </template>
         <template v-else-if="col.data == 'ngayhethan'">
           {{ formatDate(slotProps.data.dutru.date) }}
         </template>
@@ -304,6 +305,17 @@
             @update:model-value="filterCallback()"
           >
           </DepartmentOfUserTreeSelect>
+        </div>
+        <div v-else-if="col.data == 'priority_id'" style="width: 200px">
+          <select
+            class="form-control form-control-sm"
+            v-model="filterModel.value"
+            @change="filterCallback"
+          >
+            <option value="1">Bình thường</option>
+            <option value="2">Ưu tiên</option>
+            <option value="3">Gấp</option>
+          </select>
         </div>
         <div v-else>
           <InputText
@@ -493,20 +505,7 @@ const filterTable1 = ref();
 
 const store_danhgianhacungcap = useDanhgianhacungcap();
 const danhgianhacungcap = storeToRefs(store_danhgianhacungcap);
-const taodanhgia = () => {
-  store_danhgianhacungcap.openNew();
-  danhgianhacungcap.model.value.list_dutru_chitiet = selected.value.map(
-    (item) => {
-      return item.id;
-    }
-  );
-  let select = selected.value[0];
-  danhgianhacungcap.model.value.tenhh = select.tenhh;
-  danhgianhacungcap.model.value.dvt = select.dvt;
-  danhgianhacungcap.model.value.grade = select.grade;
-  danhgianhacungcap.model.value.masothietke = select.masothietke;
-  danhgianhacungcap.model.value.nhasx = select.nhasx;
-};
+
 const saveDanhgia = (id) => {
   // console.log();
   router.push("/danhgianhacungcap/details/" + id);
@@ -593,31 +592,38 @@ const columns = ref([
   },
   {
     id: 6,
+    label: "Độ ưu tiên",
+    data: "priority_id",
+    className: "text-center",
+    filter: true,
+  },
+  {
+    id: 7,
     label: "Hạn giao hàng",
     data: "ngayhethan",
     className: "text-center",
   },
 
   {
-    id: 7,
-    label: "DNMH",
+    id: 8,
+    label: "ĐNMH",
     data: "list_muahang",
     className: "text-center",
   },
   {
-    id: 8,
+    id: 9,
     label: "Số lượng mua",
     data: "soluong_mua",
     className: "text-center",
   },
   {
-    id: 9,
+    id: 10,
     label: "Còn lại",
     data: "soluong",
     className: "text-center",
   },
   {
-    id: 10,
+    id: 11,
     label: "Tổng tiền",
     data: "thanhtien",
     className: "text-center",
@@ -630,6 +636,7 @@ const filters = ref({
   tensp: { value: null, matchMode: FilterMatchMode.CONTAINS },
   bophan: { value: null, matchMode: FilterMatchMode.CONTAINS },
   list_dutru: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  priority_id: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
 const customFilter = ref({
   user_id: null,

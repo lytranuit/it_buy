@@ -1,18 +1,18 @@
 <template>
   <TreeSelect
-    :options="products"
+    :options="list_dangbaoche"
     :multiple="multiple"
     :normalizer="normalizer"
     :modelValue="modelValue"
     :name="name"
     :required="required"
     :append-to-body="appendToBody"
-    placeholder="Chọn sản phẩm"
+    placeholder="Dạng bào chế"
     @update:modelValue="emit('update:modelValue', $event)"
     zIndex="3000"
     :disableFuzzyMatching="true"
     :limit="0"
-    :limitText="(count) => 'Lựa chọn: ' + count + ' sản phẩm'"
+    :limitText="(count) => 'Lựa chọn: ' + count + ' dạng'"
   >
   </TreeSelect>
 </template>
@@ -21,10 +21,6 @@
 import { storeToRefs } from "pinia";
 import { onMounted, computed, ref } from "vue";
 
-import { useGeneral } from "../../stores/general";
-
-const store = useGeneral();
-const { products } = storeToRefs(store);
 const props = defineProps({
   appendToBody: {
     type: Boolean,
@@ -49,14 +45,26 @@ const props = defineProps({
 const emit = defineEmits(["update:modelValue"]);
 
 const normalizer = (node) => {
-  var id = node.mahh;
   // console.log(id);
   return {
-    id: id,
-    label: node.mahh + " - " + node.tenhh,
+    id: node,
+    label: node,
   };
 };
-onMounted(() => {
-  store.fetchProducts();
-});
+const list_dangbaoche = ref([
+  "Viên nén",
+  "Viên nén bao phim",
+  "Viên nén sủi",
+  "Viên nang cứng",
+  "Viên nang mềm",
+  "Bột cốm",
+  "Bột sủi",
+  "Mỡ",
+  "Kem",
+  "Gel",
+  "Viên ngậm",
+  "Kẹo cứng",
+  "Gummy",
+]);
+onMounted(() => {});
 </script>

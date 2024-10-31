@@ -49,6 +49,7 @@ namespace Vue.Models
         public string? grade { get; set; }
         public string? nhasx { get; set; }
         public string? tensp { get; set; }
+        public string? masp { get; set; }
         public string? dangbaoche { get; set; }
         public string? mansx { get; set; }
         [NotMapped]
@@ -58,5 +59,20 @@ namespace Vue.Models
 
         public bool? can_huy { get; set; } = false;
 
+
+        public List<string> list_dangbaoche
+        {
+            get
+            {
+                return dangbaoche != null ? dangbaoche.Split(",").ToList() : new List<string>();
+            }
+        }
+        public List<string> list_sp
+        {
+            get
+            {
+                return masp != null ? masp.Split(",").ToList() : new List<string>();
+            }
+        }
     }
 }

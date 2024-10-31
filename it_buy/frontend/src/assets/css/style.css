@@ -8732,3 +8732,6 @@ body.dark-sidenav .left-sidenav .left-sidenav-menu li.mm-active>a i {
 		bottom: 0px;
 	}
 }
+.vue-treeselect {
+    border-collapse: separate;
+}

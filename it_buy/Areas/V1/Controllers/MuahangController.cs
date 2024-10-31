@@ -429,6 +429,20 @@ namespace it_template.Areas.V1.Controllers
             var Model1 = _context.MuahangChitietModel.Where(d => d.muahang_id == id).ToList();
             _context.RemoveRange(Model1);
 
+            ///Child
+            var Model2 = _context.MuahangModel.Where(d => d.parent_id == id).ToList();
+            foreach (var item in Model2)
+            {
+                item.deleted_at = DateTime.Now;
+            }
+            _context.UpdateRange(Model2);
+
+            foreach (var item in Model2)
+            {
+                var muahangchitiet = _context.MuahangChitietModel.Where(d => d.muahang_id == item.id).ToList();
+                _context.RemoveRange(muahangchitiet);
+            }
+
             _context.SaveChanges();
             return Json(Model, new System.Text.Json.JsonSerializerOptions()
             {

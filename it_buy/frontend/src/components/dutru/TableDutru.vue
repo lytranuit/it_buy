@@ -388,7 +388,7 @@ const columns = ref([
   },
   {
     id: 6,
-    label: "DNMH",
+    label: "ĐNMH",
     data: "list_muahang",
     className: "text-center",
   },

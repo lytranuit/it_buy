@@ -62,14 +62,35 @@
                                 @click="openNew(slotProps.index)" v-if="model.type_id != 1"></span> -->
             </div>
           </template>
-
+          <template v-else-if="col.data == 'grade' && model.status_id == 1">
+            <select
+              class="form-control form-control-sm"
+              v-model="slotProps.data[col.data]"
+            >
+              <option value="Dược phẩm">Dược phẩm</option>
+              <option value="Mỹ phẩm">Mỹ phẩm</option>
+              <option value="Thực phẩm">Thực phẩm</option>
+            </select>
+          </template>
+          <template
+            v-else-if="col.data == 'list_dangbaoche' && model.status_id == 1"
+          >
+            <DangbaocheTreeSelect
+              v-model="slotProps.data.list_dangbaoche"
+              @update:modelValue="changeDangbaoche($event, slotProps.data)"
+              :multiple="true"
+            ></DangbaocheTreeSelect>
+          </template>
+          <template v-else-if="col.data == 'list_sp' && model.status_id == 1">
+            <ProductTreeSelect
+              v-model="slotProps.data.list_sp"
+              @update:modelValue="changeProduct($event, slotProps.data)"
+              :multiple="true"
+            ></ProductTreeSelect>
+          </template>
           <template
             v-else-if="
-              (col.data == 'dvt' ||
-                col.data == 'dangbaoche' ||
-                col.data == 'grade' ||
-                col.data == 'tensp' ||
-                col.data == 'masothietke') &&
+              (col.data == 'dvt' || col.data == 'masothietke') &&
               model.status_id == 1
             "
           >
@@ -249,6 +270,8 @@ import MaterialAutoComplete from "../AutoComplete/MaterialAutoComplete.vue";
 import { download, formatDate } from "../../utilities/util";
 import dutruApi from "../../api/dutruApi";
 import { useToast } from "primevue/usetoast";
+import ProductTreeSelect from "../TreeSelect/ProductTreeSelect.vue";
+import DangbaocheTreeSelect from "../TreeSelect/DangbaocheTreeSelect.vue";
 const store_auth = useAuth();
 const { user } = storeToRefs(store_auth);
 const toast = useToast();
@@ -340,7 +363,7 @@ const modelMaterial = RefMaterials.model;
 const { headerForm, visibleDialog } = RefMaterials;
 
 const { datatable, model, list_delete } = storeToRefs(store_dutru);
-const { materials } = storeToRefs(store_general);
+const { materials, products } = storeToRefs(store_general);
 const changeMaterial = store_general.changeMaterial;
 const changeProducer = store_general.changeProducer;
 const confirm = useConfirm();
@@ -372,12 +395,12 @@ const columns = computed(() => {
       },
       {
         label: "Tên SP(*)",
-        data: "tensp",
+        data: "list_sp",
         className: "text-center",
       },
       {
         label: "Dạng bào chế(*)",
-        data: "dangbaoche",
+        data: "list_dangbaoche",
         className: "text-center",
       },
       {
@@ -476,6 +499,35 @@ const confirmDeleteSelected = () => {
     },
   });
 };
+const changeProduct = (item, row) => {
+  if (item != null && item.length > 0) {
+    row.masp = item.join(",");
+    var list_dangbaoche = [];
+    var product_name = item.map((x) => {
+      var product = products.value.find((y) => {
+        return y.mahh == x;
+      });
+      if (product.dangbaoche != null) list_dangbaoche.push(product.dangbaoche);
+      return product.tenhh;
+    });
+    row.tensp = product_name.join(",");
+    var uniqueArray = [...new Set(list_dangbaoche)];
+    row.list_dangbaoche = uniqueArray;
+    changeDangbaoche(row.list_dangbaoche, row);
+  } else {
+    row.masp = null;
+    row.tensp = null;
+  }
+};
+const changeDangbaoche = (item, row) => {
+  if (item != null && item.length > 0) {
+    row.dangbaoche = item.join(",");
+  } else {
+    row.dangbaoche = null;
+  }
+  console.log(row);
+};
+
 onMounted(async () => {
   // if(items)
 });
@@ -496,6 +548,14 @@ onMounted(async () => {
 .note {
   word-wrap: break-word;
   white-space: pre-line;
+}
+.list_sp,
+.nhasx,
+.list_dangbaoche {
+  min-width: 300px;
+}
+.grade {
+  min-width: 150px;
 }
 
 tr.bg-gray {
