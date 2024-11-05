@@ -23,6 +23,7 @@
     contextMenu
     v-model:contextMenuSelection="selectedItem"
     @rowContextmenu="onRowContextMenu"
+    @sort="onSort($event)"
   >
     <template #header>
       <div class="d-flex align-items-center">
@@ -113,6 +114,7 @@
       :header="col.label"
       :key="col.data"
       :showFilterMatchModes="false"
+      :sortable="col.sortable"
     >
       <template #body="slotProps">
         <template v-if="col.data == 'list_dutru'">
@@ -510,6 +512,12 @@ const saveDanhgia = (id) => {
   // console.log();
   router.push("/danhgianhacungcap/details/" + id);
 };
+const onSort = (event) => {
+  // console.log(event);
+  sorts.value = {};
+  sorts.value[event.sortField] = event.sortOrder;
+  loadLazyData();
+};
 const changeFilterTable = () => {
   selected.value = null;
   loadLazyData();
@@ -553,6 +561,7 @@ const columns = ref([
     data: "mahh",
     className: "text-center",
     filter: true,
+    sortable: true,
   },
 
   {
@@ -561,6 +570,7 @@ const columns = ref([
     data: "tenhh",
     className: "text-center",
     filter: true,
+    sortable: true,
   },
   {
     id: 2,
@@ -568,6 +578,7 @@ const columns = ref([
     data: "tensp",
     className: "text-center",
     filter: true,
+    sortable: true,
   },
   {
     id: 3,
@@ -575,6 +586,7 @@ const columns = ref([
     data: "bophan",
     className: "text-center",
     filter: true,
+    sortable: true,
   },
   {
     id: 4,
@@ -589,6 +601,7 @@ const columns = ref([
     data: "list_dutru",
     className: "text-center",
     filter: true,
+    sortable: true,
   },
   {
     id: 6,
@@ -596,12 +609,14 @@ const columns = ref([
     data: "priority_id",
     className: "text-center",
     filter: true,
+    sortable: true,
   },
   {
     id: 7,
     label: "Hạn giao hàng",
     data: "ngayhethan",
     className: "text-center",
+    sortable: true,
   },
 
   {
@@ -638,6 +653,7 @@ const filters = ref({
   list_dutru: { value: null, matchMode: FilterMatchMode.CONTAINS },
   priority_id: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
+const sorts = ref({});
 const customFilter = ref({
   user_id: null,
   tags: null,
@@ -661,11 +677,17 @@ const lazyParams = computed(() => {
   for (let key in customFilter.value) {
     data_filters[key] = customFilter.value[key];
   }
+  let data_sorts = {};
+  // console.log(sorts.value);
+  for (let key in sorts.value) {
+    data_sorts[key] = sorts.value[key];
+  }
   return {
     draw: draw.value,
     start: first.value,
     length: rows.value,
     filters: data_filters,
+    sorts: data_sorts,
     type_id: filterTable.value,
     dutru_id: props.dutru_id,
     filterTable: filterTable1.value,

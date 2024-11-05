@@ -80,97 +80,97 @@ namespace it_template.Areas.V1.Controllers
             });
         }
 
-        [HttpPost]
-        public async Task<JsonResult> Remove(List<int> item)
-        {
-            var jsonData = new { success = true, message = "" };
-            try
-            {
-                var list = _context.MaterialModel.Where(d => item.Contains(d.id)).ToList();
-                foreach (var i in list)
-                {
-                    i.deleted_at = DateTime.Now;
-                }
-                _context.UpdateRange(list);
-                _context.SaveChanges();
-            }
-            catch (Exception ex)
-            {
-                jsonData = new { success = false, message = ex.Message };
-            }
+        //[HttpPost]
+        //public async Task<JsonResult> Remove(List<int> item)
+        //{
+        //    var jsonData = new { success = true, message = "" };
+        //    try
+        //    {
+        //        var list = _context.MaterialModel.Where(d => item.Contains(d.id)).ToList();
+        //        foreach (var i in list)
+        //        {
+        //            i.deleted_at = DateTime.Now;
+        //        }
+        //        _context.UpdateRange(list);
+        //        _context.SaveChanges();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        jsonData = new { success = false, message = ex.Message };
+        //    }
 
 
-            return Json(jsonData, new System.Text.Json.JsonSerializerOptions()
-            {
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-                ReferenceHandler = ReferenceHandler.IgnoreCycles,
-            });
-        }
-        [HttpPost]
-        public async Task<JsonResult> Table()
-        {
-            var draw = Request.Form["draw"].FirstOrDefault();
-            var start = Request.Form["start"].FirstOrDefault();
-            var length = Request.Form["length"].FirstOrDefault();
-            int pageSize = length != null ? Convert.ToInt32(length) : 0;
-            var mancc = Request.Form["filters[mancc]"].FirstOrDefault();
-            var mansx = Request.Form["filters[mansx]"].FirstOrDefault();
-            var mahh = Request.Form["filters[mahh]"].FirstOrDefault();
-            var tenhh = Request.Form["filters[tenhh]"].FirstOrDefault();
-            int skip = start != null ? Convert.ToInt32(start) : 0;
-            var customerData = _context.MaterialModel.Where(d => d.deleted_at == null);
-            int recordsTotal = customerData.Count();
-            if (mancc != null && mancc != "")
-            {
-                customerData = customerData.Where(d => d.mancc.Contains(mancc));
-            }
-            if (mansx != null && mansx != "")
-            {
-                customerData = customerData.Where(d => d.mansx.Contains(mansx));
-            }
-            if (mahh != null && mahh != "")
-            {
-                customerData = customerData.Where(d => d.mahh.Contains(mahh));
-            }
+        //    return Json(jsonData, new System.Text.Json.JsonSerializerOptions()
+        //    {
+        //        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        //        ReferenceHandler = ReferenceHandler.IgnoreCycles,
+        //    });
+        //}
+        //[HttpPost]
+        //public async Task<JsonResult> Table()
+        //{
+        //    var draw = Request.Form["draw"].FirstOrDefault();
+        //    var start = Request.Form["start"].FirstOrDefault();
+        //    var length = Request.Form["length"].FirstOrDefault();
+        //    int pageSize = length != null ? Convert.ToInt32(length) : 0;
+        //    var mancc = Request.Form["filters[mancc]"].FirstOrDefault();
+        //    var mansx = Request.Form["filters[mansx]"].FirstOrDefault();
+        //    var mahh = Request.Form["filters[mahh]"].FirstOrDefault();
+        //    var tenhh = Request.Form["filters[tenhh]"].FirstOrDefault();
+        //    int skip = start != null ? Convert.ToInt32(start) : 0;
+        //    var customerData = _context.MaterialModel.Where(d => d.deleted_at == null);
+        //    int recordsTotal = customerData.Count();
+        //    if (mancc != null && mancc != "")
+        //    {
+        //        customerData = customerData.Where(d => d.mancc.Contains(mancc));
+        //    }
+        //    if (mansx != null && mansx != "")
+        //    {
+        //        customerData = customerData.Where(d => d.mansx.Contains(mansx));
+        //    }
+        //    if (mahh != null && mahh != "")
+        //    {
+        //        customerData = customerData.Where(d => d.mahh.Contains(mahh));
+        //    }
 
-            if (tenhh != null && tenhh != "")
-            {
-                customerData = customerData.Where(d => d.tenhh.Contains(tenhh));
-            }
-            int recordsFiltered = customerData.Count();
-            var datapost = customerData.Include(d => d.nhasanxuat).Include(d => d.nhacungcap).OrderBy(d => d.mahh).Skip(skip).Take(pageSize).ToList();
-            //var data = new ArrayList();
-            //foreach (var record in datapost)
-            //{
-            //	var ngaythietke = record.ngaythietke != null ? record.ngaythietke.Value.ToString("yyyy-MM-dd") : null;
-            //	var ngaysodk = record.ngaysodk != null ? record.ngaysodk.Value.ToString("yyyy-MM-dd") : null;
-            //	var ngayhethanthietke = record.ngayhethanthietke != null ? record.ngayhethanthietke.Value.ToString("yyyy-MM-dd") : null;
-            //	var data1 = new
-            //	{
-            //		mahh = record.mahh,
-            //		tenhh = record.tenhh,
-            //		dvt = record.dvt,
-            //		mansx = record.mansx,
-            //		mancc = record.mancc,
-            //		tennvlgoc = record.tennvlgoc,
-            //		masothietke = record.masothietke,
-            //		ghichu_thietke = record.ghichu_thietke,
-            //		masodk = record.masodk,
-            //		ghichu_sodk = record.ghichu_sodk,
-            //		nhuongquyen = record.nhuongquyen,
-            //		ngaythietke = ngaythietke,
-            //		ngaysodk = ngaysodk,
-            //		ngayhethanthietke = ngayhethanthietke
-            //	};
-            //	data.Add(data1);
-            //}
-            var jsonData = new { draw = draw, recordsFiltered = recordsFiltered, recordsTotal = recordsTotal, data = datapost };
-            return Json(jsonData, new System.Text.Json.JsonSerializerOptions()
-            {
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-                ReferenceHandler = ReferenceHandler.IgnoreCycles,
-            });
-        }
+        //    if (tenhh != null && tenhh != "")
+        //    {
+        //        customerData = customerData.Where(d => d.tenhh.Contains(tenhh));
+        //    }
+        //    int recordsFiltered = customerData.Count();
+        //    var datapost = customerData.Include(d => d.nhasanxuat).Include(d => d.nhacungcap).OrderBy(d => d.mahh).Skip(skip).Take(pageSize).ToList();
+        //    //var data = new ArrayList();
+        //    //foreach (var record in datapost)
+        //    //{
+        //    //	var ngaythietke = record.ngaythietke != null ? record.ngaythietke.Value.ToString("yyyy-MM-dd") : null;
+        //    //	var ngaysodk = record.ngaysodk != null ? record.ngaysodk.Value.ToString("yyyy-MM-dd") : null;
+        //    //	var ngayhethanthietke = record.ngayhethanthietke != null ? record.ngayhethanthietke.Value.ToString("yyyy-MM-dd") : null;
+        //    //	var data1 = new
+        //    //	{
+        //    //		mahh = record.mahh,
+        //    //		tenhh = record.tenhh,
+        //    //		dvt = record.dvt,
+        //    //		mansx = record.mansx,
+        //    //		mancc = record.mancc,
+        //    //		tennvlgoc = record.tennvlgoc,
+        //    //		masothietke = record.masothietke,
+        //    //		ghichu_thietke = record.ghichu_thietke,
+        //    //		masodk = record.masodk,
+        //    //		ghichu_sodk = record.ghichu_sodk,
+        //    //		nhuongquyen = record.nhuongquyen,
+        //    //		ngaythietke = ngaythietke,
+        //    //		ngaysodk = ngaysodk,
+        //    //		ngayhethanthietke = ngayhethanthietke
+        //    //	};
+        //    //	data.Add(data1);
+        //    //}
+        //    var jsonData = new { draw = draw, recordsFiltered = recordsFiltered, recordsTotal = recordsTotal, data = datapost };
+        //    return Json(jsonData, new System.Text.Json.JsonSerializerOptions()
+        //    {
+        //        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        //        ReferenceHandler = ReferenceHandler.IgnoreCycles,
+        //    });
+        //}
         //public async Task<JsonResult> nhasx()
         //{
         //    var data = _QLSXcontext.NhasanxuatModel.ToList();

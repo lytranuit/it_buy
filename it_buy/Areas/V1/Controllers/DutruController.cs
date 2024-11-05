@@ -897,6 +897,13 @@ namespace it_template.Areas.V1.Controllers
             var is_CungungGiantiep = departments.Contains(14) == true;
             var is_CungungHCTT = departments.Contains(30) == true;
 
+            var sort_mahh = Request.Form["sorts[mahh]"].FirstOrDefault();
+            var sort_tenhh = Request.Form["sorts[tenhh]"].FirstOrDefault();
+            var sort_tensp = Request.Form["sorts[tensp]"].FirstOrDefault();
+            var sort_bophan = Request.Form["sorts[bophan]"].FirstOrDefault();
+            var sort_priority = Request.Form["sorts[priority_id]"].FirstOrDefault();
+            var sort_dutru = Request.Form["sorts[list_dutru]"].FirstOrDefault();
+            var sort_ngayhethan = Request.Form["sorts[ngayhethan]"].FirstOrDefault();
             //var 
 
             //var tenhh = Request.Form["filters[tenhh]"].FirstOrDefault();
@@ -988,10 +995,89 @@ namespace it_template.Areas.V1.Controllers
             {
                 customerData = customerData.OrderBy(d => d.id);
             }
+            else if (sort_mahh != null)
+            {
+                if (sort_mahh == "1")
+                {
+                    customerData = customerData.OrderBy(d => d.mahh);
+                }
+                else if (sort_mahh == "-1")
+                {
+                    customerData = customerData.OrderByDescending(d => d.mahh);
+                }
+            }
+            else if (sort_tenhh != null)
+            {
+                if (sort_tenhh == "1")
+                {
+                    customerData = customerData.OrderBy(d => d.tenhh);
+                }
+                else if (sort_tenhh == "-1")
+                {
+                    customerData = customerData.OrderByDescending(d => d.tenhh);
+                }
+            }
+            else if (sort_tensp != null)
+            {
+                if (sort_tensp == "1")
+                {
+                    customerData = customerData.OrderBy(d => d.tensp);
+                }
+                else if (sort_tensp == "-1")
+                {
+                    customerData = customerData.OrderByDescending(d => d.tensp);
+                }
+            }
+            else if (sort_bophan != null)
+            {
+                if (sort_bophan == "1")
+                {
+                    customerData = customerData.OrderBy(d => d.dutru.bophan_id);
+                }
+                else if (sort_bophan == "-1")
+                {
+                    customerData = customerData.OrderByDescending(d => d.dutru.bophan_id);
+                }
+            }
+            else if (sort_priority != null)
+            {
+                if (sort_priority == "1")
+                {
+                    customerData = customerData.OrderBy(d => d.dutru.priority_id);
+                }
+                else if (sort_priority == "-1")
+                {
+                    customerData = customerData.OrderByDescending(d => d.dutru.priority_id);
+                }
+            }
+            else if (sort_dutru != null)
+            {
+                if (sort_dutru == "1")
+                {
+                    customerData = customerData.OrderBy(d => d.dutru.code);
+                }
+                else if (sort_dutru == "-1")
+                {
+                    customerData = customerData.OrderByDescending(d => d.dutru.code);
+                }
+            }
+            else if (sort_ngayhethan != null)
+            {
+                if (sort_ngayhethan == "1")
+                {
+                    customerData = customerData.OrderBy(d => d.dutru.date);
+                }
+                else if (sort_ngayhethan == "-1")
+                {
+                    customerData = customerData.OrderByDescending(d => d.dutru.date);
+                }
+            }
             else
             {
                 customerData = customerData.OrderByDescending(d => d.id);
             }
+
+
             var datapost = customerData.Skip(skip).Take(pageSize)
                 .Include(d => d.user)
                 .ToList();

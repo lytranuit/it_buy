@@ -183,7 +183,14 @@
           <template v-else-if="col.data == 'tenhh' && model.status_id != 1">
             {{ label(slotProps.data) }}
           </template>
-
+          <template v-else-if="col.data == 'list_sp' && model.status_id != 1">
+            {{ slotProps.data.tensp }}
+          </template>
+          <template
+            v-else-if="col.data == 'list_dangbaoche' && model.status_id != 1"
+          >
+            {{ slotProps.data.dangbaoche }}
+          </template>
           <template v-else>
             {{ slotProps.data[col.data] }}
           </template>

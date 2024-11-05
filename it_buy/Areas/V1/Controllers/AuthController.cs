@@ -246,41 +246,41 @@ namespace it_template.Areas.V1.Controllers
         //    _context.SaveChanges();
         //    return Json(new { success = true });
         //}
-        public async Task<JsonResult> updatehh()
-        {
-            var items = _context.NVLQLSXModel.ToList();
-            foreach (var value in items)
-            {
-                //var tennhasanxuat = value.nhasanxuat != null ? value.nhasanxuat.tennsx : "";
-                var find = _context.MaterialModel.Where(d => d.mahh == value.mahh).FirstOrDefault();
-                if (find != null)
-                {
-                    find.nhom = value.manhom;
-                    find.tenhh = value.tenhh;
-                    find.dvt = value.dvt;
-                    find.mansx = value.mansx;
-                    find.mancc = value.mancc;
-                    find.masothietke = value.masothietke;
-                    _context.Update(find);
-                }
-                else
-                {
-                    _context.Add(new MaterialModel()
-                    {
-                        tenhh = value.tenhh,
-                        mahh = value.mahh,
-                        dvt = value.dvt,
-                        mancc = value.mancc,
-                        mansx = value.mansx,
-                        masothietke = value.masothietke,
-                        nhom = value.manhom
-                    });
-                }
-                _context.SaveChanges();
-            }
+        //public async Task<JsonResult> updatehh()
+        //{
+        //    var items = _context.NVLQLSXModel.ToList();
+        //    foreach (var value in items)
+        //    {
+        //        //var tennhasanxuat = value.nhasanxuat != null ? value.nhasanxuat.tennsx : "";
+        //        var find = _context.MaterialModel.Where(d => d.mahh == value.mahh).FirstOrDefault();
+        //        if (find != null)
+        //        {
+        //            find.nhom = value.manhom;
+        //            find.tenhh = value.tenhh;
+        //            find.dvt = value.dvt;
+        //            find.mansx = value.mansx;
+        //            find.mancc = value.mancc;
+        //            find.masothietke = value.masothietke;
+        //            _context.Update(find);
+        //        }
+        //        else
+        //        {
+        //            _context.Add(new MaterialModel()
+        //            {
+        //                tenhh = value.tenhh,
+        //                mahh = value.mahh,
+        //                dvt = value.dvt,
+        //                mancc = value.mancc,
+        //                mansx = value.mansx,
+        //                masothietke = value.masothietke,
+        //                nhom = value.manhom
+        //            });
+        //        }
+        //        _context.SaveChanges();
+        //    }
 
-            return Json(new { success = true });
-        }
+        //    return Json(new { success = true });
+        //}
         public class SelectResponse
         {
             public string id { get; set; }

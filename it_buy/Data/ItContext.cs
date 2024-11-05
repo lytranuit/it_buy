@@ -39,7 +39,6 @@ namespace Vue.Data
 
 
         //public DbSet<NhacungcapQLSXModel> NhacungcapQLSXModel { get; set; }
-        public DbSet<NVLQLSXModel> NVLQLSXModel { get; set; }
         //public DbSet<NVLRDQLSXModel> NVLRDQLSXModel { get; set; }
         public DbSet<KhuvucModel> KhuvucModel { get; set; }
         public DbSet<NsxModel> NsxModel { get; set; }

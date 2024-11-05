@@ -421,6 +421,7 @@ const toast = useToast();
 const minDate = new Date();
 const route = useRoute();
 const storeDutru = useDutru();
+const store_general = useGeneral();
 const {
   model,
   datatable,
@@ -481,6 +482,9 @@ const load_data = async (id) => {
   waiting.value = false;
 };
 onMounted(() => {
+  store_general.fetchMaterialGroup();
+  store_general.fetchMaterials();
+
   load_data(route.params.id);
 });
 const submit = async () => {
