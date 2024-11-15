@@ -38,7 +38,7 @@
           </div>
         </div>
       </div>
-      <div class="col-md-2" v-if="user.email == 'tran.dl@astahealthcare.com'">
+      <div class="col-md-2">
         <div class="form-group row">
           <b class="col-12 col-lg-12 col-form-label"
             >Nhiều nhà cung cấp:<i class="text-danger">*</i></b

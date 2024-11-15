@@ -273,6 +273,19 @@
                   <option value="3">Gấp</option>
                 </select>
               </template>
+              <template v-else-if="col.data == 'status_id'">
+                <select
+                  class="form-control"
+                  v-model="filterModel.value"
+                  @change="filterCallback()"
+                >
+                  <option value="1">Nháp</option>
+                  <option value="2">Đang trình ký</option>
+                  <option value="3">Chờ ký duyệt</option>
+                  <option value="4">Đã duyệt</option>
+                  <option value="5">Không duyệt</option>
+                </select>
+              </template>
               <div v-else-if="col.data == 'bophan_id'" style="width: 200px">
                 <DepartmentOfUserTreeSelect
                   v-model="filterModel.value"
@@ -385,6 +398,7 @@ const columns = ref([
     label: "Trạng thái",
     data: "status_id",
     className: "text-center",
+    filter: true,
   },
   {
     id: 6,
@@ -399,6 +413,7 @@ const filters = ref({
   name: { value: null, matchMode: FilterMatchMode.CONTAINS },
   bophan_id: { value: null, matchMode: FilterMatchMode.CONTAINS },
   priority_id: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  status_id: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
 const departments = ref([]);
 const totalRecords = ref(0);

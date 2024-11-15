@@ -746,9 +746,11 @@ namespace it_template.Areas.V1.Controllers
             var name = Request.Form["filters[name]"].FirstOrDefault();
             var code = Request.Form["filters[code]"].FirstOrDefault();
             var priority_id_string = Request.Form["filters[priority_id]"].FirstOrDefault();
+            var status_id_string = Request.Form["filters[status_id]"].FirstOrDefault();
             var id_text = Request.Form["filters[id]"].FirstOrDefault();
             int id = id_text != null ? Convert.ToInt32(id_text) : 0;
             int priority_id = priority_id_string != null ? Convert.ToInt32(priority_id_string) : 0;
+            int status_id = status_id_string != null ? Convert.ToInt32(status_id_string) : 0;
             var department_id_string = Request.Form["filters[bophan_id]"].FirstOrDefault();
             int department_id = department_id_string != null ? Convert.ToInt32(department_id_string) : 0;
             var type_id_string = Request.Form["type_id"].FirstOrDefault();
@@ -824,6 +826,10 @@ namespace it_template.Areas.V1.Controllers
             {
                 customerData = customerData.Where(d => d.priority_id == priority_id);
             }
+            if (status_id != 0)
+            {
+                customerData = customerData.Where(d => d.status_id == status_id);
+            }
             int recordsFiltered = customerData.Count();
             var datapost = customerData.OrderByDescending(d => d.id).Skip(skip).Take(pageSize).Include(d => d.user_created_by).Include(d => d.chitiet).ThenInclude(d => d.muahang_chitiet).ThenInclude(d => d.muahang).ToList();
             var data = new ArrayList();
@@ -875,6 +881,8 @@ namespace it_template.Areas.V1.Controllers
             var length = Request.Form["length"].FirstOrDefault();
             int pageSize = length != null ? Convert.ToInt32(length) : 0;
             var type_id_string = Request.Form["type_id"].FirstOrDefault();
+            var filter_DNMH_string = Request.Form["filter_DNMH"].FirstOrDefault();
+            int filter_DNMH = filter_DNMH_string != null ? Convert.ToInt32(filter_DNMH_string) : 0;
             int type_id = type_id_string != null ? Convert.ToInt32(type_id_string) : 0;
             var mahh = Request.Form["filters[mahh]"].FirstOrDefault();
             var tenhh = Request.Form["filters[tenhh]"].FirstOrDefault();
@@ -951,6 +959,35 @@ namespace it_template.Areas.V1.Controllers
             }
 
             int recordsTotal = customerData.Count();
+            if (filter_DNMH == 1)
+            {
+                customerData = customerData.Where(d => d.muahang_chitiet.Any(m => m.muahang != null && (m.muahang.status_id == 1 || m.muahang.status_id == 6 || m.muahang.status_id == 7)));
+            }
+            else if (filter_DNMH == 2)
+            {
+                customerData = customerData.Where(d => d.muahang_chitiet.Any(m => m.muahang != null && m.muahang.status_id == 9));
+            }
+            else if (filter_DNMH == 3)
+            {
+                customerData = customerData.Where(d => d.muahang_chitiet.Any(m => m.muahang != null && m.muahang.status_id == 11));
+            }
+            else if (filter_DNMH == 4)
+            {
+                customerData = customerData.Where(d => d.muahang_chitiet.Any(m => m.muahang != null && m.muahang.status_id == 10 && m.muahang.is_dathang != true));
+            }
+            else if (filter_DNMH == 5)
+            {
+                customerData = customerData.Where(d => d.muahang_chitiet.Any(m => m.muahang != null && m.muahang.date_finish == null && (m.muahang.is_dathang == true && ((m.muahang.loaithanhtoan == "tra_sau" && m.muahang.is_nhanhang == false) || (m.muahang.loaithanhtoan == "tra_truoc" && m.muahang.is_thanhtoan == true)))));
+            }
+            else if (filter_DNMH == 6)
+            {
+                customerData = customerData.Where(d => d.muahang_chitiet.Any(m => m.muahang != null && m.muahang.date_finish == null && (m.muahang.is_dathang == true && ((m.muahang.loaithanhtoan == "tra_truoc" && m.muahang.is_thanhtoan == false) || (m.muahang.loaithanhtoan == "tra_sau" && m.muahang.is_nhanhang == true)))));
+            }
+            else if (filter_DNMH == 7)
+            {
+                customerData = customerData.Where(d => d.muahang_chitiet.Any(m => m.muahang != null && m.muahang.date_finish != null));
+            }
+
             if (type_id != null && type_id != 0)
             {
                 customerData = customerData.Where(d => d.dutru.type_id == type_id);
@@ -1318,6 +1355,7 @@ namespace it_template.Areas.V1.Controllers
             dt.Columns.Add("masothietke", typeof(string));
             dt.Columns.Add("mansx", typeof(string));
             dt.Columns.Add("tennsx", typeof(string));
+            dt.Columns.Add("mota", typeof(string));
             dt.Columns.Add("priority", typeof(string));
             dt.Columns.Add("created_at", typeof(DateTime));
             dt.Columns.Add("created_by", typeof(string));
@@ -1423,6 +1461,7 @@ namespace it_template.Areas.V1.Controllers
                 dr1["masothietke"] = record.masothietke;
                 dr1["mansx"] = record.mansx;
                 dr1["tennsx"] = record.nhasx;
+                dr1["mota"] = record.note;
                 dr1["priority"] = dutru.priority_id != null ? GetEnumDisplayName((Priority)dutru.priority_id) : "";
                 dr1["created_at"] = dutru.created_at;
                 dr1["created_by"] = dutru.user_created_by.FullName;

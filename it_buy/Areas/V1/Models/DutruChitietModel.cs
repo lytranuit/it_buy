@@ -48,10 +48,10 @@ namespace Vue.Models
         public string? masothietke { get; set; }
         public string? grade { get; set; }
         public string? nhasx { get; set; }
+        public string? mansx { get; set; }
         public string? tensp { get; set; }
         public string? masp { get; set; }
         public string? dangbaoche { get; set; }
-        public string? mansx { get; set; }
         [NotMapped]
 
         public int? stt { get; set; }

@@ -69,6 +69,15 @@ export default {
       })
       .then((res) => res.data);
   },
+  saveChitiet(params) {
+    return repository
+      .post(`/v1/${resoure}/saveChitiet`, params, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => res.data);
+  },
   save(params) {
     return repository
       .post(`/v1/${resoure}/Save`, params, {

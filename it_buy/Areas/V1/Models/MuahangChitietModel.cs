@@ -38,6 +38,9 @@ namespace Vue.Models
         //[NotMapped]
         public string? dvt { get; set; }
         public string? dvt_dutru { get; set; }
+        public string? grade { get; set; }
+        public string? nhasx { get; set; }
+        public string? mansx { get; set; }
         [NotMapped]
 
         public int? stt { get; set; }

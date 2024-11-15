@@ -78,12 +78,12 @@
               ><i class="ti-control-record"></i>Nhà cung cấp</router-link
             >
           </li>
-          <!-- <li class="nav-item" v-if="is_Cungung">
+          <li class="nav-item" v-if="is_Cungung">
             <router-link class="nav-link" to="/producer"
               ><i class="ti-control-record"></i>Nhà sản xuất</router-link
             >
           </li>
-          <li class="nav-item" v-if="is_KHSX || is_RD || is_admin">
+          <!-- <li class="nav-item" v-if="is_KHSX || is_RD || is_admin">
             <router-link class="nav-link" to="/product"
               ><i class="ti-control-record"></i>Danh mục sản phẩm
             </router-link>

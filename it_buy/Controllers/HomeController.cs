@@ -267,6 +267,9 @@ namespace Vue.Controllers
                                     {
                                         muahang_id = muahang_data.id,
                                         dutru_chitiet_id = dutru_chitiet_id,
+                                        grade = item.grade,
+                                        mansx = item.mansx,
+                                        nhasx = item.nhasx,
                                         //hh_id = item.hh_id,
                                         quidoi = item.quidoi,
                                         soluong = item.soluong,
@@ -283,6 +286,9 @@ namespace Vue.Controllers
                                     {
                                         muahang_ncc_id = muahang_ncc.id,
                                         muahang_chitiet_id = muahang_chitiet_data1.id,
+                                        grade = item.grade,
+                                        mansx = item.mansx,
+                                        nhasx = item.nhasx,
                                         //hh_id = item.hh_id,
                                         quidoi = item.quidoi,
                                         dvt_dutru = item.dvt_dutru,

@@ -4,6 +4,7 @@
       showGridlines
       :value="datatable"
       ref="dt"
+      id="table-muahang-chitiet"
       class="p-datatable-ct"
       :rowHover="true"
       :loading="loading"
@@ -46,6 +47,12 @@
             <textarea v-model="slotProps.data[col.data]" class="form-control" />
           </template>
           <template v-else-if="col.data == 'tenhh' && model.status_id == 1">
+            <input v-model="slotProps.data[col.data]" class="form-control" />
+          </template>
+          <template v-else-if="col.data == 'grade' && model.status_id == 1">
+            <input v-model="slotProps.data[col.data]" class="form-control" />
+          </template>
+          <template v-else-if="col.data == 'nhasx' && model.status_id == 1">
             <input v-model="slotProps.data[col.data]" class="form-control" />
           </template>
           <template v-else-if="col.data == 'dvt' && model.status_id == 1">
@@ -110,6 +117,7 @@ import { rand } from "../../utilities/rand";
 import { formatPrice } from "../../utilities/util";
 import { useMuahang } from "../../stores/muahang";
 import { useGeneral } from "../../stores/general";
+import NsxTreeSelect from "../TreeSelect/NsxTreeSelect.vue";
 
 const store_muahang = useMuahang();
 const store_general = useGeneral();
@@ -119,42 +127,92 @@ const editingRow = ref();
 
 const loading = ref(false);
 const selected = ref();
-const columns = ref([
-  {
-    label: "STT(*)",
-    data: "stt",
-    className: "text-center",
-  },
-  {
-    label: "Mã(*)",
-    data: "mahh",
-    className: "text-center",
-  },
-  {
-    label: "Tên(*)",
-    data: "tenhh",
-    className: "text-center",
-  },
-  {
-    label: "ĐVT(*)",
-    data: "dvt",
-    className: "text-center",
-  },
-  {
-    label: "Số lượng(*)",
-    data: "soluong",
-    className: "text-center",
-  },
-  {
-    label: "Mô tả",
-    data: "note",
-    className: "text-center",
-  },
-]);
+const columns = computed(() => {
+  if (model.value.type_id == 1) {
+    return [
+      {
+        label: "STT(*)",
+        data: "stt",
+        className: "text-center",
+      },
+      {
+        label: "Mã(*)",
+        data: "mahh",
+        className: "text-center",
+      },
+      {
+        label: "Tên(*)",
+        data: "tenhh",
+        className: "text-center",
+      },
+      {
+        label: "Grade",
+        data: "grade",
+        className: "text-center",
+      },
+      {
+        label: "Nhà sản xuất",
+        data: "nhasx",
+        className: "text-center",
+      },
+
+      {
+        label: "ĐVT(*)",
+        data: "dvt",
+        className: "text-center",
+      },
+      {
+        label: "Số lượng(*)",
+        data: "soluong",
+        className: "text-center",
+      },
+      {
+        label: "Mô tả",
+        data: "note",
+        className: "text-center",
+      },
+    ];
+  } else {
+    return [
+      {
+        label: "STT(*)",
+        data: "stt",
+        className: "text-center",
+      },
+      {
+        label: "Mã(*)",
+        data: "mahh",
+        className: "text-center",
+      },
+      {
+        label: "Tên(*)",
+        data: "tenhh",
+        className: "text-center",
+      },
+      {
+        label: "ĐVT(*)",
+        data: "dvt",
+        className: "text-center",
+      },
+      {
+        label: "Số lượng(*)",
+        data: "soluong",
+        className: "text-center",
+      },
+      {
+        label: "Mô tả",
+        data: "note",
+        className: "text-center",
+      },
+    ];
+  }
+});
 
 const selectedColumns = computed(() => {
   return columns.value.filter((col) => col.hide != true);
 });
+
+const changeProducer = store_general.changeProducer;
 const op = ref();
 const openOp = (event, row) => {
   editingRow.value = row;
@@ -170,8 +228,15 @@ onMounted(async () => {
   // await store_general.fetchMaterials();
 });
 </script>
-<style>
-.mahh {
-  max-width: 300px;
+<style lang="scss">
+#table-muahang-chitiet {
+  .mahh,
+  .grade {
+    min-width: 150px;
+  }
+  .tenhh,
+  .nhasx {
+    min-width: 300px;
+  }
 }
 </style>

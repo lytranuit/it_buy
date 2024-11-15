@@ -268,16 +268,19 @@ namespace it_template.Areas.V1.Controllers
                 ReferenceHandler = ReferenceHandler.IgnoreCycles,
             });
         }
-        public JsonResult GetNhanhang(int id)
+        public async Task<JsonResult> GetNhanhang(int id)
         {
             System.Security.Claims.ClaimsPrincipal currentUser = this.User;
 
+            var user = await UserManager.GetUserAsync(currentUser);
             var user_id = UserManager.GetUserId(currentUser);
+
+            var is_admin = await UserManager.IsInRoleAsync(user, "Administrator");
             var my_item = _context.DutruChitietModel.Include(d => d.dutru).Where(d => d.dutru.deleted_at == null && d.dutru.created_by == user_id).Select(d => d.id).ToList();
 
             var data = _context.MuahangModel.Where(d => d.id == id)
                 .Include(d => d.muahang_chonmua).ThenInclude(d => d.ncc)
-                .Include(d => d.chitiet.Where(e => my_item.Contains(e.dutru_chitiet_id)))
+                .Include(d => d.chitiet.Where(e => is_admin == true || my_item.Contains(e.dutru_chitiet_id) ))
                 .ThenInclude(d => d.user_nhanhang).FirstOrDefault();
             if (data != null)
             {
@@ -748,6 +751,25 @@ namespace it_template.Areas.V1.Controllers
 
         }
         [HttpPost]
+        public async Task<JsonResult> saveChitiet(List<MuahangChitietModel> list)
+        {
+
+            System.Security.Claims.ClaimsPrincipal currentUser = this.User;
+
+            if (list != null)
+            {
+                foreach (var item in list)
+                {
+                    item.user_nhanhang = null;
+                    _context.Update(item);
+                }
+            }
+            _context.SaveChanges();
+
+            return Json(new { success = true });
+
+        }
+        [HttpPost]
 
         public async Task<JsonResult> baogia(int id)
         {
@@ -1079,10 +1101,41 @@ namespace it_template.Areas.V1.Controllers
             int id = id_text != null ? Convert.ToInt32(id_text) : 0;
             var type_id_string = Request.Form["type_id"].FirstOrDefault();
             int type_id = type_id_string != null ? Convert.ToInt32(type_id_string) : 0;
+            var status_id_string = Request.Form["filters[status_id]"].FirstOrDefault();
+            int status_id = status_id_string != null ? Convert.ToInt32(status_id_string) : 0;
             //var filter_thanhtoan = Request.Form["filter_thanhtoan"].FirstOrDefault();
             //var tenhh = Request.Form["filters[tenhh]"].FirstOrDefault();
             int skip = start != null ? Convert.ToInt32(start) : 0;
             var customerData = _context.MuahangModel.Where(d => d.deleted_at == null && d.parent_id == null);
+            if (status_id == 1)
+            {
+                customerData = customerData.Where(m => m.status_id == 1 || m.status_id == 6 || m.status_id == 7);
+            }
+            else if (status_id == 2)
+            {
+                customerData = customerData.Where(m => m.status_id == 9);
+            }
+            else if (status_id == 3)
+            {
+                customerData = customerData.Where(m => m.status_id == 11);
+            }
+            else if (status_id == 4)
+            {
+                customerData = customerData.Where(m => m.status_id == 10 && m.is_dathang != true);
+            }
+            else if (status_id == 5)
+            {
+                customerData = customerData.Where(m => m.date_finish == null && (m.is_dathang == true && ((m.loaithanhtoan == "tra_sau" && m.is_nhanhang == false) || (m.loaithanhtoan == "tra_truoc" && m.is_thanhtoan == true))));
+            }
+            else if (status_id == 6)
+            {
+                customerData = customerData.Where(m => m.date_finish == null && (m.is_dathang == true && ((m.loaithanhtoan == "tra_truoc" && m.is_thanhtoan == false) || (m.loaithanhtoan == "tra_sau" && m.is_nhanhang == true))));
+            }
+            else if (status_id == 7)
+            {
+                customerData = customerData.Where(m => m.date_finish != null);
+            }
+
             if (filter_thanhtoan == true)
             {
                 customerData = customerData.Where(d => d.is_dathang == true && (d.loaithanhtoan == "tra_truoc" || (d.loaithanhtoan == "tra_sau" && d.is_nhanhang == true)));

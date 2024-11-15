@@ -4,6 +4,7 @@
       showGridlines
       :value="datatable"
       ref="dt"
+      id="table-muahang-nhanhang"
       class="p-datatable-ct"
       :rowHover="true"
       :loading="loading"
@@ -36,10 +37,7 @@
         :class="col.data"
       >
         <template #body="slotProps">
-          <template v-if="col.data == 'mahh'">
-            {{ slotProps.data["mahh"] }}
-          </template>
-          <template v-else-if="editable == true && col.data == 'date_nhanhang'">
+          <template v-if="editable == true && col.data == 'date_nhanhang'">
             <Calendar
               v-model="slotProps.data[col.data]"
               dateFormat="yy-mm-dd"
@@ -49,7 +47,28 @@
               :disabled="model.date_finish"
             />
           </template>
-
+          <template v-else-if="editable == false && col.data == 'grade'">
+            <!-- Cung ứng điền -->
+            <input
+              v-model="slotProps.data[col.data]"
+              class="form-control"
+              :disabled="model.date_finish"
+            />
+          </template>
+          <template v-else-if="editable == false && col.data == 'nhasx'">
+            <input
+              v-model="slotProps.data[col.data]"
+              class="form-control"
+              :disabled="model.date_finish"
+            />
+          </template>
+          <template v-else-if="editable == false && col.data == 'mahh'">
+            <input
+              v-model="slotProps.data[col.data]"
+              class="form-control form-control-sm"
+              :disabled="model.date_finish"
+            />
+          </template>
           <template
             v-else-if="editable == true && col.data == 'soluong_nhanhang'"
           >
@@ -130,7 +149,9 @@
           >
             {{ formatDate(slotProps.data[col.data]) }}
           </template>
-
+          <template v-else-if="col.data == 'mahh'">
+            {{ slotProps.data["mahh"] }}
+          </template>
           <template v-else>
             {{ slotProps.data[col.data] }}
           </template>
@@ -152,9 +173,12 @@ import { storeToRefs } from "pinia";
 import { formatDate, formatPrice } from "../../utilities/util";
 import { useMuahang } from "../../stores/muahang";
 import { useAuth } from "../../stores/auth";
+import { useGeneral } from "../../stores/general";
+import NsxTreeSelect from "../TreeSelect/NsxTreeSelect.vue";
 
 const store_auth = useAuth();
 const store_muahang = useMuahang();
+const store_general = useGeneral();
 const { datatable, model } = storeToRefs(store_muahang);
 const { user } = storeToRefs(store_auth);
 const minDate = ref(new Date());
@@ -162,27 +186,37 @@ const loading = ref(false);
 const selected = ref();
 const columns = ref([
   {
-    label: "STT(*)",
+    label: "STT",
     data: "stt",
     className: "text-center",
   },
   {
-    label: "Mã(*)",
+    label: "Mã",
     data: "mahh",
     className: "text-center",
   },
   {
-    label: "Tên(*)",
+    label: "Tên",
     data: "tenhh",
     className: "text-center",
   },
   {
-    label: "ĐVT(*)",
+    label: "Grade",
+    data: "grade",
+    className: "text-center",
+  },
+  {
+    label: "Nhà sản xuất",
+    data: "nhasx",
+    className: "text-center",
+  },
+  {
+    label: "ĐVT",
     data: "dvt",
     className: "text-center",
   },
   {
-    label: "Số lượng(*)",
+    label: "Số lượng",
     data: "soluong",
     className: "text-center",
   },
@@ -213,6 +247,7 @@ const columns = ref([
   },
 ]);
 
+const changeProducer = store_general.changeProducer;
 const selectedColumns = computed(() => {
   return columns.value.filter((col) => col.hide != true);
 });
@@ -232,8 +267,16 @@ onMounted(() => {
 });
 </script>
 
-<style>
-.mahh {
-  max-width: 300px;
+
+<style lang="scss">
+#table-muahang-nhanhang {
+  .mahh,
+  .grade {
+    min-width: 150px;
+  }
+  .tenhh,
+  .nhasx {
+    min-width: 300px;
+  }
 }
 </style>

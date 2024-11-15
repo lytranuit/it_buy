@@ -80,26 +80,52 @@
           <div class="col-md">Các loại trạng thái ĐNMH</div>
         </div>
         <div class="row justify-content-center" style="gap: 20px">
-          <div class="col-md">
-            <Tag value="Đang thực hiện" severity="secondary" />
+          <div class="col-md" :class="{ 'mt-3': type_dnmh != 1 }">
+            <Tag
+              value="Đang thực hiện"
+              severity="secondary"
+              style="cursor: pointer"
+              @click="filter_DNMH(1)"
+            />
           </div>
-          <div class="col-md">
-            <Tag value="Đang trình ký" severity="warning" />
+          <div class="col-md" :class="{ 'mt-3': type_dnmh != 2 }">
+            <Tag
+              value="Đang trình ký"
+              severity="warning"
+              style="cursor: pointer"
+              @click="filter_DNMH(2)"
+            />
           </div>
-          <div class="col-md">
-            <Tag value="Không duyệt" severity="danger" />
+          <div class="col-md" :class="{ 'mt-3': type_dnmh != 4 }">
+            <Tag
+              value="Đang đặt hàng"
+              style="cursor: pointer"
+              @click="filter_DNMH(4)"
+            />
           </div>
-          <div class="col-md">
-            <Tag value="Đang đặt hàng" />
+          <div class="col-md" :class="{ 'mt-3': type_dnmh != 5 }">
+            <Tag
+              value="Chờ nhận hàng"
+              severity="info"
+              style="cursor: pointer"
+              @click="filter_DNMH(5)"
+            />
           </div>
-          <div class="col-md">
-            <Tag value="Chờ nhận hàng" severity="info" />
+          <div class="col-md" :class="{ 'mt-3': type_dnmh != 6 }">
+            <Tag
+              value="Chờ thanh toán"
+              severity="info"
+              style="cursor: pointer"
+              @click="filter_DNMH(6)"
+            />
           </div>
-          <div class="col-md">
-            <Tag value="Chờ thanh toán" severity="info" />
-          </div>
-          <div class="col-md">
-            <Tag value="Hoàn thành" severity="success" />
+          <div class="col-md" :class="{ 'mt-3': type_dnmh != 7 }">
+            <Tag
+              value="Hoàn thành"
+              severity="success"
+              style="cursor: pointer"
+              @click="filter_DNMH(7)"
+            />
           </div>
         </div>
       </div>
@@ -217,18 +243,21 @@
         </template>
 
         <template v-else-if="col.data == 'soluong_dutru'">
-          {{ slotProps.data[col.data] }} {{ slotProps.data["dvt"] }}
+          {{ formatPrice(slotProps.data[col.data], 2) }}
+          {{ slotProps.data["dvt"] }}
         </template>
 
         <template v-else-if="col.data == 'bophan'">
           {{ bophan(slotProps.data.dutru.bophan_id) }}
         </template>
         <template v-else-if="col.data == 'soluong_mua'">
-          {{ slotProps.data[col.data] }} {{ slotProps.data["dvt"] }}
+          {{ formatPrice(slotProps.data[col.data], 2) }}
+          {{ slotProps.data["dvt"] }}
         </template>
 
         <template v-else-if="col.data == 'soluong'">
-          {{ slotProps.data[col.data] }} {{ slotProps.data["dvt"] }}
+          {{ formatPrice(slotProps.data[col.data], 2) }}
+          {{ slotProps.data["dvt"] }}
         </template>
         <template v-else-if="col.data == 'mahh'">
           {{ slotProps.data[col.data] }}
@@ -480,7 +509,7 @@ import { rand } from "../../utilities/rand";
 import MaterialTreeSelect from "../../components/TreeSelect/MaterialTreeSelect.vue";
 
 import muahangApi from "../../api/muahangApi";
-import { change } from "@syncfusion/ej2-grids";
+import { change, load } from "@syncfusion/ej2-grids";
 import { useToast } from "primevue/usetoast";
 import Loading from "../Loading.vue";
 import UserTreeSelect from "../../components/TreeSelect/UserTreeSelect.vue";
@@ -502,12 +531,21 @@ const {
   user,
 } = storeToRefs(store);
 
+const type_dnmh = ref();
 const list_filterTable = ref([]);
 const filterTable1 = ref();
 
 const store_danhgianhacungcap = useDanhgianhacungcap();
 const danhgianhacungcap = storeToRefs(store_danhgianhacungcap);
 
+const filter_DNMH = (id) => {
+  if (type_dnmh.value == id) {
+    type_dnmh.value = null;
+  } else {
+    type_dnmh.value = id;
+  }
+  loadLazyData();
+};
 const saveDanhgia = (id) => {
   // console.log();
   router.push("/danhgianhacungcap/details/" + id);
@@ -691,6 +729,7 @@ const lazyParams = computed(() => {
     type_id: filterTable.value,
     dutru_id: props.dutru_id,
     filterTable: filterTable1.value,
+    filter_DNMH: type_dnmh.value,
   };
 });
 const dt = ref(null);

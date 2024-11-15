@@ -9,6 +9,7 @@
     :suggestions="filterItems"
     @complete="search"
     class="w-100"
+    :virtualScrollerOptions="{ itemSize: 38 }"
     inputClass="form-control form-control-sm"
     @item-select="emit('item-select', $event)"
   >

@@ -154,11 +154,27 @@
         #filter="{ filterModel, filterCallback }"
         v-if="col.filter == true"
       >
+        <template v-if="col.data == 'status_id'">
+          <select
+            class="form-control"
+            v-model="filterModel.value"
+            @change="filterCallback()"
+          >
+            <option value="1">Đang thực hiện</option>
+            <option value="2">Đang trình ký</option>
+            <option value="3">Không duyệt</option>
+            <option value="4">Đang đặt hàng</option>
+            <option value="5">Chờ nhận hàng</option>
+            <option value="6">Chờ thanh toán</option>
+            <option value="7">Hoàn thành</option>
+          </select>
+        </template>
         <InputText
           type="text"
           v-model="filterModel.value"
           @keydown.enter="filterCallback()"
           class="p-column-filter"
+          v-else
         />
       </template>
     </Column>
@@ -237,9 +253,10 @@ const columns = ref([
     label: "Trạng thái",
     data: "status_id",
     className: "text-center",
+    filter: true,
   },
   {
-    id: 5,
+    id: 4,
     label: "Tổng giá trị",
     data: "tonggiatri",
     className: "text-center",
@@ -249,6 +266,7 @@ const filters = ref({
   id: { value: null, matchMode: FilterMatchMode.CONTAINS },
   code: { value: null, matchMode: FilterMatchMode.CONTAINS },
   name: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  status_id: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
 const totalRecords = ref(0);
 const loading = ref(true);
