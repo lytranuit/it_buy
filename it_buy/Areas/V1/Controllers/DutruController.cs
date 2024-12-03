@@ -892,7 +892,6 @@ namespace it_template.Areas.V1.Controllers
             var priority_id_string = Request.Form["filters[priority_id]"].FirstOrDefault();
             int priority_id = priority_id_string != null ? Convert.ToInt32(priority_id_string) : 0;
             var tensp = Request.Form["filters[tensp]"].FirstOrDefault();
-            var orderById = Request.Form["orderBy[id]"].FirstOrDefault();
 
             var filterTable = Request.Form["filterTable"].FirstOrDefault();
             var dutru_id_string = Request.Form["dutru_id"].FirstOrDefault();
@@ -905,6 +904,7 @@ namespace it_template.Areas.V1.Controllers
             var is_CungungGiantiep = departments.Contains(14) == true;
             var is_CungungHCTT = departments.Contains(30) == true;
 
+            var sort_id = Request.Form["sorts[id]"].FirstOrDefault();
             var sort_mahh = Request.Form["sorts[mahh]"].FirstOrDefault();
             var sort_tenhh = Request.Form["sorts[tenhh]"].FirstOrDefault();
             var sort_tensp = Request.Form["sorts[tensp]"].FirstOrDefault();
@@ -1028,9 +1028,16 @@ namespace it_template.Areas.V1.Controllers
             }
             int recordsFiltered = customerData.Count();
 
-            if (orderById != null && orderById == "Asc")
+            if (sort_id != null)
             {
-                customerData = customerData.OrderBy(d => d.id);
+                if (sort_id == "1")
+                {
+                    customerData = customerData.OrderBy(d => d.id);
+                }
+                else if (sort_id == "-1")
+                {
+                    customerData = customerData.OrderByDescending(d => d.id);
+                }
             }
             else if (sort_mahh != null)
             {
@@ -1198,6 +1205,7 @@ namespace it_template.Areas.V1.Controllers
                         date = dutru.date,
 
                     },
+                    user_nhanhang_id = dutru.created_by,
                     list_muahang = list_muahang
                 }); ;
             }
@@ -1222,7 +1230,16 @@ namespace it_template.Areas.V1.Controllers
             var filter_tags = Request.Form["filters[tags]"].FirstOrDefault();
             var list_dutru = Request.Form["filters[list_dutru]"].FirstOrDefault();
             var tensp = Request.Form["filters[tensp]"].FirstOrDefault();
-            var orderById = Request.Form["orderBy[id]"].FirstOrDefault();
+
+            var sort_id = Request.Form["sorts[id]"].FirstOrDefault();
+            var sort_mahh = Request.Form["sorts[mahh]"].FirstOrDefault();
+            var sort_tenhh = Request.Form["sorts[tenhh]"].FirstOrDefault();
+            var sort_tensp = Request.Form["sorts[tensp]"].FirstOrDefault();
+            var sort_bophan = Request.Form["sorts[bophan]"].FirstOrDefault();
+            var sort_priority = Request.Form["sorts[priority_id]"].FirstOrDefault();
+            var sort_dutru = Request.Form["sorts[list_dutru]"].FirstOrDefault();
+            var sort_ngayhethan = Request.Form["sorts[ngayhethan]"].FirstOrDefault();
+            //var 
 
             var filterTable = Request.Form["filterTable"].FirstOrDefault();
             var dutru_id_string = Request.Form["dutru_id"].FirstOrDefault();
@@ -1317,9 +1334,93 @@ namespace it_template.Areas.V1.Controllers
             }
             int recordsFiltered = customerData.Count();
 
-            if (orderById != null && orderById == "Asc")
+            if (sort_id != null)
             {
-                customerData = customerData.OrderBy(d => d.id);
+                if (sort_id == "1")
+                {
+                    customerData = customerData.OrderBy(d => d.id);
+                }
+                else if (sort_id == "-1")
+                {
+                    customerData = customerData.OrderByDescending(d => d.id);
+                }
+            }
+            else if (sort_mahh != null)
+            {
+                if (sort_mahh == "1")
+                {
+                    customerData = customerData.OrderBy(d => d.mahh);
+                }
+                else if (sort_mahh == "-1")
+                {
+                    customerData = customerData.OrderByDescending(d => d.mahh);
+                }
+            }
+            else if (sort_tenhh != null)
+            {
+                if (sort_tenhh == "1")
+                {
+                    customerData = customerData.OrderBy(d => d.tenhh);
+                }
+                else if (sort_tenhh == "-1")
+                {
+                    customerData = customerData.OrderByDescending(d => d.tenhh);
+                }
+            }
+            else if (sort_tensp != null)
+            {
+                if (sort_tensp == "1")
+                {
+                    customerData = customerData.OrderBy(d => d.tensp);
+                }
+                else if (sort_tensp == "-1")
+                {
+                    customerData = customerData.OrderByDescending(d => d.tensp);
+                }
+            }
+            else if (sort_bophan != null)
+            {
+                if (sort_bophan == "1")
+                {
+                    customerData = customerData.OrderBy(d => d.dutru.bophan_id);
+                }
+                else if (sort_bophan == "-1")
+                {
+                    customerData = customerData.OrderByDescending(d => d.dutru.bophan_id);
+                }
+            }
+            else if (sort_priority != null)
+            {
+                if (sort_priority == "1")
+                {
+                    customerData = customerData.OrderBy(d => d.dutru.priority_id);
+                }
+                else if (sort_priority == "-1")
+                {
+                    customerData = customerData.OrderByDescending(d => d.dutru.priority_id);
+                }
+            }
+            else if (sort_dutru != null)
+            {
+                if (sort_dutru == "1")
+                {
+                    customerData = customerData.OrderBy(d => d.dutru.code);
+                }
+                else if (sort_dutru == "-1")
+                {
+                    customerData = customerData.OrderByDescending(d => d.dutru.code);
+                }
+            }
+            else if (sort_ngayhethan != null)
+            {
+                if (sort_ngayhethan == "1")
+                {
+                    customerData = customerData.OrderBy(d => d.dutru.date);
+                }
+                else if (sort_ngayhethan == "-1")
+                {
+                    customerData = customerData.OrderByDescending(d => d.dutru.date);
+                }
             }
             else
             {

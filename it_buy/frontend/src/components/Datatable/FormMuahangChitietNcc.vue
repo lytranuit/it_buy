@@ -41,6 +41,13 @@
               :disabled="readonly"
             />
           </template>
+          <template v-else-if="col.data == 'nhasx'">
+            <InputText
+              v-model="slotProps.data[col.data]"
+              class="p-inputtext-sm"
+              :disabled="readonly"
+            />
+          </template>
           <template v-else-if="col.data == 'dvt'">
             {{ slotProps.data["dvt"] }}
             <i
@@ -172,6 +179,11 @@ const columns = ref([
     className: "text-center",
   },
   {
+    label: "Nhà sản xuất",
+    data: "nhasx",
+    className: "text-center",
+  },
+  {
     label: "Đơn giá",
     data: "dongia",
     className: "text-center",
@@ -265,6 +277,11 @@ watch(
           className: "text-center",
         },
         {
+          label: "Nhà sản xuất",
+          data: "nhasx",
+          className: "text-center",
+        },
+        {
           label: "ĐVT",
           data: "dvt",
           className: "text-center",
@@ -310,6 +327,11 @@ watch(
         {
           label: "Tên",
           data: "tenhh",
+          className: "text-center",
+        },
+        {
+          label: "Nhà sản xuất",
+          data: "nhasx",
           className: "text-center",
         },
         {

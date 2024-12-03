@@ -1,6 +1,7 @@
 ﻿
 
 using iText.Commons.Actions.Contexts;
+using iText.Layout.Element;
 using iText.StyledXmlParser.Jsoup.Nodes;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -280,7 +281,7 @@ namespace it_template.Areas.V1.Controllers
 
             var data = _context.MuahangModel.Where(d => d.id == id)
                 .Include(d => d.muahang_chonmua).ThenInclude(d => d.ncc)
-                .Include(d => d.chitiet.Where(e => is_admin == true || my_item.Contains(e.dutru_chitiet_id) ))
+                .Include(d => d.chitiet)
                 .ThenInclude(d => d.user_nhanhang).FirstOrDefault();
             if (data != null)
             {
@@ -353,7 +354,7 @@ namespace it_template.Areas.V1.Controllers
         public async Task<JsonResult> QrNhanhang(int muahang_id)
         {
             //var data = _context.MuahangChitietModel.Where(d => d.muahang_id == muahang_id).Include(d => d.dutru_chitiet).GroupBy(d => d.dutru_chitiet.dutru_id).Select(d => d.Key).ToList();
-            List<string> ret = new List<string>();
+
             string Domain = (HttpContext.Request.IsHttps ? "https://" : "http://") + HttpContext.Request.Host.Value;
             //foreach (var item in data)
             //{
@@ -369,16 +370,13 @@ namespace it_template.Areas.V1.Controllers
             qrCodeAsBitmap.Save(ms, ImageFormat.Png);
             byte[] byteImage = ms.ToArray();
             var SigBase64 = Convert.ToBase64String(byteImage); // Get Base64
-
-            var timeStamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
-            //qrCodeAsBitmap.Save("wwwroot/temp/" + timeStamp + ".png", System.Drawing.Imaging.ImageFormat.Png);
-            ret.Add("data:image/png;base64, " + SigBase64);
+            var link = "data:image/png;base64, " + SigBase64;
             //}
 
             return Json(new
             {
                 success = true,
-                list = ret
+                link = link
             }, new System.Text.Json.JsonSerializerOptions()
             {
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
@@ -874,6 +872,7 @@ namespace it_template.Areas.V1.Controllers
             {
                 return Json(new { success = false, message = "Đề nghị mua hàng này không tồn tại!" });
             }
+
             System.Data.DataTable datatable_details = new System.Data.DataTable("details");
             PropertyInfo[] Props = typeof(RawMuahangDetails).GetProperties(BindingFlags.Public | BindingFlags.Instance);
             foreach (PropertyInfo prop in Props)
@@ -1224,7 +1223,8 @@ namespace it_template.Areas.V1.Controllers
             raw.Add("bophan", bophan);
             var RawDetails = new List<RawMuahangDetails>();
             var data = _context.MuahangModel.Where(d => d.id == id)
-                .Include(d => d.nccs).ThenInclude(d => d.ncc).FirstOrDefault();
+                .Include(d => d.nccs).ThenInclude(d => d.ncc)
+                .Include(d => d.nccs).ThenInclude(d => d.chitiet).FirstOrDefault();
             if (data != null)
             {
                 raw.Add("note", data.note);
@@ -1274,7 +1274,10 @@ namespace it_template.Areas.V1.Controllers
                     {
                         ncc.chonmua = true;
                     }
+                    var list_nsx = ncc.chitiet.Select(d => d.nhasx).ToList();
+                    var nhasx = string.Join("/", list_nsx);
                     raw.Add("bang_ncc_ten_" + key, ncc.ncc.tenncc);
+                    raw.Add("bang_ncc_nsx_" + key, nhasx);
                     raw.Add("bang_ncc_tong_" + key, ncc.tonggiatri.Value.ToString("#,##0.##"));
                     raw.Add("bang_ncc_dap_ung_" + key, ncc.dapung == true ? "X" : "");
                     raw.Add("bang_ncc_time_delivery_" + key, ncc.thoigiangiaohang);
@@ -1380,8 +1383,8 @@ namespace it_template.Areas.V1.Controllers
                 foreach (var item in nccs)
                 {
                     var stt = 1;
-                    var chitiet = _context.MuahangNccChitietModel.Where(d => d.muahang_ncc_id == item.id).ToList();
-                    foreach (var e in chitiet)
+                    //var chitiet = _context.MuahangNccChitietModel.Where(d => d.muahang_ncc_id == item.id).ToList();
+                    foreach (var e in item.chitiet)
                     {
                         details.Add(new
                         {
@@ -1820,6 +1823,7 @@ namespace it_template.Areas.V1.Controllers
 
         public async Task<JsonResult> updatethanhtien()
         {
+            return Json(new { });
             var muahang_ncc = _context.MuahangNccModel.Include(d => d.chitiet).ToList();
             foreach (var item in muahang_ncc)
             {
@@ -1837,6 +1841,25 @@ namespace it_template.Areas.V1.Controllers
                 }
             }
             return Json(muahang_ncc, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            });
+
+        }
+        public async Task<JsonResult> updateUserNhanhang()
+        {
+            return Json(new { });
+            var muahang_chitiet = _context.MuahangChitietModel.Include(d => d.dutru_chitiet).ThenInclude(d => d.dutru).ToList();
+            foreach (var item in muahang_chitiet)
+            {
+                item.user_nhanhang_id = item.dutru_chitiet.dutru.created_by;
+
+                _context.Update(item);
+                _context.SaveChanges();
+
+            }
+            return Json(new { success = true }, new System.Text.Json.JsonSerializerOptions()
             {
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                 ReferenceHandler = ReferenceHandler.IgnoreCycles,

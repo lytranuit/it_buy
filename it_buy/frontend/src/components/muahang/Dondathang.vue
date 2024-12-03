@@ -33,7 +33,6 @@
             class="date-custom"
             :manualInput="false"
             showIcon
-            :minDate="minDate"
             :disabled="model.is_dathang"
           />
         </div>

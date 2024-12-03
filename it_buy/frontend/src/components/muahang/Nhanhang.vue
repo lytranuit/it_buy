@@ -9,7 +9,6 @@
           class="date-custom"
           :manualInput="false"
           showIcon
-          :minDate="minDate"
           :disabled="readonly"
           @update:modelValue="changeNgaygiaohang"
         />
@@ -18,12 +17,9 @@
     <div class="col-md-6 form-group row align-items-center">
       <b class="col-md-3 text-md-right">Mã nhận hàng:</b>
       <div class="col-md-8">
-        <img
-          :src="item"
-          style="width: 100px"
-          v-for="(item, index) in QrNhanhang"
-          :key="index"
-        />
+        <a :href="QrNhanhang" :download="model.code" class="text-blue">
+          <img :src="QrNhanhang" style="width: 100px" />
+        </a>
         hoặc
         <a
           :href="'/muahang/nhanhang/' + model.id"

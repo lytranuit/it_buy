@@ -168,6 +168,11 @@ const submit = () => {
     buttonDisabled.value = false;
     return false;
   }
+  if (!model.value.bophan_id) {
+    alert("Chưa chọn bộ phận!");
+    buttonDisabled.value = false;
+    return false;
+  }
   if (datatable.value.length) {
     for (let product of datatable.value) {
       if (!product.tenhh) {

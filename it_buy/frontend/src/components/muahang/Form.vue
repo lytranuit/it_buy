@@ -32,13 +32,14 @@
                 class="custom-control-input"
                 v-model="model.is_sample"
                 :disabled="readonly"
+                @change="changeHangMau()"
               />
               <label :for="'hangmau'" class="custom-control-label"></label>
             </div>
           </div>
         </div>
       </div>
-      <div class="col-md-2">
+      <div class="col-md-2" v-if="!model.is_sample">
         <div class="form-group row">
           <b class="col-12 col-lg-12 col-form-label"
             >Nhiều nhà cung cấp:<i class="text-danger">*</i></b
@@ -215,6 +216,11 @@ const baogia = () => {
       store_muahang.load_data(model.value.id);
     }
   });
+};
+const changeHangMau = () => {
+  if (model.value.is_sample) {
+    model.value.is_multiple_ncc = null;
+  }
 };
 const readonly = ref(false);
 onMounted(() => {

@@ -14,7 +14,6 @@
                   class="date-custom"
                   :manualInput="false"
                   showIcon
-                  :minDate="minDate"
                   :disabled="true"
                 />
               </div>
@@ -125,6 +124,7 @@ const savenhanhang = () => {
 
 const load_data = async (id) => {
   waiting.value = true;
+  var listuser = await muahangApi.getUserNhanhang(id);
   var res = await muahangApi.getNhanhang(id);
   var chitiet = res.chitiet;
   var muahang_chonmua = res.muahang_chonmua;

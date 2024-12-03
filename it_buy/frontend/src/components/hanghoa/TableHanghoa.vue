@@ -907,6 +907,9 @@ onMounted(() => {
   } else {
     showing.value = JSON.parse(cache);
   }
+  if (props.dutru_id > 0) {
+    sorts.value = { id: 1 };
+  }
   fill();
   loadLazyData();
   Api.departmentsofuser().then((res) => {

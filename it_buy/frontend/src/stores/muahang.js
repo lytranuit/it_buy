@@ -11,10 +11,11 @@ export const useMuahang = defineStore("muahang", () => {
   const nccs = ref([]);
   const nccs_chitiet = ref([]);
   const files = ref([]);
-  const QrNhanhang = ref([]);
+  const QrNhanhang = ref();
   const waiting = ref();
   const list_uynhiemchi = ref([]);
   const chonmua = ref({});
+  const list_user_nhanhang = ref([]);
   const list_add = computed(() => {
     return datatable.value.filter((item) => {
       return item.ids;
@@ -57,7 +58,7 @@ export const useMuahang = defineStore("muahang", () => {
   const getQrNhanhang = async (id) => {
     var res = await muahangApi.QrNhanhang(id);
     if (res.success) {
-      QrNhanhang.value = res.list;
+      QrNhanhang.value = res.link;
     }
   };
   return {

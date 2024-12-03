@@ -14,7 +14,7 @@
       v-model:selection="selected"
     >
       <!-- <template #header>
-                <div class="d-inline-flex" style="width:200px" v-if="model.status_id == 1">
+                <div class="d-inline-flex" style="width:200px" v-if="!readonly">
                     <Button label="Thêm" icon="pi pi-plus" class="p-button-success p-button-sm mr-2"
                         @click="addRow"></Button>
                     <Button label="Xóa" icon="pi pi-trash" class="p-button-danger p-button-sm"
@@ -36,26 +36,26 @@
         :class="col.data"
       >
         <template #body="slotProps">
-          <template v-if="col.data == 'soluong' && model.status_id == 1">
+          <template v-if="col.data == 'soluong' && !readonly">
             <InputNumber
               v-model="slotProps.data[col.data]"
               class="p-inputtext-sm"
               :maxFractionDigits="2"
             />
           </template>
-          <template v-else-if="col.data == 'note' && model.status_id == 1">
+          <template v-else-if="col.data == 'note' && !readonly">
             <textarea v-model="slotProps.data[col.data]" class="form-control" />
           </template>
-          <template v-else-if="col.data == 'tenhh' && model.status_id == 1">
+          <template v-else-if="col.data == 'tenhh' && !readonly">
             <input v-model="slotProps.data[col.data]" class="form-control" />
           </template>
-          <template v-else-if="col.data == 'grade' && model.status_id == 1">
+          <template v-else-if="col.data == 'grade' && !readonly">
             <input v-model="slotProps.data[col.data]" class="form-control" />
           </template>
-          <template v-else-if="col.data == 'nhasx' && model.status_id == 1">
+          <template v-else-if="col.data == 'nhasx' && !readonly">
             <input v-model="slotProps.data[col.data]" class="form-control" />
           </template>
-          <template v-else-if="col.data == 'dvt' && model.status_id == 1">
+          <template v-else-if="col.data == 'dvt' && !readonly">
             {{ slotProps.data["dvt"] }}
             <i
               class="fas fa-sync-alt"
@@ -63,7 +63,7 @@
               @click="openOp($event, slotProps.data)"
             ></i>
           </template>
-          <template v-else-if="col.data == 'mahh' && model.status_id == 1">
+          <template v-else-if="col.data == 'mahh' && !readonly">
             <div class="d-flex align-items-center">
               <material-auto-complete
                 v-model="slotProps.data[col.data]"
@@ -224,10 +224,21 @@ const select = (event, row) => {
   row.mahh = id;
   // store_general.changeMaterial(row);
 };
+const readonly = computed(() => {
+  if ([9, 10, 11].indexOf(model.value.status_id) != -1) {
+    return true;
+  }
+  return false;
+});
 onMounted(async () => {
   // await store_general.fetchMaterials();
+  if ([9, 10, 11].indexOf(model.value.status_id) != -1) {
+    readonly.value = true;
+  }
 });
 </script>
+
+
 <style lang="scss">
 #table-muahang-chitiet {
   .mahh,

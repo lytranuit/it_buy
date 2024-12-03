@@ -373,6 +373,7 @@ const addNCC = () => {
     obj.vat = 0;
     delete obj.id;
     delete obj.muahang_ncc_chitiet;
+    delete obj.user_nhanhang;
     chitiet.push(obj);
   }
   ncc.chitiet = chitiet;
@@ -395,6 +396,7 @@ const addNCC = () => {
   ncc.tiente = "VND";
   ncc.quidoi = 1;
   nccs.value.push(ncc);
+  // console.log(nccs.value);
   active.value = nccs.value.length - 1;
   nccmodel.value = null;
 };
@@ -459,7 +461,6 @@ const submit1 = () => {
     alert("Chưa chọn nhà cung cấp!");
     return false;
   }
-  waiting.value = true;
   var params = { nccs: nccs.value };
 
   // console.log(params)
@@ -495,9 +496,18 @@ const submit1 = () => {
       params["file_" + key + "_" + stt] = file;
     }
   });
-  muahangApi.saveNcc(params).then((response) => {
-    waiting.value = false;
-    if (response.success) {
+  ////
+
+  waiting.value = true;
+  if (params.nccs[0].chitiet.length > 20) {
+    var PromiseAll = [];
+    for (var ncc of params.nccs) {
+      // console.log(ncc);
+      var promise = muahangApi.saveNcc({ nccs: [ncc] });
+      PromiseAll.push(promise);
+    }
+    Promise.all(PromiseAll).then((response) => {
+      waiting.value = false;
       toast.add({
         severity: "success",
         summary: "Thành công!",
@@ -505,10 +515,23 @@ const submit1 = () => {
         life: 3000,
       });
       location.reload();
-      // store_muahang.load_data(model.value.id);
-    }
-    // console.log(response)
-  });
+    });
+  } else {
+    muahangApi.saveNcc(params).then((response) => {
+      waiting.value = false;
+      if (response.success) {
+        toast.add({
+          severity: "success",
+          summary: "Thành công!",
+          detail: "Thay đổi thành công",
+          life: 3000,
+        });
+        location.reload();
+        // store_muahang.load_data(model.value.id);
+      }
+      // console.log(response)
+    });
+  }
 };
 const readonly = ref(false);
 onMounted(() => {

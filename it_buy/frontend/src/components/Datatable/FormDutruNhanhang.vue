@@ -40,7 +40,12 @@
             {{ slotProps.data["mahh"] }}
           </template>
 
-          <template v-else-if="col.data == 'date_nhanhang'">
+          <template
+            v-else-if="
+              col.data == 'date_nhanhang' &&
+              slotProps.data.user_nhanhang_id == user.id
+            "
+          >
             <Calendar
               v-model="slotProps.data[col.data]"
               dateFormat="yy-mm-dd"
@@ -51,7 +56,12 @@
             />
           </template>
 
-          <template v-else-if="col.data == 'soluong_nhanhang'">
+          <template
+            v-else-if="
+              col.data == 'soluong_nhanhang' &&
+              slotProps.data.user_nhanhang_id == user.id
+            "
+          >
             <InputNumber
               v-model="slotProps.data[col.data]"
               class="p-inputtext-sm"
@@ -60,7 +70,12 @@
             />
           </template>
 
-          <template v-else-if="col.data == 'note_nhanhang'">
+          <template
+            v-else-if="
+              col.data == 'note_nhanhang' &&
+              slotProps.data.user_nhanhang_id == user.id
+            "
+          >
             <textarea
               v-model="slotProps.data[col.data]"
               class="form-control form-control-sm"
@@ -68,7 +83,12 @@
             ></textarea>
           </template>
 
-          <template v-else-if="col.data == 'status_nhanhang'">
+          <template
+            v-else-if="
+              col.data == 'status_nhanhang' &&
+              slotProps.data.user_nhanhang_id == user.id
+            "
+          >
             <select
               class="form-control form-control-sm"
               v-model="slotProps.data[col.data]"
