@@ -148,7 +148,11 @@
           </div>
           <div class="text-center mt-2"></div>
         </template>
-        <div v-else v-html="slotProps.data[col.data]"></div>
+        <div
+          v-else
+          v-html="slotProps.data[col.data]"
+          style="text-wrap: pretty"
+        ></div>
       </template>
       <template
         #filter="{ filterModel, filterCallback }"
@@ -257,6 +261,18 @@ const columns = ref([
   },
   {
     id: 4,
+    label: "Thời gian giao hàng",
+    data: "thoigiangiaohang",
+    className: "text-center",
+  },
+  {
+    id: 5,
+    label: "Điều kiện thanh toán",
+    data: "thanhtoan",
+    className: "text-center",
+  },
+  {
+    id: 6,
     label: "Tổng giá trị",
     data: "tonggiatri",
     className: "text-center",

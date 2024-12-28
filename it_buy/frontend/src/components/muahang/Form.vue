@@ -16,7 +16,7 @@
           </div>
         </div>
       </div>
-      <div class="col-md-1">
+      <div class="col-md-1" v-if="model.type == 1">
         <div class="form-group row">
           <b class="col-12 col-lg-12 col-form-label"
             >Hàng mẫu:<i class="text-danger">*</i></b
@@ -64,7 +64,7 @@
           </div>
         </div>
       </div>
-      <div class="col-md-3" v-if="model.is_sample">
+      <div class="col-md-3" v-if="model.type == 1 && model.is_sample">
         <div class="form-group row">
           <b class="col-12 col-lg-12 col-form-label"
             >Nhà cung cấp:<i class="text-danger">*</i></b
@@ -174,7 +174,10 @@ const submit = async () => {
     return false;
   }
   model.value.list_add = list_add.value;
-  // model.value.list_update = list_update.value
+  model.value.list_update = list_update.value.map((item) => {
+    delete item.user_nhanhang;
+    return item;
+  });
   // model.value.list_delete = list_delete.value
   waiting.value = true;
   var response = await muahangApi.save(model.value);

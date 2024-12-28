@@ -1168,10 +1168,15 @@ namespace it_template.Areas.V1.Controllers
                 var chonmua = record.muahang_chonmua;
                 decimal? tonggiatri = null;
                 var tiente = "VND";
+                var thoigiangiaohang = "";
+                var thanhtoan = "";
                 if (chonmua != null)
                 {
                     tonggiatri = chonmua.tonggiatri;
                     tiente = chonmua.tiente;
+
+                    thoigiangiaohang = chonmua.thoigiangiaohang;
+                    thanhtoan = chonmua.thanhtoan;
                 }
                 var data1 = new
                 {
@@ -1186,6 +1191,8 @@ namespace it_template.Areas.V1.Controllers
                     is_nhanhang = record.is_nhanhang,
                     is_thanhtoan = record.is_thanhtoan,
                     tiente = tiente,
+                    thoigiangiaohang = thoigiangiaohang,
+                    thanhtoan = thanhtoan,
                     date_finish = record.date_finish,
                     tonggiatri = tonggiatri,
                     created_at = record.created_at
@@ -1207,6 +1214,11 @@ namespace it_template.Areas.V1.Controllers
             var user_id = UserManager.GetUserId(currentUser);
             var now = DateTime.Now;
 
+            var date_now = DateTime.Now;
+            var count_type_in_day = _context.DocumentModel.Where(d => d.type_id == 73 && d.created_at.Value.DayOfYear == date_now.DayOfYear).Count();
+            var type = _context.DocumentTypeModel.Where(d => d.id == 73).Include(d => d.users_receive).FirstOrDefault();
+            var code = type.symbol + date_now.ToString("ddMMyy") + (count_type_in_day < 9 ? "0" : "") + (count_type_in_day + 1);
+
             //var is_nvl_moi = false;
             bool? is_vat = false;
             var raw = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
@@ -1222,14 +1234,23 @@ namespace it_template.Areas.V1.Controllers
             }
             raw.Add("bophan", bophan);
             var RawDetails = new List<RawMuahangDetails>();
+            var RawTonghop = new List<RawMuahangTonghop>();
             var data = _context.MuahangModel.Where(d => d.id == id)
                 .Include(d => d.nccs).ThenInclude(d => d.ncc)
-                .Include(d => d.nccs).ThenInclude(d => d.chitiet).FirstOrDefault();
+                .Include(d => d.nccs).ThenInclude(d => d.chitiet)
+                .ThenInclude(d => d.muahang_chitiet)
+                    .ThenInclude(d => d.dutru_chitiet).ThenInclude(d => d.dutru).ThenInclude(d => d.bophan)
+                    .FirstOrDefault();
             if (data != null)
             {
+                raw.Add("code", code);
                 raw.Add("note", data.note);
                 raw.Add("note_chonmua", data.note_chonmua);
-                var muahang_chonmua = _context.MuahangNccModel.Where(d => d.id == data.muahang_chonmua_id).Include(d => d.chitiet).FirstOrDefault();
+                var muahang_chonmua = _context.MuahangNccModel.Where(d => d.id == data.muahang_chonmua_id)
+                    .Include(d => d.chitiet)
+                    .ThenInclude(d => d.muahang_chitiet)
+                    .ThenInclude(d => d.dutru_chitiet).ThenInclude(d => d.dutru).ThenInclude(d => d.bophan)
+                    .FirstOrDefault();
                 if (muahang_chonmua != null)
                 {
                     is_vat = muahang_chonmua.is_vat;
@@ -1250,6 +1271,18 @@ namespace it_template.Areas.V1.Controllers
                         //var material = _context.MaterialModel.Where(d => item.hh_id == "m-" + d.id).FirstOrDefault();
                         //if (material != null)
                         //{
+                        var dutru = item.muahang_chitiet.dutru_chitiet.dutru;
+                        if (dutru.type_id == 2 || dutru.type_id == 3)
+                        {
+                            var bp = dutru.bophan;
+                            var thanhtien = item.thanhtien;
+                            RawTonghop.Add(new RawMuahangTonghop
+                            {
+                                bophan = bp.name,
+                                thanhtien = item.thanhtien.Value,
+                                tiente = ncc_chon.tiente
+                            });
+                        }
                         RawDetails.Add(new RawMuahangDetails
                         {
                             stt = stt++,
@@ -1264,8 +1297,16 @@ namespace it_template.Areas.V1.Controllers
                             //artwork = material.masothietke,
                             //date = data.date.Value.ToString("yyyy-MM-dd")
                         });
+
+
                         //}
                     }
+                    RawTonghop = RawTonghop.GroupBy(d => d.bophan).Select(d => new RawMuahangTonghop
+                    {
+                        bophan = d.Key,
+                        thanhtien = d.Sum(e => e.thanhtien),
+                        tiente = d.FirstOrDefault().tiente
+                    }).ToList();
                 }
                 var key = 0;
                 foreach (var ncc in data.nccs)
@@ -1287,11 +1328,55 @@ namespace it_template.Areas.V1.Controllers
 
                     key++;
                 }
+
+
+                if (data.is_multiple_ncc == true)
+                {
+                    var nccs = data.nccs.Where(d => d.chonmua == true).ToList();
+                    var tonggiatri = nccs.Sum(d => d.tonggiatri);
+                    var ncc = nccs.FirstOrDefault();
+                    raw.Add("tonggiatri", tonggiatri.Value.ToString("#,##0.##"));
+                    raw.Add("tiente", ncc != null ? ncc.tiente : "");
+
+                    var stt = 1;
+                    foreach (var ncc_chon in nccs)
+                    {
+                        foreach (var item in ncc_chon.chitiet)
+                        {
+                            //if (item.hh_id != null && data.type_id == 1) /// Check có phải mua nguyên liệu mới hay ko?
+                            //    is_nvl_moi = true;
+                            //var material = _context.MaterialModel.Where(d => item.hh_id == "m-" + d.id).FirstOrDefault();
+                            //if (material != null)
+                            //{
+                            var dutru = item.muahang_chitiet.dutru_chitiet.dutru;
+                            if (dutru.type_id == 2 || dutru.type_id == 3)
+                            {
+                                var bp = dutru.bophan;
+                                var thanhtien = item.thanhtien;
+                                RawTonghop.Add(new RawMuahangTonghop
+                                {
+                                    bophan = bp.name,
+                                    thanhtien = item.thanhtien.Value,
+                                    tiente = ncc_chon.tiente
+                                });
+                            }
+                        }
+                    }
+
+                    RawTonghop = RawTonghop.GroupBy(d => d.bophan).Select(d => new RawMuahangTonghop
+                    {
+                        bophan = d.Key,
+                        thanhtien = d.Sum(e => e.thanhtien),
+                        tiente = d.FirstOrDefault().tiente
+                    }).ToList();
+                }
             }
             else
             {
                 return Json(new { success = false, message = "Đề nghị mua hàng này không tồn tại!" });
             }
+
+            ///DETAILS
             System.Data.DataTable datatable_details = new System.Data.DataTable("details");
             PropertyInfo[] Props = typeof(RawMuahangDetails).GetProperties(BindingFlags.Public | BindingFlags.Instance);
             foreach (PropertyInfo prop in Props)
@@ -1309,14 +1394,38 @@ namespace it_template.Areas.V1.Controllers
                 }
                 datatable_details.Rows.Add(values);
             }
+
+            ///Tong hop
+            System.Data.DataTable datatable_tonghop = new System.Data.DataTable("tonghop");
+            PropertyInfo[] Props_tonghop = typeof(RawMuahangTonghop).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            foreach (PropertyInfo prop in Props_tonghop)
+            {
+                //Setting column names as Property names
+                datatable_tonghop.Columns.Add(prop.Name);
+            }
+            foreach (RawMuahangTonghop item in RawTonghop)
+            {
+                var values = new object[Props_tonghop.Length];
+                for (int i = 0; i < Props_tonghop.Length; i++)
+                {
+                    //inserting property values to datatable rows
+                    values[i] = Props_tonghop[i].GetValue(item, null);
+                }
+                datatable_tonghop.Rows.Add(values);
+            }
             ///XUẤT PDF
 
             //Creates Document instance
             Spire.Doc.Document document = new Spire.Doc.Document();
             //Loads the word document
-            if (data.is_multiple_ncc == true)
+            if (data.is_multiple_ncc == true && data.type_id == 1)
             {
                 document.LoadFromFile(_configuration["Source:Path_Private"] + "/buy/templates/denghimuahangnvlmoi_multiple_ncc.docx", Spire.Doc.FileFormat.Docx);
+
+            }
+            else if (data.is_multiple_ncc == true)
+            {
+                document.LoadFromFile(_configuration["Source:Path_Private"] + "/buy/templates/denghimuahang_multiple_ncc.docx", Spire.Doc.FileFormat.Docx);
 
             }
             else if (loaimau == 1 && is_vat == false)
@@ -1346,7 +1455,6 @@ namespace it_template.Areas.V1.Controllers
 
 
 
-
             string[] fieldName = raw.Keys.ToArray();
             string[] fieldValue = raw.Values.ToArray();
 
@@ -1354,6 +1462,7 @@ namespace it_template.Areas.V1.Controllers
             string[] GroupNames = document.MailMerge.GetMergeGroupNames();
 
             document.MailMerge.Execute(fieldName, fieldValue);
+
             if (data.is_multiple_ncc == true)
             {
                 //raw.Add("tonggiatri", ncc_chon.tonggiatri.Value.ToString("#,##0.##"));
@@ -1427,12 +1536,20 @@ namespace it_template.Areas.V1.Controllers
                 relationsList.Add(new DictionaryEntry("details", "muahang_ncc_id = %nccs.id%"));
 
                 // Thực hiện MailMerge với vùng dữ liệu lồng nhau
-                document.MailMerge.ExecuteWidthNestedRegion(mailMergeDataSet, relationsList);
 
+
+                document.MailMerge.ExecuteWidthNestedRegion(mailMergeDataSet, relationsList);
+                if (data.type_id != 1)
+                {
+
+                    document.MailMerge.ExecuteWidthRegion(datatable_tonghop);
+                }
             }
             else
             {
+
                 document.MailMerge.ExecuteWidthRegion(datatable_details);
+                document.MailMerge.ExecuteWidthRegion(datatable_tonghop);
             }
             var timeStamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
             if (Directory.Exists(_configuration["Source:Path_Private"] + "\\buy\\muahang\\" + id))
@@ -1485,10 +1602,7 @@ namespace it_template.Areas.V1.Controllers
                     created_at = DateTime.Now,
                 };
 
-                var date_now = DateTime.Now;
-                var count_type_in_day = _context.DocumentModel.Where(d => d.type_id == DocumentModel.type_id && d.created_at.Value.DayOfYear == date_now.DayOfYear).Count();
-                var type = _context.DocumentTypeModel.Where(d => d.id == DocumentModel.type_id).Include(d => d.users_receive).FirstOrDefault();
-                DocumentModel.code = type.symbol + date_now.ToString("ddMMyy") + (count_type_in_day < 9 ? "0" : "") + (count_type_in_day + 1);
+                DocumentModel.code = code;
                 _context.Add(DocumentModel);
                 _context.SaveChanges();
                 ///DocumentFile
@@ -1899,6 +2013,19 @@ namespace it_template.Areas.V1.Controllers
         }
 
 
+        public class RawMuahangTonghop
+        {
+            public string bophan { get; set; }
+            public decimal thanhtien { get; set; }
+            public string tiente { get; set; }
+            public string thanhtien_string
+            {
+                get
+                {
+                    return thanhtien.ToString("#,##0.##") + " " + tiente;
+                }
+            }
+        }
         public class RawMuahangDetails
         {
             public int stt { get; set; }

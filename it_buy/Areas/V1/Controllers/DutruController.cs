@@ -523,6 +523,8 @@ namespace it_template.Areas.V1.Controllers
             {
                 return Json(new { success = false, message = "Dự trù không tồn tại!" });
             }
+
+
             System.Data.DataTable datatable_details = new System.Data.DataTable("details");
             PropertyInfo[] Props = typeof(RawDetails).GetProperties(BindingFlags.Public | BindingFlags.Instance);
             foreach (PropertyInfo prop in Props)
@@ -563,6 +565,8 @@ namespace it_template.Areas.V1.Controllers
                 {"thang",now.ToString("MM") },
                 {"nam",now.ToString("yyyy") },
                 {"bophan",data.bophan.name },
+                {"code",data.code },
+                {"tonggiatri",data.tonggiatri },
                 {"note",data.note },
             };
 

@@ -305,6 +305,12 @@
           <Column style="width: 1rem">
             <template #body="slotProps">
               <a
+                class="p-link text-warning font-16 mr-2"
+                @click="confirmCopy(slotProps.data['id'])"
+                v-if="slotProps.data.created_by == user.id"
+                ><i class="pi pi-copy"></i
+              ></a>
+              <a
                 class="p-link text-danger font-16"
                 @click="confirmDelete(slotProps.data['id'])"
                 v-if="slotProps.data.created_by == user.id"
@@ -335,6 +341,7 @@ import { storeToRefs } from "pinia";
 import PopupDutru from "./PopupDutru.vue";
 import DepartmentOfUserTreeSelect from "../TreeSelect/DepartmentOfUserTreeSelect.vue";
 import Api from "../../api/Api";
+import { useRouter } from "vue-router";
 const store = useAuth();
 const {
   is_admin,
@@ -415,6 +422,7 @@ const filters = ref({
   priority_id: { value: null, matchMode: FilterMatchMode.CONTAINS },
   status_id: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
+const router = useRouter();
 const departments = ref([]);
 const totalRecords = ref(0);
 const loading = ref(true);
@@ -469,6 +477,17 @@ const confirmDelete = (id) => {
       dutruApi.delete(id).then((res) => {
         loadLazyData();
       });
+    },
+  });
+};
+
+const confirmCopy = (id) => {
+  confirm.require({
+    message: "Bạn có muốn copy row này?",
+    header: "Xác nhận",
+    icon: "pi pi-exclamation-triangle",
+    accept: () => {
+      router.push("/dutru/copy/" + id);
     },
   });
 };

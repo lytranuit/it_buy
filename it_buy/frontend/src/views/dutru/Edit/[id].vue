@@ -106,6 +106,20 @@
                           </div>
                         </div>
                       </div>
+                      <div class="col-md-3">
+                        <div class="form-group row">
+                          <b class="col-12 col-lg-12 col-form-label">
+                            Tổng giá trị dự kiến
+                          </b>
+                          <div class="col-12 col-lg-12 pt-1">
+                            <input
+                              class="form-control"
+                              v-model="model.tonggiatri"
+                              :disabled="model.status_id != 1"
+                            />
+                          </div>
+                        </div>
+                      </div>
                       <div class="col-md-12">
                         <div class="form-group row">
                           <b class="col-12 col-lg-12 col-form-label"
@@ -155,6 +169,7 @@
                           icon="pi pi-file"
                           class="p-button-sm mr-2"
                           @click.once="xuatpdf()"
+                          :disabled="waiting"
                         ></Button>
                       </div>
                     </div>

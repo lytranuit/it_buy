@@ -25,6 +25,7 @@ namespace Vue.Models
         public int? activeStep { get; set; }
         public string? note { get; set; }
         public string? pdf { get; set; }
+        public string? tonggiatri { get; set; }
         public int? esign_id { get; set; }
         public virtual List<DutruChitietModel>? chitiet { get; set; }
 
@@ -74,6 +75,6 @@ namespace Vue.Models
         High = 2,
         [Display(Name = "Gấp")]
         Urgent = 3,
-        
+
     }
 }

@@ -128,6 +128,7 @@ import { useToast } from "primevue/usetoast";
 import { rand } from "../../../utilities/rand";
 import DepartmentTreeSelect from "../../../components/TreeSelect/DepartmentTreeSelect.vue";
 import { useGeneral } from "../../../stores/general";
+import moment from "moment";
 const toast = useToast();
 const minDate = new Date();
 const route = useRoute();
@@ -137,30 +138,44 @@ const messageError = ref();
 const store = useAuth();
 const store_general = useGeneral();
 const buttonDisabled = ref();
-const { model, datatable, list_add } = storeToRefs(storeDutru);
+const { model, datatable, list_add, waiting } = storeToRefs(storeDutru);
+
+const load_data = async (id) => {
+  waiting.value = true;
+
+  var all = [dutruApi.get(id)];
+  var response = await Promise.all(all);
+
+  var chitiet = response[0].chitiet.map((item) => {
+    item.ids = rand();
+    delete item.dinhkem;
+    delete item.id;
+    return item;
+  });
+  response[0].date = moment(response[0].date).format("YYYY-MM-DD");
+  delete response[0].chitiet;
+  delete response[0].user_created_by;
+  delete response[0].id;
+  response[0].ids = rand();
+  model.value = response[0];
+  datatable.value = chitiet;
+
+  model.value.status_id = 1;
+  waiting.value = false;
+};
+onMounted(() => {
+  store_general.fetchMaterialGroup();
+  store_general.fetchMaterials();
+
+  load_data(route.params.id);
+  console.log(list_add);
+  console.log(datatable);
+});
 onMounted(() => {
   storeDutru.reset();
   store_general.fetchMaterialGroup();
   store_general.fetchMaterials();
-
-  model.value.type_id = route.params.id;
-  model.value.status_id = 1;
-  model.value.priority_id = 1;
-  if (model.value.type_id == 1) {
-    model.value.bophan_id = 19;
-  } else if (model.value.type_id == 3) {
-    model.value.bophan_id = 4;
-  }
-  addRow();
 });
-const addRow = () => {
-  let stt = 0;
-  if (datatable.value.length) {
-    stt = datatable.value[datatable.value.length - 1].stt;
-  }
-  stt++;
-  datatable.value.push({ ids: rand(), stt: stt, soluong: 1, is_new: true });
-};
 const submit = () => {
   buttonDisabled.value = true;
   if (!model.value.name) {
