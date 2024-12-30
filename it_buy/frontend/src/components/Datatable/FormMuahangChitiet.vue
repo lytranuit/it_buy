@@ -83,19 +83,22 @@
     </DataTable>
     <OverlayPanel ref="op">
       <div>
-        Qui đổi từ 1
+        Qui đổi từ {{ editingRow.soluong }}
         <input
           class="form-control form-control-sm d-inline-block"
-          style="width: 60px"
+          style="width: 60px; margin-right: 5px"
           v-model="editingRow.dvt"
         />
-        =
+        mua hàng =
         <input
           class="form-control form-control-sm d-inline-block"
-          style="width: 60px"
-          v-model="editingRow.quidoi"
+          style="width: 60px; margin-right: 5px"
+          v-model="editingRow.soluong_quidoi"
+          @change="changeQuidoi(editingRow)"
         />
-        <b>{{ editingRow.dvt_dutru }}</b>
+        <b>{{ editingRow.dvt_dutru }}</b> dự trù (Tỉ lệ 1:{{
+          editingRow.quidoi
+        }})
       </div>
     </OverlayPanel>
   </div>
@@ -230,6 +233,11 @@ const readonly = computed(() => {
   }
   return false;
 });
+const changeQuidoi = (row) => {
+  if (row.soluong_quidoi) {
+    row.quidoi = row.soluong_quidoi / row.soluong;
+  }
+};
 onMounted(async () => {
   // await store_general.fetchMaterials();
   if ([9, 10, 11].indexOf(model.value.status_id) != -1) {

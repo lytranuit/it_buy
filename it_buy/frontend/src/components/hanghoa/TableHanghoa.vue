@@ -769,6 +769,7 @@ const taodenghimuahang = () => {
     item.dvt_dutru = item.dvt;
     item.quidoi = 1;
     item.soluong_dutru = item.soluong;
+    // item.soluong_quidoi = item.soluong;
     item.stt = key + 1;
     item.ids = rand();
     delete item.dutru;

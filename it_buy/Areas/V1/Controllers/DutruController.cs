@@ -1151,7 +1151,7 @@ namespace it_template.Areas.V1.Controllers
                 var thanhtien1 = _context.MuahangNccChitietModel.Include(d => d.muahang_ncc).ThenInclude(d => d.muahang)
                     .Where(d => d.muahang_ncc.muahang.deleted_at == null && d.muahang_ncc.muahang.status_id != (int)Status.MuahangEsignError && list_muahang_ncc_id.Contains(d.muahang_ncc_id) && list_muahang_chitiet_id.Contains(d.muahang_chitiet_id))
                     .ToList();
-                var thanhtien = thanhtien1.Sum(d => d.thanhtien_vat * d.muahang_ncc.quidoi);
+                var thanhtien = thanhtien1.Sum(d => d.thanhtien_vat);
                 var muahang_chitiet = record.muahang_chitiet.Where(d => d.muahang.deleted_at == null && d.muahang.status_id != (int)Status.MuahangEsignError).ToList();
                 var soluong_dutru = record.soluong;
                 var soluong_mua = muahang_chitiet.Where(d => d.muahang.parent_id == null).Sum(d => d.soluong * d.quidoi);
@@ -1493,63 +1493,49 @@ namespace it_template.Areas.V1.Controllers
                 var thanhtien1 = _context.MuahangNccChitietModel.Include(d => d.muahang_ncc).ThenInclude(d => d.muahang)
                     .Where(d => d.muahang_ncc.muahang.deleted_at == null && d.muahang_ncc.muahang.status_id != (int)Status.MuahangEsignError && list_muahang_ncc_id.Contains(d.muahang_ncc_id) && list_muahang_chitiet_id.Contains(d.muahang_chitiet_id))
                     .ToList();
-                var thanhtien = thanhtien1.Sum(d => d.thanhtien_vat * d.muahang_ncc.quidoi);
+                var thanhtien = thanhtien1.Sum(d => d.thanhtien_vat);
                 var muahang_chitiet = record.muahang_chitiet.Where(d => d.muahang.deleted_at == null && d.muahang.status_id != (int)Status.MuahangEsignError).ToList();
-                //var soluong_dutru = record.soluong;
-                //var soluong_mua = muahang_chitiet.Sum(d => d.soluong * d.quidoi);
+                var dulieu_muahang = "";
+                foreach (var item3 in muahang_chitiet.Select(d=>d.muahang).ToList())
+                {
+                    var status = "";
+                    if (item3.date_finish != null)
+                    {
+                        status = "Hoàn thành";
 
-                //var soluong = soluong_mua < soluong_dutru ? soluong_dutru - soluong_mua : 0;
-                //var list_muahang = new List<MuahangModel>();
-                //foreach (var m in muahang_chitiet)
-                //{
-                //    var muahang = m.muahang;
-                //    list_muahang.Add(new MuahangModel()
-                //    {
-                //        id = muahang.id,
-                //        name = muahang.name,
-                //        code = muahang.code,
-                //        date_finish = muahang.date_finish,
-                //        is_dathang = muahang.is_dathang,
-                //        is_thanhtoan = muahang.is_thanhtoan,
-                //        is_nhanhang = muahang.is_nhanhang,
-                //        loaithanhtoan = muahang.loaithanhtoan,
-                //        status_id = muahang.status_id,
-                //    });
-                //}
-                //data.Add(new
-                //{
-                //    id = record.id,
-                //    //hh_id = record.hh_id,
-                //    //soluong_dutru = soluong_dutru,
-                //    //soluong_mua = soluong_mua,
-                //    thanhtien = thanhtien,
-                //    nhacc = nhacc,
-                //    nhasx = nhasx,
-                //    mahh = mahh1,
-                //    tenhh = tenhh1,
-                //    is_new = record.is_new,
-                //    grade = record.grade,
-                //    masothietke = record.masothietke,
-                //    dvt = record.dvt,
-                //    //soluong = soluong,
-                //    user = record.user,
-                //    list_tag = record.list_tag,
-                //    tensp = record.tensp,
-                //    dutru_chitiet_id = record.id,
-                //    danhgianhacungcap_id = record.danhgianhacungcap_id,
-                //    danhgianhacungcap_is_chapnhan = record.danhgianhacungcap?.status_id == (int)DanhgianhacungcapStatus.SUCCESS,
-                //    dutru = new DutruModel()
-                //    {
-                //        id = dutru.id,
-                //        name = dutru.name,
-                //        code = dutru.code,
-                //        type_id = dutru.type_id,
-                //        priority_id = dutru.priority_id,
-                //        bophan_id = dutru.bophan_id,
+                    }
+                    else if (item3.is_dathang == true && ((item3.loaithanhtoan == "tra_sau" && item3.is_nhanhang == true) ||
+                                    (item3.loaithanhtoan == "tra_truoc" && item3.is_thanhtoan == true)))
+                    {
+                        status = "Chờ nhận hàng";
+                    }
+                    else if (item3.is_dathang == true && ((item3.loaithanhtoan == "tra_sau" && item3.is_nhanhang == false) ||
+                                    (item3.loaithanhtoan == "tra_truoc" && item3.is_thanhtoan == false)))
+                    {
+                        status = "Chờ thanh toán";
+                    }
+                    else if (item3.status_id == 1 || item3.status_id == 6 || item3.status_id == 7)
+                    {
+                        status = "Đang thực hiện";
 
-                //    },
-                //    //list_muahang = list_muahang
-                //});
+                    }
+                    else if (item3.status_id == 9)
+                    {
+                        status = "Đang trình ký";
+
+                    }
+                    else if (item3.status_id == 10)
+                    {
+                        status = "Đang đặt hàng";
+
+                    }
+                    else if (item3.status_id == 11)
+                    {
+                        status = "Không duyệt";
+
+                    }
+                    dulieu_muahang += $"{item3.id} - {item3.code} - {status}\n";
+                }
                 DataRow dr1 = dt.NewRow();
                 //dr1["stt"] = (++stt);
                 dr1["code"] = dutru.code;
@@ -1571,7 +1557,8 @@ namespace it_template.Areas.V1.Controllers
                 dr1["created_at"] = dutru.created_at;
                 dr1["created_by"] = dutru.user_created_by.FullName;
                 dr1["date"] = dutru.date;
-                dr1["status"] = muahang_chitiet.Count() > 0 ? "Đã xử lý" : "Chưa xử lý";
+                
+                dr1["status"] = dulieu_muahang;
                 dt.Rows.Add(dr1);
                 start_r++;
 
