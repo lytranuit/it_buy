@@ -99,13 +99,17 @@
                 <a
                   class="p-link text-warning mr-2 font-16"
                   @click="editProduct(slotProps.data)"
-                  ><i class="pi pi-pencil"></i
-                ></a>
+                  v-if="slotProps.data.nhom == 'Khac'"
+                >
+                  <i class="pi pi-pencil"></i>
+                </a>
                 <a
                   class="p-link text-danger font-16"
                   @click="confirmDeleteProduct(slotProps.data)"
-                  ><i class="pi pi-trash"></i
-                ></a>
+                  v-if="slotProps.data.nhom == 'Khac'"
+                >
+                  <i class="pi pi-trash"></i>
+                </a>
               </template>
             </Column>
           </DataTable>
@@ -216,16 +220,22 @@ const columns = ref([
     data: "dvt",
     className: "text-center",
   },
-
   {
     id: 3,
+    label: "Nhóm",
+    data: "nhom",
+    className: "text-center",
+    filter: true,
+  },
+  {
+    id: 4,
     label: "Nhà sản xuất",
     data: "mansx",
     className: "text-center",
     filter: true,
   },
   {
-    id: 4,
+    id: 5,
     label: "Nhà cung cấp",
     data: "mancc",
     className: "text-center",
@@ -237,6 +247,7 @@ const filters = ref({
   tenhh: { value: null, matchMode: FilterMatchMode.CONTAINS },
   mancc: { value: null, matchMode: FilterMatchMode.CONTAINS },
   mansx: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  nhom: { value: null, matchMode: FilterMatchMode.CONTAINS },
 });
 const totalRecords = ref(0);
 const loading = ref(true);
@@ -362,6 +373,11 @@ const deleteProduct = () => {
 };
 const deleteSelectedProducts = () => {
   // datatable.value = datatable.value.filter(val => !selectedProducts.value.includes(val));
+  let list_no = selectedProducts.value.filter((val) => val.nhom != "Khac");
+  if (list_no.length > 0) {
+    alert("Không xóa được");
+    return;
+  }
   let list = selectedProducts.value.map((item) => {
     return item.mahh;
   });

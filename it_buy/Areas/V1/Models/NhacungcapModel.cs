@@ -43,6 +43,7 @@ namespace Vue.Models
         [Column("nhom")]
         public string? nhom { get; set; }
 
+        public string? nguoiphutrach { get; set; }
         //public virtual List<MaterialModel> Materials { get; set; }
 
         [NotMapped]

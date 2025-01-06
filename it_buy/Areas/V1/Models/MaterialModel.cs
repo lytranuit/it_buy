@@ -31,6 +31,13 @@ namespace Vue.Models
         public virtual NhacungcapModel? nhacungcap { get; set; }
 
 
+        public string? created_by { get; set; }
+
+        [ForeignKey("created_by")]
+        public UserModel? user_created_by { get; set; }
+
+        public DateTime? deleted_at { get; set; }
+        public DateTime? created_at { get; set; }
 
 
 
