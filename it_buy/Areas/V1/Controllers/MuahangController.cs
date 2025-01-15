@@ -1190,6 +1190,7 @@ namespace it_template.Areas.V1.Controllers
                     loaithanhtoan = record.loaithanhtoan,
                     is_nhanhang = record.is_nhanhang,
                     is_thanhtoan = record.is_thanhtoan,
+                    date_pay_at = record.date_pay_at,
                     tiente = tiente,
                     thoigiangiaohang = thoigiangiaohang,
                     thanhtoan = thanhtoan,

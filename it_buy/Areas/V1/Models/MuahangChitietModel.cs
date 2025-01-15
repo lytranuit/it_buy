@@ -45,5 +45,14 @@ namespace Vue.Models
 
         public int? stt { get; set; }
 
+        [NotMapped]
+        public decimal? soluong_quidoi
+        {
+            get
+            {
+                return soluong * quidoi;
+            }
+        }
+
     }
 }

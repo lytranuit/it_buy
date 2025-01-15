@@ -1,7 +1,7 @@
 ﻿<template>
   <div class="row my-5">
     <div class="row col-12">
-      <div class="col-md-4">
+      <div class="col-md-3">
         <b class="">Loại thanh toán:</b>
         <div class="mt-2">
           <select
@@ -14,7 +14,7 @@
           </select>
         </div>
       </div>
-      <div class="col-md-4">
+      <div class="col-md-3">
         <b class="">Phương thức thanh toán:</b>
         <div class="mt-2">
           <input
@@ -24,7 +24,20 @@
           />
         </div>
       </div>
-      <div class="col-md-4">
+      <div class="col-md-3">
+        <b class="">Ngày thanh toán dự kiến:</b>
+        <div class="mt-2">
+          <Calendar
+            v-model="model.date_pay_at"
+            dateFormat="yy-mm-dd"
+            class="date-custom"
+            :manualInput="false"
+            showIcon
+            :disabled="model.is_dathang"
+          />
+        </div>
+      </div>
+      <div class="col-md-3">
         <b class="">Yêu cầu giao hàng:</b>
         <div class="mt-2">
           <Calendar

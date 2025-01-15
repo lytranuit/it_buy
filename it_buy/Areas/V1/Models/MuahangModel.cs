@@ -44,11 +44,12 @@ namespace Vue.Models
         public virtual List<MuahangNccModel>? nccs { get; set; }
         public virtual List<MuahangUynhiemchiModel>? uynhiemchi { get; set; }
 
-        public DateTime? pay_at { get; set; }     ///Ngày thanh toán
+        public DateTime? pay_at { get; set; }     ///Ngày thanh toán( Ký esign xong)
         public DateTime? date_finish { get; set; }     ///Ngày hoàn thành
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         [DataType(DataType.Date)]
         public DateTime? date { get; set; }     ///Ngày giao hàng dự kiến
+        public DateTime? date_pay_at { get; set; }     ///Ngày thanh toán dự kiến
         public DateTime? deleted_at { get; set; }
         public DateTime? updated_at { get; set; }
         public DateTime? created_at { get; set; }

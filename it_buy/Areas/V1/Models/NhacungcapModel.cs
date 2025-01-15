@@ -44,6 +44,8 @@ namespace Vue.Models
         public string? nhom { get; set; }
 
         public string? nguoiphutrach { get; set; }
+        public int? danhgia { get; set; }
+        public int? type { get; set; }
         //public virtual List<MaterialModel> Materials { get; set; }
 
         [NotMapped]

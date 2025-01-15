@@ -261,6 +261,7 @@ const onPage = (event) => {
 const openNew = () => {
   model.value = {};
   model.value.nguoiphutrach = store.user.id;
+  model.value.type = 2;
   headerForm.value = "Tạo mới";
   visibleDialog.value = true;
 };

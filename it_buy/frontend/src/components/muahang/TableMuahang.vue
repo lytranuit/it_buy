@@ -87,7 +87,9 @@
             >
           </div>
         </template>
-
+        <template v-else-if="col.data == 'date_pay_at'">
+          {{ formatDate(slotProps.data.date_pay_at, "YYYY-MM-DD") }}
+        </template>
         <template v-else-if="col.data == 'tonggiatri'">
           {{ formatPrice(slotProps.data[col.data], 2) }}
           {{ slotProps.data["tiente"] }}
@@ -273,6 +275,12 @@ const columns = ref([
   },
   {
     id: 6,
+    label: "Thanh toán dự kiến",
+    data: "date_pay_at",
+    className: "text-center",
+  },
+  {
+    id: 7,
     label: "Tổng giá trị",
     data: "tonggiatri",
     className: "text-center",

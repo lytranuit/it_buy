@@ -55,19 +55,23 @@
     </div>
     <div class="row mb-2">
       <div class="field col">
+        <label for="name">Điện thoại<span class="text-danger">*</span></label>
+        <input-text
+          id="name"
+          class="p-inputtext-sm"
+          v-model.trim="model.dienthoaincc"
+          :class="{ 'p-invalid': submitted && !model.dienthoaincc }"
+        />
+        <small class="p-error" v-if="submitted && !model.dienthoaincc"
+          >Required.</small
+        >
+      </div>
+      <div class="field col">
         <label for="name">Email</label>
         <input-text
           id="name"
           class="p-inputtext-sm"
           v-model.trim="model.emailncc"
-        />
-      </div>
-      <div class="field col">
-        <label for="name">Điện thoại</label>
-        <input-text
-          id="name"
-          class="p-inputtext-sm"
-          v-model.trim="model.dienthoaincc"
         />
       </div>
       <div class="field col">
@@ -86,6 +90,25 @@
           v-model.trim="model.masothue"
         />
       </div>
+    </div>
+    <div class="row mb-2">
+      <div class="field col">
+        <label for="name">Loại</label>
+        <div>
+          <select class="form-control form-control-sm" v-model="model.type">
+            <option value="1">Mua hàng trực tiếp</option>
+            <option value="2">Mua hàng gián tiếp</option>
+          </select>
+        </div>
+      </div>
+      <div class="field col">
+        <label for="name">Đánh giá</label>
+        <div>
+          <Rating v-model="model.danhgia" :cancel="false" />
+        </div>
+      </div>
+      <div class="field col"></div>
+      <div class="field col"></div>
     </div>
     <div class="row mb-2">
       <div class="field col-12">
@@ -139,7 +162,7 @@
     <div class="row mb-2">
       <div class="field col">
         <label for="name"
-          >Người phụ trách <span class="text-danger">*</span></label
+          >Người phụ trách mua hàng <span class="text-danger">*</span></label
         >
         <div>
           <UserTreeSelect v-model="model.nguoiphutrach"></UserTreeSelect>
@@ -174,6 +197,7 @@ import supplierApi from "../../api/supplierApi";
 import Dialog from "primevue/dialog";
 import Button from "primevue/button";
 import InputText from "primevue/inputtext";
+import Rating from "primevue/rating";
 import { useSupplier } from "../../stores/supplier";
 import UserTreeSelect from "../TreeSelect/UserTreeSelect.vue";
 
@@ -227,21 +251,29 @@ const save = () => {
 ///Form
 const valid = () => {
   if (!model.value.mancc) {
-    alert("Chọn nhập mã nhà cung cấp");
+    alert("Nhập mã nhà cung cấp");
     return false;
   }
   if (!model.value.tenncc) {
-    alert("Chọn nhập tên nhà cung cấp");
+    alert("Nhập tên nhà cung cấp");
     return false;
   }
 
   if (!model.value.diachincc) {
-    alert("Chọn nhập địa chỉ nhà cung cấp");
+    alert("Nhập địa chỉ nhà cung cấp");
+    return false;
+  }
+  if (!model.value.dienthoaincc) {
+    alert("Nhập điện thoại nhà cung cấp");
     return false;
   }
 
   if (!model.value.nguoilienhe) {
-    alert("Chọn nhập tên người liên hệ");
+    alert("Nhập họ tên người liên hệ!");
+    return false;
+  }
+  if (!model.value.nguoiphutrach) {
+    alert("Chọn người phụ trách mua hàng!");
     return false;
   }
   return true;
