@@ -366,3 +366,4 @@ it_buy/wwwroot/temp/
 it_buy/appsettings.Development.json
 it_buy/appsettings.Production.json
 it_buy/appsettings.Staging.json
+it_buy/wwwroot/tmp/

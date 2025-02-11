@@ -21,6 +21,7 @@ namespace Vue.Models
         public string? note { get; set; }
         public string? note_huy { get; set; }
         public DateTime? date_huy { get; set; }
+        public DateTime? date { get; set; } /// Ngày giao hàng dự kiến
         public string? user_id { get; set; }
 
         [ForeignKey("user_id")]
@@ -52,7 +53,6 @@ namespace Vue.Models
         public string? tensp { get; set; }
         public string? masp { get; set; }
         public string? dangbaoche { get; set; }
-        [NotMapped]
 
         public int? stt { get; set; }
         [NotMapped]

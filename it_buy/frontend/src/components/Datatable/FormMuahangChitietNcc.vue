@@ -74,6 +74,7 @@
               @update:modelValue="changeDongia()"
               :disabled="readonly"
               :maxFractionDigits="5"
+              :inputStyle="{ width: '150px' }"
             />
           </template>
           <template v-else-if="col.data == 'vat'">
@@ -91,7 +92,14 @@
           <template
             v-else-if="col.data == 'thanhtien' || col.data == 'thanhtien_vat'"
           >
-            {{ formatPrice(slotProps.data[col.data], 2) }} {{ modelncc.tiente }}
+            <InputNumber
+              v-model="slotProps.data[col.data]"
+              class="p-inputtext-sm"
+              :suffix="' ' + modelncc.tiente"
+              :disabled="readonly || !modelncc.is_edit"
+              :maxFractionDigits="2"
+              :inputStyle="{ width: '150px' }"
+            />
           </template>
 
           <template v-else>

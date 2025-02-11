@@ -31,6 +31,15 @@
           >
           </TreeSelect>
         </div>
+        <div class="ml-2">
+          <SplitButton
+            :model="items"
+            label="Xuất excel"
+            icon="pi pi-download"
+            size="small"
+            @click="xuatexcel"
+          ></SplitButton>
+        </div>
         <div class="ml-auto">
           <SelectButton
             v-model="filterTable"
@@ -201,6 +210,7 @@
 import { onMounted, ref, computed, watch } from "vue";
 import muahangApi from "../../api/muahangApi";
 import Tag from "primevue/tag";
+import SplitButton from "primevue/splitbutton";
 import Button from "primevue/button";
 import DataTable from "primevue/datatable";
 import { FilterMatchMode } from "primevue/api";
@@ -231,6 +241,15 @@ const list_filterTable = ref([]);
 const filterTable = ref();
 const confirm = useConfirm();
 const datatable = ref();
+const items = [
+  {
+    label: "Chi tiết hàng hóa",
+    // icon: "pi pi-file-word",
+    command: () => {
+      xuatexcelchitiet();
+    },
+  },
+];
 const columns = ref([
   {
     id: 0,
@@ -359,6 +378,29 @@ onMounted(() => {
   fill();
   loadLazyData();
 });
+
+const xuatexcel = () => {
+  waiting.value = true;
+  muahangApi.xuatexcel(lazyParams.value).then((res) => {
+    waiting.value = false;
+    if (res.success) {
+      window.open(res.link, "_blank");
+    } else {
+      alert(res.message);
+    }
+  });
+};
+const xuatexcelchitiet = () => {
+  waiting.value = true;
+  muahangApi.xuatexcelchitiet(lazyParams.value).then((res) => {
+    waiting.value = false;
+    if (res.success) {
+      window.open(res.link, "_blank");
+    } else {
+      alert(res.message);
+    }
+  });
+};
 const fill = () => {
   if (props.filter_thanhtoan > 0) return;
   if (is_CungungGiantiep.value) {

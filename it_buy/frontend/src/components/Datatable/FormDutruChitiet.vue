@@ -128,7 +128,15 @@
           <template v-else-if="col.data == 'note' && model.status_id == 1">
             <textarea v-model="slotProps.data[col.data]" class="form-control" />
           </template>
-
+          <template v-else-if="col.data == 'date' && model.status_id == 1">
+            <Calendar
+              v-model="slotProps.data.date"
+              dateFormat="yy-mm-dd"
+              class="date-custom"
+              :manualInput="false"
+              showIcon
+            />
+          </template>
           <template v-else-if="col.data == 'dinhkem' && model.status_id == 1">
             <div class="custom-file mt-2">
               <input
@@ -190,6 +198,9 @@
             v-else-if="col.data == 'list_dangbaoche' && model.status_id != 1"
           >
             {{ slotProps.data.dangbaoche }}
+          </template>
+          <template v-else-if="col.data == 'date' && model.status_id != 1">
+            {{ formatDate(slotProps.data.date) }}
           </template>
           <template v-else>
             {{ slotProps.data[col.data] }}
@@ -431,6 +442,11 @@ const columns = computed(() => {
         className: "text-center",
       },
       {
+        label: "Ngày giao hàng",
+        data: "date",
+        className: "text-center",
+      },
+      {
         label: "Mô tả",
         data: "note",
         className: "text-center",
@@ -476,12 +492,22 @@ const selectedColumns = computed(() => {
   return columns.value.filter((col) => col.hide != true);
 });
 const addRow = () => {
-  let stt = 0;
-  if (datatable.value.length) {
-    stt = datatable.value[datatable.value.length - 1].stt;
+  var index = datatable.value.length;
+  if (selected.value && selected.value.length == 1) {
+    index = selected.value[selected.value.length - 1].stt;
   }
-  stt++;
-  datatable.value.push({ ids: rand(), stt: stt, soluong: 1, is_new: true });
+  datatable.value.splice(index, 0, {
+    ids: rand(),
+    soluong: 1,
+    is_new: true,
+  });
+  calculate_stt();
+};
+const calculate_stt = () => {
+  datatable.value = datatable.value.map((item, index) => {
+    item.stt = index + 1;
+    return item;
+  });
 };
 const confirmDeleteSelected = () => {
   confirm.require({
@@ -532,7 +558,7 @@ const changeDangbaoche = (item, row) => {
   } else {
     row.dangbaoche = null;
   }
-  console.log(row);
+  // console.log(row);
 };
 
 onMounted(async () => {
@@ -565,6 +591,13 @@ onMounted(async () => {
   min-width: 150px;
 }
 
+.date {
+  min-width: 200px;
+}
+
+.note {
+  min-width: 150px;
+}
 tr.bg-gray {
   background-color: rgb(229 229 229) !important;
 }

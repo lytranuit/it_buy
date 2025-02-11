@@ -10,11 +10,14 @@ using Microsoft.EntityFrameworkCore;
 using NuGet.Packaging;
 using QRCoder;
 using Spire.Doc.Reporting;
+using Spire.Xls;
 using System;
 using System.Collections;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing.Imaging;
+using System.Globalization;
+using System.Linq.Expressions;
 using System.Net.WebSockets;
 using System.Reflection;
 using System.Security.Policy;
@@ -791,6 +794,7 @@ namespace it_template.Areas.V1.Controllers
 
         public async Task<JsonResult> XuatDondathang(int id)
         {
+            CultureInfo vietnamCulture = new CultureInfo("vi-VN");
             var now = DateTime.Now;
             var raw = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
             {
@@ -806,13 +810,13 @@ namespace it_template.Areas.V1.Controllers
                 {
                     var ncc_chon = muahang_chonmua;
                     is_vat = ncc_chon.is_vat;
-                    raw.Add("tonggiatri", ncc_chon.tonggiatri.Value.ToString("#,##0.##"));
+                    raw.Add("tonggiatri", ncc_chon.tonggiatri.Value.ToString("#,##0.##", vietnamCulture));
                     raw.Add("tggh", data.date.Value.ToString("dd/MM/yyyy"));
-                    raw.Add("thanhtien", ncc_chon.thanhtien.Value.ToString("#,##0.##"));
-                    raw.Add("thanhtien_vat", ncc_chon.thanhtien_vat.Value.ToString("#,##0.##"));
-                    raw.Add("phigiaohang", ncc_chon.phigiaohang.Value.ToString("#,##0.##"));
-                    raw.Add("ck", ncc_chon.ck.Value.ToString("#,##0.##"));
-                    raw.Add("tienvat", ncc_chon.tienvat.Value.ToString("#,##0.##"));
+                    raw.Add("thanhtien", ncc_chon.thanhtien.Value.ToString("#,##0.##", vietnamCulture));
+                    raw.Add("thanhtien_vat", ncc_chon.thanhtien_vat.Value.ToString("#,##0.##", vietnamCulture));
+                    raw.Add("phigiaohang", ncc_chon.phigiaohang.Value.ToString("#,##0.##", vietnamCulture));
+                    raw.Add("ck", ncc_chon.ck.Value.ToString("#,##0.##", vietnamCulture));
+                    raw.Add("tienvat", ncc_chon.tienvat.Value.ToString("#,##0.##", vietnamCulture));
                     //raw.Add("vat", ncc_chon.vat.Value.ToString());
                     raw.Add("tiente", ncc_chon.tiente.ToString());
                     var stt = 1;
@@ -834,9 +838,9 @@ namespace it_template.Areas.V1.Controllers
                             tenhh = item.tenhh,
                             mahh = item.mahh,
                             dvt = item.dvt,
-                            soluong = item.soluong.Value.ToString("#,##0.##"),
-                            dongia = item.dongia.Value.ToString("#,##0.##"),
-                            thanhtien = item.thanhtien.Value.ToString("#,##0.##"),
+                            soluong = item.soluong.Value.ToString("#,##0.##", vietnamCulture),
+                            dongia = item.dongia.Value.ToString("#,##0.##", vietnamCulture),
+                            thanhtien = item.thanhtien.Value.ToString("#,##0.##", vietnamCulture),
                             nhasx = nhasx,
                             tieuchuan = tieuchuan,
                             vat = item.vat,
@@ -1211,6 +1215,7 @@ namespace it_template.Areas.V1.Controllers
         [HttpPost]
         public async Task<JsonResult> xuatpdf(int id, bool is_view = false, int loaimau = 0)
         {
+            CultureInfo vietnamCulture = new CultureInfo("vi-VN");
             System.Security.Claims.ClaimsPrincipal currentUser = this.User;
             var user_id = UserManager.GetUserId(currentUser);
             var now = DateTime.Now;
@@ -1256,12 +1261,22 @@ namespace it_template.Areas.V1.Controllers
                 {
                     is_vat = muahang_chonmua.is_vat;
                     var ncc_chon = muahang_chonmua;
-                    raw.Add("tonggiatri", ncc_chon.tonggiatri.Value.ToString("#,##0.##"));
-                    raw.Add("thanhtien", ncc_chon.thanhtien.Value.ToString("#,##0.##"));
-                    raw.Add("thanhtien_vat", ncc_chon.thanhtien_vat.Value.ToString("#,##0.##"));
-                    raw.Add("phigiaohang", ncc_chon.phigiaohang.Value.ToString("#,##0.##"));
-                    raw.Add("ck", ncc_chon.ck.Value.ToString("#,##0.##"));
-                    raw.Add("tienvat", ncc_chon.tienvat.Value.ToString("#,##0.##"));
+                    var tonggiatri_string = ncc_chon.tonggiatri.Value.ToString("#,##0.##", vietnamCulture);
+                    var thanhtien_vat_string = ncc_chon.thanhtien_vat.Value.ToString("#,##0.##", vietnamCulture);
+                    var thanhtien_string = ncc_chon.thanhtien.Value.ToString("#,##0.##", vietnamCulture);
+                    if (ncc_chon.tiente == "VND" || ncc_chon.tiente == "VNĐ" || ncc_chon.tiente == null)
+                    {
+                        tonggiatri_string = ncc_chon.tonggiatri.Value.ToString("#,##0", vietnamCulture);
+                        thanhtien_vat_string = ncc_chon.thanhtien_vat.Value.ToString("#,##0", vietnamCulture);
+                        thanhtien_string = ncc_chon.thanhtien.Value.ToString("#,##0", vietnamCulture);
+                    }
+
+                    raw.Add("tonggiatri", tonggiatri_string);
+                    raw.Add("thanhtien_vat", thanhtien_vat_string);
+                    raw.Add("thanhtien", thanhtien_string);
+                    raw.Add("phigiaohang", ncc_chon.phigiaohang.Value.ToString("#,##0.##", vietnamCulture));
+                    raw.Add("ck", ncc_chon.ck.Value.ToString("#,##0.##", vietnamCulture));
+                    raw.Add("tienvat", ncc_chon.tienvat.Value.ToString("#,##0.##", vietnamCulture));
                     //raw.Add("vat", ncc_chon.vat.Value.ToString());
                     raw.Add("tiente", ncc_chon.tiente.ToString());
                     var stt = 1;
@@ -1290,9 +1305,9 @@ namespace it_template.Areas.V1.Controllers
                             tenhh = item.tenhh,
                             mahh = item.mahh,
                             dvt = item.dvt,
-                            soluong = item.soluong.Value.ToString("#,##0.##"),
-                            dongia = item.dongia.Value.ToString("#,##0.#####"),
-                            thanhtien = item.thanhtien.Value.ToString("#,##0.##"),
+                            soluong = item.soluong.Value.ToString("#,##0.##", vietnamCulture),
+                            dongia = item.dongia.Value.ToString("#,##0.#####", vietnamCulture),
+                            thanhtien = item.thanhtien.Value.ToString("#,##0.##", vietnamCulture),
                             vat = item.vat,
                             note = item.note,
                             //artwork = material.masothietke,
@@ -1320,7 +1335,7 @@ namespace it_template.Areas.V1.Controllers
                     var nhasx = string.Join("/", list_nsx);
                     raw.Add("bang_ncc_ten_" + key, ncc.ncc.tenncc);
                     raw.Add("bang_ncc_nsx_" + key, nhasx);
-                    raw.Add("bang_ncc_tong_" + key, ncc.tonggiatri.Value.ToString("#,##0.##"));
+                    raw.Add("bang_ncc_tong_" + key, ncc.tonggiatri.Value.ToString("#,##0.##", vietnamCulture));
                     raw.Add("bang_ncc_dap_ung_" + key, ncc.dapung == true ? "X" : "");
                     raw.Add("bang_ncc_time_delivery_" + key, ncc.thoigiangiaohang);
                     raw.Add("bang_ncc_policy_" + key, ncc.baohanh);
@@ -1336,7 +1351,12 @@ namespace it_template.Areas.V1.Controllers
                     var nccs = data.nccs.Where(d => d.chonmua == true).ToList();
                     var tonggiatri = nccs.Sum(d => d.tonggiatri);
                     var ncc = nccs.FirstOrDefault();
-                    raw.Add("tonggiatri", tonggiatri.Value.ToString("#,##0.##"));
+                    var tonggiatri_string = tonggiatri.Value.ToString("#,##0.##", vietnamCulture);
+                    if (ncc.tiente == "VND" || ncc.tiente == "VNĐ" || ncc.tiente == null)
+                    {
+                        tonggiatri_string = tonggiatri.Value.ToString("#,##0", vietnamCulture);
+                    }
+                    raw.Add("tonggiatri", tonggiatri_string);
                     raw.Add("tiente", ncc != null ? ncc.tiente : "");
 
                     var stt = 1;
@@ -1503,9 +1523,9 @@ namespace it_template.Areas.V1.Controllers
                             tenhh = e.tenhh,
                             mahh = e.mahh,
                             dvt = e.dvt,
-                            soluong = e.soluong.Value.ToString("#,##0.##"),
-                            dongia = e.dongia.Value.ToString("#,##0.#####"),
-                            thanhtien = e.thanhtien.Value.ToString("#,##0.##"),
+                            soluong = e.soluong.Value.ToString("#,##0.##", vietnamCulture),
+                            dongia = e.dongia.Value.ToString("#,##0.#####", vietnamCulture),
+                            thanhtien = e.thanhtien.Value.ToString("#,##0.##", vietnamCulture),
                             vat = e.vat,
                             note = e.note,
                         });
@@ -1514,12 +1534,12 @@ namespace it_template.Areas.V1.Controllers
                     {
                         id = item.id,
                         tiente = item.tiente,
-                        thanhtien = item.thanhtien.Value.ToString("#,##0.##"),
-                        thanhtien_vat = item.thanhtien_vat.Value.ToString("#,##0.##"),
-                        phigiaohang = item.phigiaohang.Value.ToString("#,##0.##"),
-                        tonggiatri = item.tonggiatri.Value.ToString("#,##0.##"),
-                        tienvat = item.tienvat.Value.ToString("#,##0.##"),
-                        ck = item.ck.Value.ToString("#,##0.##"),
+                        thanhtien = item.thanhtien.Value.ToString("#,##0.##", vietnamCulture),
+                        thanhtien_vat = item.thanhtien_vat.Value.ToString("#,##0.##", vietnamCulture),
+                        phigiaohang = item.phigiaohang.Value.ToString("#,##0.##", vietnamCulture),
+                        tonggiatri = item.tonggiatri.Value.ToString("#,##0.##", vietnamCulture),
+                        tienvat = item.tienvat.Value.ToString("#,##0.##", vietnamCulture),
+                        ck = item.ck.Value.ToString("#,##0.##", vietnamCulture),
                         tenncc = item.ncc.tenncc
                     });
                 }
@@ -1696,6 +1716,361 @@ namespace it_template.Areas.V1.Controllers
 
                 return Json(new { success = true });
             }
+        }
+        [HttpPost]
+        public async Task<JsonResult> xuatexcel(bool filter_thanhtoan)
+        {
+            System.Security.Claims.ClaimsPrincipal currentUser = this.User;
+            var user_id = UserManager.GetUserId(currentUser);
+            var draw = Request.Form["draw"].FirstOrDefault();
+            var start = Request.Form["start"].FirstOrDefault();
+            var length = Request.Form["length"].FirstOrDefault();
+            int pageSize = length != null ? Convert.ToInt32(length) : 0;
+            var code = Request.Form["filters[code]"].FirstOrDefault();
+            var name = Request.Form["filters[name]"].FirstOrDefault();
+            var id_text = Request.Form["filters[id]"].FirstOrDefault();
+            int id = id_text != null ? Convert.ToInt32(id_text) : 0;
+            var type_id_string = Request.Form["type_id"].FirstOrDefault();
+            int type_id = type_id_string != null ? Convert.ToInt32(type_id_string) : 0;
+            var status_id_string = Request.Form["filters[status_id]"].FirstOrDefault();
+            int status_id = status_id_string != null ? Convert.ToInt32(status_id_string) : 0;
+            //var filter_thanhtoan = Request.Form["filter_thanhtoan"].FirstOrDefault();
+            //var tenhh = Request.Form["filters[tenhh]"].FirstOrDefault();
+            int skip = start != null ? Convert.ToInt32(start) : 0;
+            var customerData = _context.MuahangModel.Where(d => d.deleted_at == null && d.parent_id == null);
+            if (status_id == 1)
+            {
+                customerData = customerData.Where(m => m.status_id == 1 || m.status_id == 6 || m.status_id == 7);
+            }
+            else if (status_id == 2)
+            {
+                customerData = customerData.Where(m => m.status_id == 9);
+            }
+            else if (status_id == 3)
+            {
+                customerData = customerData.Where(m => m.status_id == 11);
+            }
+            else if (status_id == 4)
+            {
+                customerData = customerData.Where(m => m.status_id == 10 && m.is_dathang != true);
+            }
+            else if (status_id == 5)
+            {
+                customerData = customerData.Where(m => m.date_finish == null && (m.is_dathang == true && ((m.loaithanhtoan == "tra_sau" && m.is_nhanhang == false) || (m.loaithanhtoan == "tra_truoc" && m.is_thanhtoan == true))));
+            }
+            else if (status_id == 6)
+            {
+                customerData = customerData.Where(m => m.date_finish == null && (m.is_dathang == true && ((m.loaithanhtoan == "tra_truoc" && m.is_thanhtoan == false) || (m.loaithanhtoan == "tra_sau" && m.is_nhanhang == true))));
+            }
+            else if (status_id == 7)
+            {
+                customerData = customerData.Where(m => m.date_finish != null);
+            }
+
+            if (filter_thanhtoan == true)
+            {
+                customerData = customerData.Where(d => d.is_dathang == true && (d.loaithanhtoan == "tra_truoc" || (d.loaithanhtoan == "tra_sau" && d.is_nhanhang == true)));
+            }
+            if (type_id != null && type_id != 0)
+            {
+                customerData = customerData.Where(d => d.type_id == type_id);
+            }
+            int recordsTotal = customerData.Count();
+
+            if (code != null && code != "")
+            {
+                customerData = customerData.Where(d => d.code.Contains(code));
+            }
+            if (name != null && name != "")
+            {
+                customerData = customerData.Where(d => d.name.Contains(name));
+            }
+            if (id != 0)
+            {
+                customerData = customerData.Where(d => d.id == id);
+            }
+            int recordsFiltered = customerData.Count();
+            var datapost = customerData
+                 .Include(d => d.user_created_by)
+                 .Include(d => d.muahang_chonmua)
+                 .ThenInclude(d => d.chitiet)
+                 .Include(d => d.muahang_chonmua)
+                 .ThenInclude(d => d.ncc)
+                 .ToList();
+            var data = new ArrayList();
+
+            var viewPath = _configuration["Source:Path_Private"] + "\\buy\\templates\\Muahang.xlsx";
+            var documentPath = "/tmp/Rawdata_" + DateTime.Now.ToFileTimeUtc() + ".xlsx";
+            string Domain = (HttpContext.Request.IsHttps ? "https://" : "http://") + HttpContext.Request.Host.Value;
+            Workbook workbook = new Workbook();
+            workbook.LoadFromFile(viewPath);
+            Worksheet sheet = workbook.Worksheets[0];
+            int stt = 0;
+            var start_r = 2;
+
+            DataTable dt = new DataTable();
+            //dt.Columns.Add("stt", typeof(int));
+            dt.Columns.Add("id", typeof(int));
+            dt.Columns.Add("code", typeof(string));
+            dt.Columns.Add("name", typeof(string));
+            dt.Columns.Add("status", typeof(string));
+            dt.Columns.Add("giaohang", typeof(string));
+            dt.Columns.Add("thanhtoan", typeof(string));
+            dt.Columns.Add("date_dukien", typeof(string));
+            dt.Columns.Add("tonggiatri", typeof(decimal));
+            dt.Columns.Add("created_at", typeof(DateTime));
+            dt.Columns.Add("created_by", typeof(string));
+
+            var stt_cell = 2;
+
+
+
+            sheet.InsertRow(start_r, datapost.Count(), InsertOptionsType.FormatAsAfter);
+            foreach (var record in datapost)
+            {
+                var chonmua = record.muahang_chonmua;
+                decimal? tonggiatri = null;
+                var tiente = "VND";
+                var thoigiangiaohang = "";
+                var thanhtoan = "";
+                if (chonmua != null)
+                {
+                    tonggiatri = chonmua.tonggiatri;
+                    tiente = chonmua.tiente;
+
+                    thoigiangiaohang = chonmua.thoigiangiaohang;
+                    thanhtoan = chonmua.thanhtoan;
+
+
+
+                }
+                var status = "";
+                if (record.date_finish != null)
+                {
+                    status = "Hoàn thành";
+
+                }
+                else if (record.is_dathang == true && ((record.loaithanhtoan == "tra_sau" && record.is_nhanhang == true) ||
+                                (record.loaithanhtoan == "tra_truoc" && record.is_thanhtoan == true)))
+                {
+                    status = "Chờ nhận hàng";
+                }
+                else if (record.is_dathang == true && ((record.loaithanhtoan == "tra_sau" && record.is_nhanhang == false) ||
+                                (record.loaithanhtoan == "tra_truoc" && record.is_thanhtoan == false)))
+                {
+                    status = "Chờ thanh toán";
+                }
+                else if (record.status_id == 1 || record.status_id == 6 || record.status_id == 7)
+                {
+                    status = "Đang thực hiện";
+
+                }
+                else if (record.status_id == 9)
+                {
+                    status = "Đang trình ký";
+
+                }
+                else if (record.status_id == 10)
+                {
+                    status = "Đang đặt hàng";
+
+                }
+                else if (record.status_id == 11)
+                {
+                    status = "Không duyệt";
+
+                }
+                DataRow dr1 = dt.NewRow();
+                //dr1["stt"] = (++stt);
+                dr1["id"] = record.id;
+                dr1["code"] = record.code;
+                dr1["name"] = record.name;
+                dr1["status"] = status;
+                //dr1["baohanh"] = chonmua.baohanh;
+                dr1["giaohang"] = thoigiangiaohang;
+                dr1["thanhtoan"] = thanhtoan;
+                dr1["date_dukien"] = record.date_pay_at != null ? record.date_pay_at.Value.ToString("dd/MM/YYYY") : "";
+                dr1["tonggiatri"] = tonggiatri ?? 0;
+                dr1["created_at"] = record.created_at;
+                dr1["created_by"] = record.user_created_by.FullName;
+                dt.Rows.Add(dr1);
+                start_r++;
+
+            }
+            sheet.InsertDataTable(dt, false, 2, 1);
+
+            workbook.SaveToFile("./wwwroot" + documentPath, ExcelVersion.Version2013);
+
+            return Json(new { success = true, link = Domain + documentPath });
+        }
+        [HttpPost]
+        public async Task<JsonResult> xuatexcelchitiet(bool filter_thanhtoan)
+        {
+            System.Security.Claims.ClaimsPrincipal currentUser = this.User;
+            var user_id = UserManager.GetUserId(currentUser);
+            var draw = Request.Form["draw"].FirstOrDefault();
+            var start = Request.Form["start"].FirstOrDefault();
+            var length = Request.Form["length"].FirstOrDefault();
+            int pageSize = length != null ? Convert.ToInt32(length) : 0;
+            var code = Request.Form["filters[code]"].FirstOrDefault();
+            var name = Request.Form["filters[name]"].FirstOrDefault();
+            var id_text = Request.Form["filters[id]"].FirstOrDefault();
+            int id = id_text != null ? Convert.ToInt32(id_text) : 0;
+            var type_id_string = Request.Form["type_id"].FirstOrDefault();
+            int type_id = type_id_string != null ? Convert.ToInt32(type_id_string) : 0;
+            var status_id_string = Request.Form["filters[status_id]"].FirstOrDefault();
+            int status_id = status_id_string != null ? Convert.ToInt32(status_id_string) : 0;
+            //var filter_thanhtoan = Request.Form["filter_thanhtoan"].FirstOrDefault();
+            //var tenhh = Request.Form["filters[tenhh]"].FirstOrDefault();
+            int skip = start != null ? Convert.ToInt32(start) : 0;
+            var customerData = _context.MuahangModel.Where(d => d.deleted_at == null && d.parent_id == null);
+            if (status_id == 1)
+            {
+                customerData = customerData.Where(m => m.status_id == 1 || m.status_id == 6 || m.status_id == 7);
+            }
+            else if (status_id == 2)
+            {
+                customerData = customerData.Where(m => m.status_id == 9);
+            }
+            else if (status_id == 3)
+            {
+                customerData = customerData.Where(m => m.status_id == 11);
+            }
+            else if (status_id == 4)
+            {
+                customerData = customerData.Where(m => m.status_id == 10 && m.is_dathang != true);
+            }
+            else if (status_id == 5)
+            {
+                customerData = customerData.Where(m => m.date_finish == null && (m.is_dathang == true && ((m.loaithanhtoan == "tra_sau" && m.is_nhanhang == false) || (m.loaithanhtoan == "tra_truoc" && m.is_thanhtoan == true))));
+            }
+            else if (status_id == 6)
+            {
+                customerData = customerData.Where(m => m.date_finish == null && (m.is_dathang == true && ((m.loaithanhtoan == "tra_truoc" && m.is_thanhtoan == false) || (m.loaithanhtoan == "tra_sau" && m.is_nhanhang == true))));
+            }
+            else if (status_id == 7)
+            {
+                customerData = customerData.Where(m => m.date_finish != null);
+            }
+
+            if (filter_thanhtoan == true)
+            {
+                customerData = customerData.Where(d => d.is_dathang == true && (d.loaithanhtoan == "tra_truoc" || (d.loaithanhtoan == "tra_sau" && d.is_nhanhang == true)));
+            }
+            if (type_id != null && type_id != 0)
+            {
+                customerData = customerData.Where(d => d.type_id == type_id);
+            }
+            int recordsTotal = customerData.Count();
+
+            if (code != null && code != "")
+            {
+                customerData = customerData.Where(d => d.code.Contains(code));
+            }
+            if (name != null && name != "")
+            {
+                customerData = customerData.Where(d => d.name.Contains(name));
+            }
+            if (id != 0)
+            {
+                customerData = customerData.Where(d => d.id == id);
+            }
+            int recordsFiltered = customerData.Count();
+            var datapost = customerData
+                 .Include(d => d.user_created_by)
+                 .Include(d => d.muahang_chonmua)
+                 .ThenInclude(d => d.chitiet)
+                 .Include(d => d.muahang_chonmua)
+                 .ThenInclude(d => d.ncc)
+                 .ToList();
+            var data = new ArrayList();
+
+            var viewPath = _configuration["Source:Path_Private"] + "\\buy\\templates\\Muahangchitiet.xlsx";
+            var documentPath = "/tmp/Rawdata_" + DateTime.Now.ToFileTimeUtc() + ".xlsx";
+            string Domain = (HttpContext.Request.IsHttps ? "https://" : "http://") + HttpContext.Request.Host.Value;
+            Workbook workbook = new Workbook();
+            workbook.LoadFromFile(viewPath);
+            Worksheet sheet = workbook.Worksheets[0];
+            int stt = 0;
+            var start_r = 2;
+
+            DataTable dt = new DataTable();
+            //dt.Columns.Add("stt", typeof(int));
+            dt.Columns.Add("name", typeof(string));
+            dt.Columns.Add("mahh", typeof(string));
+            dt.Columns.Add("tenhh", typeof(string));
+            dt.Columns.Add("soluong", typeof(decimal));
+            dt.Columns.Add("dvt", typeof(string));
+            dt.Columns.Add("dongia", typeof(decimal));
+            dt.Columns.Add("thanhtien", typeof(decimal));
+            dt.Columns.Add("tiente", typeof(string));
+            dt.Columns.Add("vat", typeof(int));
+            dt.Columns.Add("ncc", typeof(string));
+            dt.Columns.Add("baohanh", typeof(string));
+            dt.Columns.Add("giaohang", typeof(string));
+            dt.Columns.Add("thanhtoan", typeof(string));
+            dt.Columns.Add("mota", typeof(string));
+            dt.Columns.Add("created_at", typeof(DateTime));
+            dt.Columns.Add("created_by", typeof(string));
+
+            var stt_cell = 2;
+
+
+
+            sheet.InsertRow(start_r, datapost.Count(), InsertOptionsType.FormatAsAfter);
+            foreach (var record in datapost)
+            {
+                var chonmua = record.muahang_chonmua;
+                decimal? tonggiatri = null;
+                var tiente = "VND";
+                var thoigiangiaohang = "";
+                var thanhtoan = "";
+                if (chonmua != null)
+                {
+                    tonggiatri = chonmua.tonggiatri;
+                    tiente = chonmua.tiente;
+
+                    thoigiangiaohang = chonmua.thoigiangiaohang;
+                    thanhtoan = chonmua.thanhtoan;
+
+                    var chitiet = chonmua.chitiet;
+
+                    sheet.InsertRow(start_r, chitiet.Count(), InsertOptionsType.FormatAsAfter);
+                    foreach (var item in chitiet)
+                    {
+
+
+                        DataRow dr1 = dt.NewRow();
+                        //dr1["stt"] = (++stt);
+                        dr1["name"] = record.name;
+                        dr1["mahh"] = item.mahh;
+                        dr1["tenhh"] = item.tenhh;
+                        dr1["soluong"] = item.soluong;
+                        dr1["dvt"] = item.dvt;
+                        dr1["dongia"] = item.dongia ?? 0;
+                        dr1["thanhtien"] = item.thanhtien_vat ?? 0;
+                        dr1["tiente"] = tiente;
+                        dr1["vat"] = item.vat ?? 0;
+                        dr1["ncc"] = chonmua.ncc != null ? chonmua.ncc.tenncc : "";
+                        dr1["baohanh"] = chonmua.baohanh;
+                        dr1["giaohang"] = chonmua.thoigiangiaohang;
+                        dr1["thanhtoan"] = chonmua.thanhtoan;
+                        dr1["mota"] = record.note;
+                        dr1["created_at"] = record.created_at;
+                        dr1["created_by"] = record.user_created_by.FullName;
+                        dt.Rows.Add(dr1);
+                        start_r++;
+                    }
+                }
+
+
+
+            }
+            sheet.InsertDataTable(dt, false, 2, 1);
+
+            workbook.SaveToFile("./wwwroot" + documentPath, ExcelVersion.Version2013);
+
+            return Json(new { success = true, link = Domain + documentPath });
         }
 
         [HttpPost]
@@ -2023,7 +2398,8 @@ namespace it_template.Areas.V1.Controllers
             {
                 get
                 {
-                    return thanhtien.ToString("#,##0.##") + " " + tiente;
+                    CultureInfo vietnamCulture = new CultureInfo("vi-VN");
+                    return thanhtien.ToString("#,##0.##", vietnamCulture) + " " + tiente;
                 }
             }
         }

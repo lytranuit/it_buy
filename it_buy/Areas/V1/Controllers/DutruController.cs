@@ -19,6 +19,7 @@ using System.Linq;
 using Spire.Xls;
 using static iText.Svg.SvgConstants;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 
 namespace it_template.Areas.V1.Controllers
 {
@@ -37,7 +38,7 @@ namespace it_template.Areas.V1.Controllers
         public JsonResult Get(int id)
         {
             var data = _context.DutruModel.Where(d => d.id == id)
-                .Include(d => d.chitiet)
+                .Include(d => d.chitiet.OrderBy(e => e.stt))
                 .ThenInclude(d => d.dinhkem.Where(d => d.deleted_at == null))
                 .Include(d => d.user_created_by).FirstOrDefault();
             if (data != null)
@@ -376,8 +377,13 @@ namespace it_template.Areas.V1.Controllers
                     _context.RemoveRange(list_delete);
                 if (list_add != null)
                 {
+
                     foreach (var item in list_add)
                     {
+                        if (item.date != null && item.date.Value.Kind == DateTimeKind.Utc)
+                        {
+                            item.date = item.date.Value.ToLocalTime();
+                        }
                         item.dutru_id = DutruModel_old.id;
                         _context.Add(item);
                         //_context.SaveChanges();
@@ -388,6 +394,10 @@ namespace it_template.Areas.V1.Controllers
                 {
                     foreach (var item in list_update)
                     {
+                        if (item.date != null && item.date.Value.Kind == DateTimeKind.Utc)
+                        {
+                            item.date = item.date.Value.ToLocalTime();
+                        }
                         item.dinhkem = null;
                         _context.Update(item);
                         list.Add(item);
@@ -464,8 +474,9 @@ namespace it_template.Areas.V1.Controllers
         [HttpPost]
         public async Task<JsonResult> xuatpdf(int id, bool is_view = false)
         {
+            CultureInfo vietnamCulture = new CultureInfo("vi-VN");
             var RawDetails = new List<RawDetails>();
-            var data = _context.DutruModel.Where(d => d.id == id).Include(d => d.chitiet).Include(d => d.bophan).FirstOrDefault();
+            var data = _context.DutruModel.Where(d => d.id == id).Include(d => d.chitiet.OrderBy(e => e.stt)).Include(d => d.bophan).FirstOrDefault();
             if (data != null)
             {
                 var stt = 1;
@@ -501,16 +512,18 @@ namespace it_template.Areas.V1.Controllers
                     //    _context.SaveChanges();
 
                     //}
+                    var date = item.date != null ? item.date : data.date;
+                    var date_string = date.Value.ToString("yyyy-MM-dd");
                     RawDetails.Add(new RawDetails
                     {
                         stt = stt++,
                         tennvl = item.tenhh,
                         manvl = item.mahh,
                         dvt = item.dvt,
-                        soluong = item.soluong.Value.ToString("#,##0.##"),
+                        soluong = item.soluong.Value.ToString("#,##0.##", vietnamCulture),
                         note = item.note,
                         artwork = item.masothietke,
-                        date = data.date.Value.ToString("yyyy-MM-dd"),
+                        date = date_string,
                         grade = item.grade,
                         nhasx = item.nhasx,
                         dangbaoche = item.dangbaoche,
@@ -1113,11 +1126,11 @@ namespace it_template.Areas.V1.Controllers
             {
                 if (sort_ngayhethan == "1")
                 {
-                    customerData = customerData.OrderBy(d => d.dutru.date);
+                    customerData = customerData.OrderBy(d => d.date).ThenBy(d => d.dutru.date);
                 }
                 else if (sort_ngayhethan == "-1")
                 {
-                    customerData = customerData.OrderByDescending(d => d.dutru.date);
+                    customerData = customerData.OrderByDescending(d => d.date).ThenByDescending(d => d.dutru.date);
                 }
             }
             else
@@ -1198,6 +1211,7 @@ namespace it_template.Areas.V1.Controllers
                     list_tag = record.list_tag,
                     tensp = record.tensp,
                     dutru_chitiet_id = record.id,
+                    date = record.date != null ? record.date : dutru.date,
                     dutru = new DutruModel()
                     {
                         id = dutru.id,
@@ -1419,11 +1433,11 @@ namespace it_template.Areas.V1.Controllers
             {
                 if (sort_ngayhethan == "1")
                 {
-                    customerData = customerData.OrderBy(d => d.dutru.date);
+                    customerData = customerData.OrderBy(d => d.date).ThenBy(d => d.dutru.date);
                 }
                 else if (sort_ngayhethan == "-1")
                 {
-                    customerData = customerData.OrderByDescending(d => d.dutru.date);
+                    customerData = customerData.OrderByDescending(d => d.date).ThenByDescending(d => d.dutru.date);
                 }
             }
             else
@@ -1496,7 +1510,7 @@ namespace it_template.Areas.V1.Controllers
                 var thanhtien = thanhtien1.Sum(d => d.thanhtien_vat);
                 var muahang_chitiet = record.muahang_chitiet.Where(d => d.muahang.deleted_at == null && d.muahang.status_id != (int)Status.MuahangEsignError).ToList();
                 var dulieu_muahang = "";
-                foreach (var item3 in muahang_chitiet.Select(d=>d.muahang).ToList())
+                foreach (var item3 in muahang_chitiet.Select(d => d.muahang).ToList())
                 {
                     var status = "";
                     if (item3.date_finish != null)
@@ -1556,8 +1570,8 @@ namespace it_template.Areas.V1.Controllers
                 dr1["priority"] = dutru.priority_id != null ? GetEnumDisplayName((Priority)dutru.priority_id) : "";
                 dr1["created_at"] = dutru.created_at;
                 dr1["created_by"] = dutru.user_created_by.FullName;
-                dr1["date"] = dutru.date;
-                
+                dr1["date"] = record.date != null ? record.date : dutru.date;
+
                 dr1["status"] = dulieu_muahang;
                 dt.Rows.Add(dr1);
                 start_r++;

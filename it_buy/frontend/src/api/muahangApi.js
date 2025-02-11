@@ -42,6 +42,25 @@ export default {
       })
       .then((res) => res.data);
   },
+
+  xuatexcel(params) {
+    return repository
+      .post(`/v1/${resoure}/xuatexcel`, params, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => res.data);
+  },
+  xuatexcelchitiet(params) {
+    return repository
+      .post(`/v1/${resoure}/xuatexcelchitiet`, params, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => res.data);
+  },
   saveDinhkem(params) {
     return repository
       .post(`/v1/${resoure}/saveDinhkem`, params, {

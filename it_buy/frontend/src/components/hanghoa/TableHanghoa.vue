@@ -233,7 +233,7 @@
           />
         </template>
         <template v-else-if="col.data == 'ngayhethan'">
-          {{ formatDate(slotProps.data.dutru.date) }}
+          {{ formatDate(slotProps.data.date) }}
         </template>
 
         <template v-else-if="col.data == 'thanhtien'">
@@ -571,9 +571,9 @@ const customClearFilter = (col, callback) => {
   callback();
 };
 const xuatexcel = () => {
-  loading.value = true;
+  waiting.value = true;
   dutruApi.xuatexcel(lazyParams.value).then((res) => {
-    loading.value = false;
+    waiting.value = false;
     if (res.success) {
       window.open(res.link, "_blank");
     } else {

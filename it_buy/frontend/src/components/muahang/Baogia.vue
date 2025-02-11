@@ -146,9 +146,15 @@
             <div class="col-md-4" v-if="item.is_vat">
               <div class="row">
                 <b class="col">Thành tiền (Chưa VAT):</b>
-                <span class="col text-right"
-                  >{{ formatPrice(item.thanhtien, 2) }} {{ item.tiente }}</span
-                >
+                <span class="col text-right">
+                  <InputNumber
+                    v-model="item.thanhtien"
+                    class="p-inputtext-sm"
+                    :suffix="' ' + item.tiente"
+                    :disabled="readonly || !item.is_edit"
+                    :maxFractionDigits="2"
+                  />
+                </span>
               </div>
             </div>
           </div>
@@ -159,9 +165,15 @@
             <div class="col-md-4" v-if="item.is_vat">
               <div class="row">
                 <b class="col">Tiền VAT:</b>
-                <span class="col text-right"
-                  >{{ formatPrice(item.tienvat, 2) }} {{ item.tiente }}</span
-                >
+                <span class="col text-right">
+                  <InputNumber
+                    v-model="item.tienvat"
+                    class="p-inputtext-sm"
+                    :suffix="' ' + item.tiente"
+                    :disabled="readonly || !item.is_edit"
+                    :maxFractionDigits="2"
+                  />
+                </span>
               </div>
             </div>
           </div>
@@ -172,10 +184,15 @@
             <div class="col-md-4">
               <div class="row">
                 <b class="col">Thành tiền:</b>
-                <span class="col text-right"
-                  >{{ formatPrice(item.thanhtien_vat, 2) }}
-                  {{ item.tiente }}</span
-                >
+                <span class="col text-right">
+                  <InputNumber
+                    v-model="item.thanhtien_vat"
+                    class="p-inputtext-sm"
+                    :suffix="' ' + item.tiente"
+                    :disabled="readonly || !item.is_edit"
+                    :maxFractionDigits="2"
+                  />
+                </span>
               </div>
             </div>
           </div>
@@ -223,10 +240,24 @@
 
             <div class="col-md-4">
               <div class="row">
-                <b class="col">Tổng giá trị:</b>
-                <span class="col text-right"
-                  >{{ formatPrice(item.tonggiatri, 2) }} {{ item.tiente }}</span
-                >
+                <b class="col"
+                  >Tổng giá trị:
+                  <span
+                    class="pi pi-pencil ml-2"
+                    style="cursor: pointer"
+                    v-if="readonly == false"
+                    @click="item.is_edit = true"
+                  ></span
+                ></b>
+                <span class="col text-right">
+                  <InputNumber
+                    v-model="item.tonggiatri"
+                    class="p-inputtext-sm"
+                    :suffix="' ' + item.tiente"
+                    :disabled="readonly || !item.is_edit"
+                    :maxFractionDigits="2"
+                  />
+                </span>
               </div>
             </div>
           </div>
@@ -541,4 +572,8 @@ onMounted(() => {
 });
 </script>
 
-<style lang="scss"></style>
+<style>
+.p-inputnumber-input {
+  text-align: right;
+}
+</style>
