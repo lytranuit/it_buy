@@ -71,17 +71,14 @@ namespace it_template.Areas.V1.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> Remove(List<int> item)
+        public async Task<JsonResult> Remove(List<string> item)
         {
             var jsonData = new { success = true, message = "" };
             try
             {
-                var list = _context.MaterialModel.Where(d => item.Contains(d.id)).ToList();
-                foreach (var i in list)
-                {
-                    i.deleted_at = DateTime.Now;
-                }
-                _context.UpdateRange(list);
+                var list = _context.MaterialModel.Where(d => item.Contains(d.mahh)).ToList();
+
+                _context.RemoveRange(list);
                 _context.SaveChanges();
             }
             catch (Exception ex)

@@ -65,6 +65,10 @@ const list_dangbaoche = ref([
   "Viên ngậm",
   "Kẹo cứng",
   "Gummy",
+  "Dùng ngoài - Hỗn dịch lỏng",
+  "Dùng ngoài - Serum",
+  "Dùng ngoài - Kem",
+  "Dung dịch",
 ]);
 onMounted(() => {});
 </script>
