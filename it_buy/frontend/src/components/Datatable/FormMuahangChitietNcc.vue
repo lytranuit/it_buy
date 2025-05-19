@@ -1,105 +1,51 @@
 <template>
   <div id="TablemuahangChitiet">
-    <DataTable
-      showGridlines
-      :value="modelncc.chitiet"
-      ref="dt"
-      class="p-datatable-ct"
-      :rowHover="true"
-      :loading="loading"
-      responsiveLayout="scroll"
-      :resizableColumns="true"
-      columnResizeMode="expand"
-      v-model:selection="selected"
-    >
+    <DataTable showGridlines :value="modelncc.chitiet" ref="dt" class="p-datatable-ct" :rowHover="true"
+      :loading="loading" responsiveLayout="scroll" :resizableColumns="true" columnResizeMode="expand"
+      v-model:selection="selected">
       <template #empty>
         <div class="text-center">Không có dữ liệu.</div>
       </template>
-      <Column
-        v-for="col in selectedColumns"
-        :field="col.data"
-        :header="col.label"
-        :key="col.data"
-        :showFilterMatchModes="false"
-        :className="col.className"
-      >
+      <Column v-for="col in selectedColumns" :field="col.data" :header="col.label" :key="col.data"
+        :showFilterMatchModes="false" :class="col.className">
         <template #body="slotProps">
           <template v-if="col.data == 'mahh'">
             <div class="d-flex align-items-center">
-              <material-auto-complete
-                v-model="slotProps.data[col.data]"
-                @item-select="select($event, slotProps.data)"
-                :disabled="readonly"
-              >
+              <material-auto-complete v-model="slotProps.data[col.data]" @item-select="select($event, slotProps.data)"
+                :disabled="readonly">
               </material-auto-complete>
             </div>
           </template>
           <template v-else-if="col.data == 'tenhh'">
-            <InputText
-              v-model="slotProps.data[col.data]"
-              class="p-inputtext-sm"
-              :disabled="readonly"
-            />
+            <InputText v-model="slotProps.data[col.data]" class="p-inputtext-sm" :disabled="readonly" />
           </template>
           <template v-else-if="col.data == 'nhasx'">
-            <InputText
-              v-model="slotProps.data[col.data]"
-              class="p-inputtext-sm"
-              :disabled="readonly"
-            />
+            <InputText v-model="slotProps.data[col.data]" class="p-inputtext-sm" :disabled="readonly" />
+          </template>
+          <template v-else-if="col.data == 'moq'">
+            <InputText v-model="slotProps.data[col.data]" class="p-inputtext-sm" :disabled="readonly" />
           </template>
           <template v-else-if="col.data == 'dvt'">
             {{ slotProps.data["dvt"] }}
-            <i
-              class="fas fa-sync-alt"
-              style="cursor: pointer"
-              @click="openOp($event, slotProps.data)"
-            ></i
-          ></template>
+            <i class="fas fa-sync-alt" style="cursor: pointer" @click="openOp($event, slotProps.data)"></i></template>
           <template v-else-if="col.data == 'soluong'">
-            <InputNumber
-              v-model="slotProps.data[col.data]"
-              class="p-inputtext-sm"
-              @update:modelValue="changeDongia()"
-              :disabled="readonly"
-              :inputStyle="{ width: '100px' }"
-              :maxFractionDigits="5"
-            />
+            <InputNumber v-model="slotProps.data[col.data]" class="p-inputtext-sm" @update:modelValue="changeDongia()"
+              :disabled="readonly" :inputStyle="{ width: '100px' }" :maxFractionDigits="5" />
           </template>
           <template v-else-if="col.data == 'dongia'">
-            <InputNumber
-              v-model="slotProps.data[col.data]"
-              class="p-inputtext-sm"
-              :suffix="' ' + modelncc.tiente"
-              @update:modelValue="changeDongia()"
-              :disabled="readonly"
-              :maxFractionDigits="5"
-              :inputStyle="{ width: '150px' }"
-            />
+            <InputNumber v-model="slotProps.data[col.data]" class="p-inputtext-sm" :suffix="' ' + modelncc.tiente"
+              @update:modelValue="changeDongia()" :disabled="readonly" :maxFractionDigits="5"
+              :inputStyle="{ width: '150px' }" />
           </template>
           <template v-else-if="col.data == 'vat'">
-            <InputNumber
-              v-model="slotProps.data[col.data]"
-              class="p-inputtext-sm"
-              :suffix="'%'"
-              :inputStyle="{ width: '50px' }"
-              @update:modelValue="changeDongia()"
-              :disabled="readonly"
-              :maxFractionDigits="0"
-            />
+            <InputNumber v-model="slotProps.data[col.data]" class="p-inputtext-sm" :suffix="'%'"
+              :inputStyle="{ width: '50px' }" @update:modelValue="changeDongia()" :disabled="readonly"
+              :maxFractionDigits="0" />
           </template>
 
-          <template
-            v-else-if="col.data == 'thanhtien' || col.data == 'thanhtien_vat'"
-          >
-            <InputNumber
-              v-model="slotProps.data[col.data]"
-              class="p-inputtext-sm"
-              :suffix="' ' + modelncc.tiente"
-              :disabled="readonly || !modelncc.is_edit"
-              :maxFractionDigits="2"
-              :inputStyle="{ width: '150px' }"
-            />
+          <template v-else-if="col.data == 'thanhtien' || col.data == 'thanhtien_vat'">
+            <InputNumber v-model="slotProps.data[col.data]" class="p-inputtext-sm" :suffix="' ' + modelncc.tiente"
+              :disabled="readonly || !modelncc.is_edit" :maxFractionDigits="2" :inputStyle="{ width: '150px' }" />
           </template>
 
           <template v-else>
@@ -111,18 +57,11 @@
     <OverlayPanel ref="op">
       <div>
         Qui đổi từ {{ editingRow.soluong }}
-        <input
-          class="form-control form-control-sm d-inline-block"
-          style="width: 60px; margin-right: 5px"
-          v-model="editingRow.dvt"
-        />
+        <input class="form-control form-control-sm d-inline-block" style="width: 60px; margin-right: 5px"
+          v-model="editingRow.dvt" />
         mua hàng =
-        <input
-          class="form-control form-control-sm d-inline-block"
-          style="width: 60px; margin-right: 5px"
-          v-model="editingRow.soluong_quidoi"
-          @change="changeQuidoi(editingRow)"
-        />
+        <input class="form-control form-control-sm d-inline-block" style="width: 60px; margin-right: 5px"
+          v-model="editingRow.soluong_quidoi" @change="changeQuidoi(editingRow)" />
         <b>{{ editingRow.dvt_dutru }}</b> dự trù (Tỉ lệ 1:{{
           editingRow.quidoi
         }})
@@ -163,58 +102,7 @@ const modelncc = computed(() => {
 const is_vat = computed(() => {
   return modelncc.value ? modelncc.value.is_vat : false;
 });
-const columns = ref([
-  {
-    label: "STT",
-    data: "stt",
-    className: "text-center",
-  },
-  {
-    label: "Mã",
-    data: "mahh",
-    className: "text-center",
-  },
-  {
-    label: "Tên",
-    data: "tenhh",
-    className: "text-center",
-  },
-  {
-    label: "ĐVT",
-    data: "dvt",
-    className: "text-center",
-  },
-  {
-    label: "Số lượng",
-    data: "soluong",
-    className: "text-center",
-  },
-  {
-    label: "Nhà sản xuất",
-    data: "nhasx",
-    className: "text-center",
-  },
-  {
-    label: "Đơn giá",
-    data: "dongia",
-    className: "text-center",
-  },
-  {
-    label: "VAT",
-    data: "vat",
-    className: "text-center",
-  },
-  {
-    label: "Thành tiền (Chưa vat)",
-    data: "thanhtien",
-    className: "text-center",
-  },
-  {
-    label: "Thành tiền",
-    data: "thanhtien_vat",
-    className: "text-center",
-  },
-]);
+const columns = ref([]);
 
 const op = ref();
 const openOp = (event, row) => {
@@ -285,7 +173,7 @@ watch(
         {
           label: "Mã",
           data: "mahh",
-          className: "text-center",
+          className: "text-center mahh",
         },
         {
           label: "Tên",
@@ -301,6 +189,11 @@ watch(
           label: "ĐVT",
           data: "dvt",
           className: "text-center",
+        },
+        {
+          label: "MOQ",
+          data: "moq",
+          className: "text-center moq",
         },
         {
           label: "Số lượng",
@@ -338,7 +231,7 @@ watch(
         {
           label: "Mã",
           data: "mahh",
-          className: "text-center",
+          className: "text-center mahh",
         },
         {
           label: "Tên",
@@ -354,6 +247,10 @@ watch(
           label: "ĐVT",
           data: "dvt",
           className: "text-center",
+        }, {
+          label: "MOQ",
+          data: "moq",
+          className: "text-center moq",
         },
         {
           label: "Số lượng",
@@ -383,4 +280,14 @@ watch(
   },
   { immediate: true }
 );
+defineExpose({
+  changeDongia,
+});
 </script>
+
+<style>
+.mahh,
+.moq {
+  min-width: 150px;
+}
+</style>

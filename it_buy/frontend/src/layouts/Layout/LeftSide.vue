@@ -45,22 +45,29 @@
           <span>Đánh giá nguyên liệu</span>
         </router-link>
       </li> -->
-      <li v-if="is_admin">
+
+      <li v-if="is_admin || is_Kho_VT">
         <a href="javascript: void(0);">
           <i class="fas fa-wrench"></i>
-          <span>{{ $t("system") }}</span>
+          <span>Quản lý vật tư</span>
           <span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span>
         </a>
 
         <ul class="nav-second-level" aria-expanded="false">
           <li class="nav-item">
-            <router-link class="nav-link" to="/user"
-              ><i class="ti-control-record"></i>{{ $t("user") }}</router-link
-            >
+            <router-link class="nav-link" to="/vattu"><i class="ti-control-record"></i>Tồn kho</router-link>
+          </li>
+          <li class="nav-item">
+            <router-link class="nav-link" to="/vattu/phieunhap"><i class="ti-control-record"></i>Phiếu
+              nhập</router-link>
+          </li>
+          <li class="nav-item">
+            <router-link class="nav-link" to="/vattu/phieuxuat"><i class="ti-control-record"></i>Phiếu
+              xuất</router-link>
           </li>
         </ul>
       </li>
-      <li v-if="is_admin || is_Cungung">
+      <li v-if="is_admin || is_Cungung || is_MasterData">
         <a href="javascript: void(0);">
           <i class="fas fa-database"></i>
           <span>Dữ liệu</span>
@@ -69,19 +76,13 @@
 
         <ul class="nav-second-level" aria-expanded="false">
           <li class="nav-item">
-            <router-link class="nav-link" to="/materials"
-              ><i class="ti-control-record"></i>Hàng hóa</router-link
-            >
+            <router-link class="nav-link" to="/materials"><i class="ti-control-record"></i>Hàng hóa</router-link>
           </li>
           <li class="nav-item" v-if="is_Cungung">
-            <router-link class="nav-link" to="/supplier"
-              ><i class="ti-control-record"></i>Nhà cung cấp</router-link
-            >
+            <router-link class="nav-link" to="/supplier"><i class="ti-control-record"></i>Nhà cung cấp</router-link>
           </li>
           <li class="nav-item" v-if="is_Cungung">
-            <router-link class="nav-link" to="/producer"
-              ><i class="ti-control-record"></i>Nhà sản xuất</router-link
-            >
+            <router-link class="nav-link" to="/producer"><i class="ti-control-record"></i>Nhà sản xuất</router-link>
           </li>
           <!-- <li class="nav-item" v-if="is_KHSX || is_RD || is_admin">
             <router-link class="nav-link" to="/product"
@@ -94,6 +95,19 @@
               ><i class="ti-control-record"></i>BOM
             </router-link>
           </li> -->
+        </ul>
+      </li>
+      <li v-if="is_admin">
+        <a href="javascript: void(0);">
+          <i class="fas fa-wrench"></i>
+          <span>{{ $t("system") }}</span>
+          <span class="menu-arrow"><i class="mdi mdi-chevron-right"></i></span>
+        </a>
+
+        <ul class="nav-second-level" aria-expanded="false">
+          <li class="nav-item">
+            <router-link class="nav-link" to="/user"><i class="ti-control-record"></i>{{ $t("user") }}</router-link>
+          </li>
         </ul>
       </li>
     </ul>
@@ -115,10 +129,11 @@ const {
   is_admin,
   is_Cungung,
   is_Ketoan,
+  is_MasterData,
   is_CungungNVL,
   is_Qa,
   is_CungungGiantiep,
-  is_CungungHCTT,
+  is_Kho_VT,
   is_KHSX,
   is_RD,
   is_BOM,

@@ -8,6 +8,9 @@ export default {
   nhacc() {
     return repository.get(`/v1/${resoure}/nhacc`).then((res) => res.data);
   },
+  PLHH() {
+    return repository.get(`/v1/${resoure}/PLHH`).then((res) => res.data);
+  },
   dutruchitiet(params) {
     return repository.get(`/v1/${resoure}/dutruchitiet`, { params: params }).then((res) => res.data);
   },
@@ -19,6 +22,12 @@ export default {
   },
   khuvuc() {
     return repository.get(`/v1/${resoure}/khuvuc`).then((res) => res.data);
+  },
+  kho() {
+    return repository.get(`/v1/${resoure}/kho`).then((res) => res.data);
+  },
+  nhom() {
+    return repository.get(`/v1/${resoure}/nhom`).then((res) => res.data);
   },
   group_materials() {
     return repository

@@ -19,7 +19,7 @@ const props = defineProps({
     default: true,
   },
   modelValue: {
-    type: [String, Array,Number],
+    type: [String, Array, Number],
   },
   multiple: {
     type: Boolean,

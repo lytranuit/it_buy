@@ -1,19 +1,8 @@
 <template>
-  <TreeSelect
-    :options="list_dangbaoche"
-    :multiple="multiple"
-    :normalizer="normalizer"
-    :modelValue="modelValue"
-    :name="name"
-    :required="required"
-    :append-to-body="appendToBody"
-    placeholder="Dạng bào chế"
-    @update:modelValue="emit('update:modelValue', $event)"
-    zIndex="3000"
-    :disableFuzzyMatching="true"
-    :limit="0"
-    :limitText="(count) => 'Lựa chọn: ' + count + ' dạng'"
-  >
+  <TreeSelect :options="list_dangbaoche" :multiple="multiple" :normalizer="normalizer" :modelValue="modelValue"
+    :name="name" :required="required" :append-to-body="appendToBody" placeholder="Dạng bào chế"
+    @update:modelValue="emit('update:modelValue', $event)" zIndex="3000" :disableFuzzyMatching="true" :limit="0"
+    :limitText="(count) => 'Lựa chọn: ' + count + ' dạng'">
   </TreeSelect>
 </template>
 <script setup>
@@ -65,10 +54,12 @@ const list_dangbaoche = ref([
   "Viên ngậm",
   "Kẹo cứng",
   "Gummy",
-  "Dùng ngoài - Hỗn dịch lỏng",
-  "Dùng ngoài - Serum",
-  "Dùng ngoài - Kem",
+  "Hỗn dịch lỏng",
+  "Serum",
+  "Kem",
   "Dung dịch",
+  "Cốm sủi bọt",
+  "Cốm placebo"
 ]);
-onMounted(() => {});
+onMounted(() => { });
 </script>

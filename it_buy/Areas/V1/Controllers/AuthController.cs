@@ -153,6 +153,7 @@ namespace it_template.Areas.V1.Controllers
                         departments = user.departments.Select(d => d.department_id).ToList(),
                         id = user.Id,
                         token = token,
+                        warehouses_vt = user.warehouses_vt,
                         vaild_to = find.vaild_to.Value.ToString("yyyy-MM-dd HH:mm:ss")
                     }, new System.Text.Json.JsonSerializerOptions()
                     {

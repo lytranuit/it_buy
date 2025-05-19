@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.AspNetCore.Authentication;
 using Vue.Middleware;
 using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 //using Vue.Middleware;
 
 namespace Vue
@@ -39,6 +40,8 @@ namespace Vue
 
             var connectionString = builder.Configuration.GetConnectionString("ItConnection") ?? throw new InvalidOperationException("Connection string 'ItConnection' not found.");
             var EsignConnectionString = builder.Configuration.GetConnectionString("EsignConnection") ?? throw new InvalidOperationException("Connection string 'EsignConnectionString' not found.");
+            var QLSXConnectionString = builder.Configuration.GetConnectionString("QLSXConnection") ?? throw new InvalidOperationException("Connection string 'QLSXConnectionString' not found.");
+            var KTConnectionString = builder.Configuration.GetConnectionString("KTConnection") ?? throw new InvalidOperationException("Connection string 'KTConnectionString' not found.");
 
 
             builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
@@ -54,6 +57,16 @@ namespace Vue
 
             builder.Services.AddDbContext<ItContext>(options =>
               options.UseSqlServer(connectionString)
+              );
+
+
+            builder.Services.AddDbContext<QLSXContext>(options =>
+              options.UseSqlServer(QLSXConnectionString)
+              );
+
+
+            builder.Services.AddDbContext<KTContext>(options =>
+              options.UseSqlServer(KTConnectionString)
               );
 
             builder.Services.AddScoped<ViewRender, ViewRender>();
@@ -186,6 +199,10 @@ namespace Vue
                         break;
                     }
                 }
+    //            var userRoles = context.User.Claims
+    //.Where(c => c.Type == ClaimTypes.Role)
+    //.Select(c => c.Value)
+    //.ToList();
                 var roles = builder.Configuration.GetSection("Roles").Get<string[]>().ToList();
                 foreach (var role in roles)
                 {

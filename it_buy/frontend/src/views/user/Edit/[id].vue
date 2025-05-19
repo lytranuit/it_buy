@@ -43,10 +43,19 @@
                 <div class="form-group row">
                   <b class="col-12 col-lg-2 col-form-label">Bộ phận:</b>
                   <div class="col-lg-10 pt-1">
-                    <DepartmentTreeSelect v-model="data.departments" valueConsistsOf="ALL_WITH_INDETERMINATE" :flat="true"
-                      multiple></DepartmentTreeSelect>
+                    <DepartmentTreeSelect v-model="data.departments" valueConsistsOf="ALL_WITH_INDETERMINATE"
+                      :flat="true" multiple></DepartmentTreeSelect>
                     <select name="departments[]" v-model="data.departments" multiple class="d-none">
                       <option v-for="option in data.departments" :key="option" :value="option"></option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <b class="col-12 col-lg-2 col-form-label">Kho vật tư:</b>
+                  <div class="col-lg-10 pt-1">
+                    <KhoTreeSelect v-model="data.warehouses_vt" multiple></KhoTreeSelect>
+                    <select name="warehouses_vt[]" v-model="data.warehouses_vt" multiple class="d-none">
+                      <option v-for="option in data.warehouses_vt" :key="option" :value="option"></option>
                     </select>
                   </div>
                 </div>
@@ -98,12 +107,13 @@
               <div class="row justify-content-md-center">
                 <div class="col-md-4">
                   <div class="form-floating mt-2">
-                    <input type="password" id="password" class="form-control" name="NewPassword" minlength="6" required=""
-                      placeholder="Mật khẩu mới" autocomplete="off" />
+                    <input type="password" id="password" class="form-control" name="NewPassword" minlength="6"
+                      required="" placeholder="Mật khẩu mới" autocomplete="off" />
                   </div>
                   <div class="form-floating mt-2">
                     <input type="password" class="form-control" name="ConfirmPassword" minlength="6"
-                      data-rule-equalTo="#password" required="" placeholder="Nhập lại mật khẩu mới" autocomplete="off" />
+                      data-rule-equalTo="#password" required="" placeholder="Nhập lại mật khẩu mới"
+                      autocomplete="off" />
                   </div>
                 </div>
               </div>
@@ -138,6 +148,7 @@ import userApi from "../../../api/userApi";
 import ImageManager from "../../../components/ImageManager.vue";
 import RoleTreeSelect from "../../../components/TreeSelect/RoleTreeSelect.vue";
 import DepartmentTreeSelect from "../../../components/TreeSelect/DepartmentTreeSelect.vue";
+import KhoTreeSelect from "../../../components/TreeSelect/KhoTreeSelect.vue";
 const route = useRoute();
 const messageError = ref();
 const messageSuccess = ref();

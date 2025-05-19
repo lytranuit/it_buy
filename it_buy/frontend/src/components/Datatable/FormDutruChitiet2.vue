@@ -1,42 +1,15 @@
 <template>
   <div id="TableDutruChitiet">
-    <DataTable
-      class="p-datatable-customers"
-      showGridlines
-      :value="datatable1"
-      :lazy="true"
-      ref="dt"
-      scrollHeight="70vh"
-      v-model:selection="selected"
-      :paginator="true"
-      :rowsPerPageOptions="[10, 20, 50, 100]"
-      :rows="rows"
-      :totalRecords="totalRecords"
-      @page="onPage($event)"
-      :rowHover="true"
-      :loading="loading"
-      responsiveLayout="scroll"
-      :resizableColumns="true"
-      columnResizeMode="expand"
-      v-model:filters="filters"
-      filterDisplay="menu"
-    >
+    <DataTable class="p-datatable-customers" showGridlines :value="datatable1" :lazy="true" ref="dt" scrollHeight="70vh"
+      v-model:selection="selected" :paginator="true" :rowsPerPageOptions="[10, 20, 50, 100]" :rows="rows"
+      :totalRecords="totalRecords" @page="onPage($event)" :rowHover="true" :loading="loading" responsiveLayout="scroll"
+      :resizableColumns="true" columnResizeMode="expand" v-model:filters="filters" filterDisplay="menu">
       <template #header>
-        <Button
-          label="Tạo đề nghị mua hàng"
-          icon="pi pi-plus"
-          class="p-button-success p-button-sm"
-          :disabled="!selected || !selected.length"
-          @click="taodenghimuahang()"
-        ></Button>
+        <Button label="Tạo đề nghị mua hàng" icon="pi pi-plus" class="p-button-success p-button-sm"
+          :disabled="!selected || !selected.length" @click="taodenghimuahang()"></Button>
         <div class="d-inline-flex float-right">
-          <SelectButton
-            v-model="filterTable"
-            :options="['Đã xử lý', 'Chưa xử lý']"
-            aria-labelledby="basic"
-            :pt="{ button: 'form-control-sm' }"
-            @change="loadLazyData"
-          />
+          <SelectButton v-model="filterTable" :options="['Đã xử lý', 'Chưa xử lý']" aria-labelledby="basic"
+            :pt="{ button: 'form-control-sm' }" @change="loadLazyData" />
 
           <!-- <Button label="Chi tiết" class="p-button-primary p-button-sm" @click="chitiet()"
               v-if="type == 'tonghop'"></Button>
@@ -49,13 +22,8 @@
         <div class="text-center">Không có dữ liệu.</div>
       </template>
       <Column selectionMode="multiple"></Column>
-      <Column
-        v-for="(col, index) in selectedColumns"
-        :field="col.data"
-        :header="col.label"
-        :key="col.data"
-        :showFilterMatchModes="false"
-      >
+      <Column v-for="(col, index) in selectedColumns" :field="col.data" :header="col.label" :key="col.data"
+        :showFilterMatchModes="false">
         <template #body="slotProps">
           <template v-if="col.data == 'list_dutru'">
             <div v-for="item of slotProps.data[col.data]" :key="item.id">
@@ -67,58 +35,31 @@
 
           <template v-else-if="col.data == 'list_muahang'">
             <div v-for="item of slotProps.data[col.data]" :key="item.id">
-              <RouterLink
-                :to="'/muahang/edit/' + item.id"
-                class="text-primary mr-2"
-                >{{ item.id }} - {{ item.code }}
+              <RouterLink :to="'/muahang/edit/' + item.id" class="text-primary mr-2">{{ item.id }} - {{ item.code }}
               </RouterLink>
-              <Tag
-                value="Hoàn thành"
-                severity="success"
-                v-if="item['date_finish']"
-              />
-              <Tag
-                value="Chờ nhận hàng"
-                severity="info"
-                v-else-if="
-                  item['is_dathang'] &&
-                  ((item['loaithanhtoan'] == 'tra_sau' &&
-                    !item['is_nhanhang']) ||
-                    (item['loaithanhtoan'] == 'tra_truoc' &&
-                      item['is_thanhtoan']))
-                "
-              />
-              <Tag
-                value="Chờ thanh toán"
-                severity="info"
-                v-else-if="
-                  item['is_dathang'] &&
-                  ((item['loaithanhtoan'] == 'tra_truoc' &&
-                    !item['is_thanhtoan']) ||
-                    (item['loaithanhtoan'] == 'tra_sau' && item['is_nhanhang']))
-                "
-              />
-              <Tag
-                value="Đang thực hiện"
-                severity="secondary"
-                v-else-if="
-                  item['status_id'] == 1 ||
-                  item['status_id'] == 6 ||
-                  item['status_id'] == 7
-                "
-              />
+              <Tag value="Hoàn thành" severity="success" v-if="item['date_finish']" />
+              <Tag value="Chờ nhận hàng" severity="info" v-else-if="
+                item['is_dathang'] &&
+                ((item['loaithanhtoan'] == 'tra_sau' &&
+                  !item['is_nhanhang']) ||
+                  (item['loaithanhtoan'] == 'tra_truoc' &&
+                    item['is_thanhtoan']))
+              " />
+              <Tag value="Chờ thanh toán" severity="info" v-else-if="
+                item['is_dathang'] &&
+                ((item['loaithanhtoan'] == 'tra_truoc' &&
+                  !item['is_thanhtoan']) ||
+                  (item['loaithanhtoan'] == 'tra_sau' && item['is_nhanhang']))
+              " />
+              <Tag value="Đang thực hiện" severity="secondary" v-else-if="
+                item['status_id'] == 1 ||
+                item['status_id'] == 6 ||
+                item['status_id'] == 7
+              " />
 
-              <Tag
-                value="Đang trình ký"
-                severity="warning"
-                v-else-if="item['status_id'] == 9"
-              />
+              <Tag value="Đang trình ký" severity="warning" v-else-if="item['status_id'] == 9" />
               <Tag value="Đang đặt hàng" v-else-if="item['status_id'] == 10" />
-              <Tag
-                value="Không duyệt"
-                severity="danger"
-                v-else-if="item['status_id'] == 11"
-              />
+              <Tag value="Không duyệt" severity="danger" v-else-if="item['status_id'] == 11" />
             </div>
           </template>
 
@@ -145,37 +86,21 @@
           </template>
           <template v-else-if="col.data == 'mahh'">
             {{ slotProps.data[col.data] }}
-            <i
-              class="fas fa-sync-alt"
-              style="cursor: pointer"
-              @click="openNew(slotProps.data)"
-            ></i>
+            <i class="fas fa-sync-alt" style="cursor: pointer" @click="openNew(slotProps.data)"></i>
           </template>
           <template v-else>
             {{ slotProps.data[col.data] }}
           </template>
         </template>
 
-        <template
-          #filter="{ filterModel, filterCallback }"
-          v-if="col.filter == true"
-        >
-          <InputText
-            type="text"
-            v-model="filterModel.value"
-            @keydown.enter="filterCallback()"
-            class="p-column-filter"
-          />
+        <template #filter="{ filterModel, filterCallback }" v-if="col.filter == true">
+          <InputText type="text" v-model="filterModel.value" @keydown.enter="filterCallback()"
+            class="p-column-filter" />
         </template>
       </Column>
     </DataTable>
-    <Dialog
-      v-model:visible="visibleDialog"
-      header="Đổi mã hàng hóa"
-      :modal="true"
-      style="width: 75vw"
-      :breakpoints="{ '1199px': '75vw', '575px': '95vw' }"
-    >
+    <Dialog v-model:visible="visibleDialog" header="Đổi mã hàng hóa" :modal="true" style="width: 75vw"
+      :breakpoints="{ '1199px': '75vw', '575px': '95vw' }">
       <div class="row mb-2">
         <div class="field col">
           <label for="name">Chuyển từ</label>
@@ -186,63 +111,21 @@
         <div class="field col">
           <label for="name">sang</label>
           <div>
-            <MaterialTreeSelect
-              v-model="modelDialog.to_id"
-              :useID="false"
-              @update:model-value="changeMahh()"
-            >
+            <MaterialTreeSelect v-model="modelDialog.to_id" :useID="false" @update:model-value="changeMahh()">
             </MaterialTreeSelect>
           </div>
         </div>
         <div class="field col">
           <label for="name">Thông báo đến người dự trù</label>
           <div>
-            <Button
-              label="Thông báo"
-              icon="far fa-paper-plane"
-              size="small"
-              class="mr-2"
-              @click="thongbaodoima"
-            ></Button>
-            <Button
-              label="Lưu lại"
-              icon="pi pi-check"
-              size="small"
-              severity="success"
-              @click="savedoima"
-            ></Button>
+            <Button label="Thông báo" icon="far fa-paper-plane" size="small" class="mr-2"
+              @click="thongbaodoima"></Button>
+            <Button label="Lưu lại" icon="pi pi-check" size="small" severity="success" @click="savedoima"></Button>
           </div>
         </div>
       </div>
-      <div class="row">
-        <div class="col-12">Lịch sử mua hàng của mã {{ modelDialog.to }}</div>
-        <div class="col-12 mt-2">
-          <table class="table table-border">
-            <thead>
-              <tr>
-                <th>Đề nghị mua hàng</th>
-                <th>Hàng hóa</th>
-                <th>Số lượng</th>
-                <th>Đơn giá</th>
-                <th>Thành tiền</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(item, index) in modelDialog.history">
-                <th>
-                  <RouterLink :to="'/muahang/edit/' + item.muahang.id"
-                    >{{ item.muahang.code }} - {{ item.muahang.name }}
-                  </RouterLink>
-                </th>
-                <th>{{ item.tenhh }}</th>
-                <th>{{ item.soluong }}</th>
-                <th>{{ formatPrice(item.dongia, 2) }} {{ item.tiente }}</th>
-                <th>{{ formatPrice(item.thanhtien, 2) }} {{ item.tiente }}</th>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <Lichsumuahang :mahh="modelDialog.to_id" :key="key_history"></Lichsumuahang>
+
     </Dialog>
   </div>
 </template>
@@ -267,6 +150,8 @@ import MaterialTreeSelect from "../../components/TreeSelect/MaterialTreeSelect.v
 import muahangApi from "../../api/muahangApi";
 import { change } from "@syncfusion/ej2-grids";
 import { useToast } from "primevue/usetoast";
+import Lichsumuahang from "../materials/Lichsumuahang.vue";
+const key_history = ref("0");
 const filterTable = ref();
 const toast = useToast();
 const store_muahang = useMuahang();
@@ -452,10 +337,7 @@ const thongbaodoima = async () => {
   }
 };
 const changeMahh = async () => {
-  var res = await muahangApi.getHistory(modelDialog.value.to_id);
-  // console.log(res);
-  modelDialog.value.to = res.to;
-  modelDialog.value.history = res.data;
+  key_history.value = rand();
 };
 onMounted(() => {
   let cache = localStorage.getItem(column_cache);

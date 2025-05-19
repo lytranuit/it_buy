@@ -26,8 +26,6 @@ using System.Text.RegularExpressions;
 using Vue.Data;
 using Vue.Models;
 using Vue.Services;
-using static it_template.Areas.V1.Controllers.MaterialController;
-using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 
 namespace it_template.Areas.V1.Controllers
 {
@@ -323,11 +321,18 @@ namespace it_template.Areas.V1.Controllers
                 ReferenceHandler = ReferenceHandler.IgnoreCycles,
             });
         }
-        public JsonResult getHistory(string mahh)
+        public JsonResult getHistory(string mahh, bool? is_sametype)
         {
             var hh = _context.MaterialModel.Where(d => d.mahh == mahh).FirstOrDefault();
-            var muahang_chitiet = _context.MuahangChitietModel.Include(d => d.muahang).ThenInclude(d => d.muahang_chonmua).ThenInclude(d => d.chitiet)
-                .Where(d => d.muahang.deleted_at == null && d.muahang.is_dathang == true && d.mahh == mahh)
+            var list_mahh = new List<string>() { mahh };
+            if (is_sametype == true)
+            {
+                list_mahh = _context.MaterialModel.Where(d => d.mahh == mahh || (d.group != null && d.group == hh.group)).Select(d => d.mahh).ToList();
+            }
+            var muahang_chitiet = _context.MuahangChitietModel
+                .Include(d => d.muahang).ThenInclude(d => d.muahang_chonmua).ThenInclude(d => d.chitiet)
+                 .Include(d => d.muahang).ThenInclude(d => d.muahang_chonmua).ThenInclude(d => d.ncc)
+                .Where(d => d.muahang.deleted_at == null && d.muahang.muahang_chonmua_id != null && d.muahang.pay_at != null && list_mahh.Contains(d.mahh))
                 .ToList();
             var to = hh != null ? hh.mahh + "-" + hh.tenhh : "";
 
@@ -335,7 +340,8 @@ namespace it_template.Areas.V1.Controllers
             foreach (var d in muahang_chitiet)
             {
                 var muahang = d.muahang;
-                var chonmua = muahang.muahang_chonmua.chitiet.Where(e => e.muahang_chitiet_id == d.id).FirstOrDefault();
+                var muahang_chonmua = muahang.muahang_chonmua;
+                var chonmua = muahang_chonmua.chitiet.Where(e => e.muahang_chitiet_id == d.id).FirstOrDefault();
                 var data1 = new
                 {
                     muahang = muahang,
@@ -343,6 +349,7 @@ namespace it_template.Areas.V1.Controllers
                     soluong = chonmua.soluong,
                     dongia = chonmua.dongia,
                     thanhtien = chonmua.thanhtien_vat,
+                    ncc = muahang_chonmua.ncc,
                     tiente = muahang.muahang_chonmua.tiente
                 };
                 data.Add(data1);
@@ -354,6 +361,93 @@ namespace it_template.Areas.V1.Controllers
             });
         }
 
+
+        public async Task<JsonResult> laydongiahoachat(int muahang_id, string mancc)
+        {
+            System.Security.Claims.ClaimsPrincipal currentUser = this.User;
+
+            var user = await UserManager.GetUserAsync(currentUser);
+            var user_id = UserManager.GetUserId(currentUser);
+
+            var is_admin = await UserManager.IsInRoleAsync(user, "Administrator");
+
+            var viewPath = _configuration["Source:DONGIA_HOACHAT"];
+            var data = _context.MuahangModel
+                .Where(d => d.id == muahang_id)
+                .Include(d => d.chitiet)
+                .FirstOrDefault();
+
+            var dic = new Dictionary<int, double>();
+
+            if (data != null && data.chitiet.Any())
+            {
+                // Load file Excel 1 lần duy nhất
+                Workbook workbook = new Workbook();
+                workbook.LoadFromFile(viewPath);
+
+                foreach (var item in data.chitiet)
+                {
+                    var dutru_chitiet_id = item.dutru_chitiet_id;
+                    var muahang_chitiet_id = item.id;
+                    double dongia = 0;
+                    bool found = false;
+
+                    foreach (Worksheet sheet in workbook.Worksheets)
+                    {
+                        var lastrow = sheet.LastDataRow;
+                        var lastcol = sheet.LastDataColumn;
+                        var nRowFirst = sheet.Rows[0]; // Dòng tiêu đề
+
+                        // Tìm cột của nhà cung cấp (NCC)
+                        int col_ncc = -1;
+                        for (int colIndex = 1; colIndex < lastcol; colIndex++)
+                        {
+                            var check_cell = nRowFirst.Cells[colIndex].Value?.Trim();
+                            if (string.IsNullOrEmpty(check_cell)) continue;
+
+                            var split = check_cell.Split("_");
+                            if (split.Length > 0 && split[0] == mancc)
+                            {
+                                col_ncc = colIndex;
+                                break;
+                            }
+                        }
+
+                        if (col_ncc == -1) continue;
+
+                        // Tìm dòng chứa dữ liệu đúng dự trù
+                        for (int rowIndex = 1; rowIndex < lastrow; rowIndex++)
+                        {
+                            var nowRow = sheet.Rows[rowIndex];
+                            if (nowRow?.Cells[1] == null) continue;
+
+                            int? sheet_dutru_chitiet_id = nowRow.Cells[1].Value != null && nowRow.Cells[1].Value != "" ? int.Parse(nowRow.Cells[1].Value) : null;
+                            if (sheet_dutru_chitiet_id > 0)
+                            {
+                                Console.WriteLine(sheet_dutru_chitiet_id);
+                            }
+                            if (sheet_dutru_chitiet_id == dutru_chitiet_id)
+                            {
+                                var value = nowRow.Cells[col_ncc + 4].NumberValue;
+                                dongia = double.IsNaN(value) ? 0 : value;
+                                found = true;
+                                break;
+                            }
+                        }
+
+                        if (found) break;
+                    }
+
+                    dic[muahang_chitiet_id] = dongia;
+                }
+            }
+            return Json(dic, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+                NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals
+            });
+        }
         public async Task<JsonResult> QrNhanhang(int muahang_id)
         {
             //var data = _context.MuahangChitietModel.Where(d => d.muahang_id == muahang_id).Include(d => d.dutru_chitiet).GroupBy(d => d.dutru_chitiet.dutru_id).Select(d => d.Key).ToList();
@@ -1252,77 +1346,81 @@ namespace it_template.Areas.V1.Controllers
                 raw.Add("code", code);
                 raw.Add("note", data.note);
                 raw.Add("note_chonmua", data.note_chonmua);
-                var muahang_chonmua = _context.MuahangNccModel.Where(d => d.id == data.muahang_chonmua_id)
+
+                if (data.is_multiple_ncc != true)
+                {
+                    var muahang_chonmua = _context.MuahangNccModel.Where(d => d.id == data.muahang_chonmua_id)
                     .Include(d => d.chitiet)
                     .ThenInclude(d => d.muahang_chitiet)
                     .ThenInclude(d => d.dutru_chitiet).ThenInclude(d => d.dutru).ThenInclude(d => d.bophan)
                     .FirstOrDefault();
-                if (muahang_chonmua != null)
-                {
-                    is_vat = muahang_chonmua.is_vat;
-                    var ncc_chon = muahang_chonmua;
-                    var tonggiatri_string = ncc_chon.tonggiatri.Value.ToString("#,##0.##", vietnamCulture);
-                    var thanhtien_vat_string = ncc_chon.thanhtien_vat.Value.ToString("#,##0.##", vietnamCulture);
-                    var thanhtien_string = ncc_chon.thanhtien.Value.ToString("#,##0.##", vietnamCulture);
-                    if (ncc_chon.tiente == "VND" || ncc_chon.tiente == "VNĐ" || ncc_chon.tiente == null)
+                    if (muahang_chonmua != null)
                     {
-                        tonggiatri_string = ncc_chon.tonggiatri.Value.ToString("#,##0", vietnamCulture);
-                        thanhtien_vat_string = ncc_chon.thanhtien_vat.Value.ToString("#,##0", vietnamCulture);
-                        thanhtien_string = ncc_chon.thanhtien.Value.ToString("#,##0", vietnamCulture);
-                    }
-
-                    raw.Add("tonggiatri", tonggiatri_string);
-                    raw.Add("thanhtien_vat", thanhtien_vat_string);
-                    raw.Add("thanhtien", thanhtien_string);
-                    raw.Add("phigiaohang", ncc_chon.phigiaohang.Value.ToString("#,##0.##", vietnamCulture));
-                    raw.Add("ck", ncc_chon.ck.Value.ToString("#,##0.##", vietnamCulture));
-                    raw.Add("tienvat", ncc_chon.tienvat.Value.ToString("#,##0.##", vietnamCulture));
-                    //raw.Add("vat", ncc_chon.vat.Value.ToString());
-                    raw.Add("tiente", ncc_chon.tiente.ToString());
-                    var stt = 1;
-                    foreach (var item in ncc_chon.chitiet)
-                    {
-                        //if (item.hh_id != null && data.type_id == 1) /// Check có phải mua nguyên liệu mới hay ko?
-                        //    is_nvl_moi = true;
-                        //var material = _context.MaterialModel.Where(d => item.hh_id == "m-" + d.id).FirstOrDefault();
-                        //if (material != null)
-                        //{
-                        var dutru = item.muahang_chitiet.dutru_chitiet.dutru;
-                        if (dutru.type_id == 2 || dutru.type_id == 3)
+                        is_vat = muahang_chonmua.is_vat;
+                        var ncc_chon = muahang_chonmua;
+                        var tonggiatri_string = ncc_chon.tonggiatri.Value.ToString("#,##0.##", vietnamCulture);
+                        var thanhtien_vat_string = ncc_chon.thanhtien_vat.Value.ToString("#,##0.##", vietnamCulture);
+                        var thanhtien_string = ncc_chon.thanhtien.Value.ToString("#,##0.##", vietnamCulture);
+                        if (ncc_chon.tiente == "VND" || ncc_chon.tiente == "VNĐ" || ncc_chon.tiente == null)
                         {
-                            var bp = dutru.bophan;
-                            var thanhtien = item.thanhtien;
-                            RawTonghop.Add(new RawMuahangTonghop
-                            {
-                                bophan = bp.name,
-                                thanhtien = item.thanhtien.Value,
-                                tiente = ncc_chon.tiente
-                            });
+                            tonggiatri_string = ncc_chon.tonggiatri.Value.ToString("#,##0", vietnamCulture);
+                            thanhtien_vat_string = ncc_chon.thanhtien_vat.Value.ToString("#,##0", vietnamCulture);
+                            thanhtien_string = ncc_chon.thanhtien.Value.ToString("#,##0", vietnamCulture);
                         }
-                        RawDetails.Add(new RawMuahangDetails
+
+                        raw.Add("tonggiatri", tonggiatri_string);
+                        raw.Add("thanhtien_vat", thanhtien_vat_string);
+                        raw.Add("thanhtien", thanhtien_string);
+                        raw.Add("phigiaohang", ncc_chon.phigiaohang.Value.ToString("#,##0.##", vietnamCulture));
+                        raw.Add("ck", ncc_chon.ck.Value.ToString("#,##0.##", vietnamCulture));
+                        raw.Add("tienvat", ncc_chon.tienvat.Value.ToString("#,##0.##", vietnamCulture));
+                        //raw.Add("vat", ncc_chon.vat.Value.ToString());
+                        raw.Add("tiente", ncc_chon.tiente.ToString());
+                        var stt = 1;
+                        foreach (var item in ncc_chon.chitiet)
                         {
-                            stt = stt++,
-                            tenhh = item.tenhh,
-                            mahh = item.mahh,
-                            dvt = item.dvt,
-                            soluong = item.soluong.Value.ToString("#,##0.##", vietnamCulture),
-                            dongia = item.dongia.Value.ToString("#,##0.#####", vietnamCulture),
-                            thanhtien = item.thanhtien.Value.ToString("#,##0.##", vietnamCulture),
-                            vat = item.vat,
-                            note = item.note,
-                            //artwork = material.masothietke,
-                            //date = data.date.Value.ToString("yyyy-MM-dd")
-                        });
+                            //if (item.hh_id != null && data.type_id == 1) /// Check có phải mua nguyên liệu mới hay ko?
+                            //    is_nvl_moi = true;
+                            //var material = _context.MaterialModel.Where(d => item.hh_id == "m-" + d.id).FirstOrDefault();
+                            //if (material != null)
+                            //{
+                            var dutru = item.muahang_chitiet.dutru_chitiet.dutru;
+                            if (dutru.type_id == 2 || dutru.type_id == 3)
+                            {
+                                var bp = dutru.bophan;
+                                var thanhtien = item.thanhtien;
+                                RawTonghop.Add(new RawMuahangTonghop
+                                {
+                                    bophan = bp.name,
+                                    thanhtien = item.thanhtien.Value,
+                                    tiente = ncc_chon.tiente
+                                });
+                            }
+                            RawDetails.Add(new RawMuahangDetails
+                            {
+                                stt = stt++,
+                                tenhh = item.tenhh,
+                                mahh = item.mahh,
+                                dvt = item.dvt,
+                                soluong = item.soluong.Value.ToString("#,##0.##", vietnamCulture),
+                                dongia = item.dongia.Value.ToString("#,##0.#####", vietnamCulture),
+                                thanhtien = item.thanhtien.Value.ToString("#,##0.##", vietnamCulture),
+                                vat = item.vat,
+                                note = item.note ?? "",
+                                //artwork = material.masothietke,
+                                //date = data.date.Value.ToString("yyyy-MM-dd")
+                            });
 
 
-                        //}
+                            //}
+                        }
+                        RawTonghop = RawTonghop.GroupBy(d => d.bophan).Select(d => new RawMuahangTonghop
+                        {
+                            bophan = d.Key,
+                            thanhtien = d.Sum(e => e.thanhtien),
+                            tiente = d.FirstOrDefault().tiente
+                        }).ToList();
                     }
-                    RawTonghop = RawTonghop.GroupBy(d => d.bophan).Select(d => new RawMuahangTonghop
-                    {
-                        bophan = d.Key,
-                        thanhtien = d.Sum(e => e.thanhtien),
-                        tiente = d.FirstOrDefault().tiente
-                    }).ToList();
                 }
                 var key = 0;
                 foreach (var ncc in data.nccs)
@@ -1527,7 +1625,7 @@ namespace it_template.Areas.V1.Controllers
                             dongia = e.dongia.Value.ToString("#,##0.#####", vietnamCulture),
                             thanhtien = e.thanhtien.Value.ToString("#,##0.##", vietnamCulture),
                             vat = e.vat,
-                            note = e.note,
+                            note = e.note ?? "",
                         });
                     }
                     parent.Add(new

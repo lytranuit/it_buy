@@ -9,10 +9,8 @@
             </h5>
           </div>
           <div class="flex-m">
-            <span class=""
-              ><span class="">ID</span>:
-              <span class="font-weight-bold">{{ model.code }}</span></span
-            ><span class="mx-2">|</span>
+            <span class=""><span class="">ID</span>:
+              <span class="font-weight-bold">{{ model.code }}</span></span><span class="mx-2">|</span>
             <div class="">
               <span class="">Người tạo</span>:
               <span class="font-weight-bold">{{
@@ -21,8 +19,7 @@
             </div>
             <span class="mx-2">|</span>
             <div class="">
-              <span class=""> Ngày tạo: </span
-              ><span class="font-weight-bold">{{
+              <span class=""> Ngày tạo: </span><span class="font-weight-bold">{{
                 formatDate(model.created_at)
               }}</span>
             </div>
@@ -42,30 +39,18 @@
                     <div class="row">
                       <div class="col-md-12">
                         <div class="form-group row">
-                          <b class="col-12 col-lg-12 col-form-label"
-                            >Tiêu đề:<i class="text-danger">*</i></b
-                          >
+                          <b class="col-12 col-lg-12 col-form-label">Tiêu đề:<i class="text-danger">*</i></b>
                           <div class="col-12 col-lg-12 pt-1">
-                            <input
-                              class="form-control"
-                              v-model="model.name"
-                              required
-                              :disabled="model.status_id != 1"
-                            />
+                            <input class="form-control" v-model="model.name" required
+                              :disabled="model.status_id != 1" />
                           </div>
                         </div>
                       </div>
                       <div class="col-md-3">
                         <div class="form-group row">
-                          <b class="col-12 col-lg-12 col-form-label"
-                            >Độ ưu tiên:<i class="text-danger">*</i></b
-                          >
+                          <b class="col-12 col-lg-12 col-form-label">Độ ưu tiên:<i class="text-danger">*</i></b>
                           <div class="col-12 col-lg-12 pt-1">
-                            <select
-                              class="form-control"
-                              v-model="model.priority_id"
-                              :disabled="model.status_id != 1"
-                            >
+                            <select class="form-control" v-model="model.priority_id" :disabled="model.status_id != 1">
                               <option value="1">Bình thường</option>
                               <option value="2">Ưu tiên</option>
                               <option value="3">Gấp</option>
@@ -75,34 +60,20 @@
                       </div>
                       <div class="col-md-3">
                         <div class="form-group row">
-                          <b class="col-12 col-lg-12 col-form-label"
-                            >Bộ phận dự trù:<i class="text-danger">*</i></b
-                          >
+                          <b class="col-12 col-lg-12 col-form-label">Bộ phận dự trù:<i class="text-danger">*</i></b>
                           <div class="col-12 col-lg-12 pt-1">
-                            <DepartmentTreeSelect
-                              v-model="model.bophan_id"
-                              :clearable="false"
-                              :disabled="model.status_id != 1"
-                            >
+                            <DepartmentTreeSelect v-model="model.bophan_id" :clearable="false"
+                              :disabled="model.status_id != 1">
                             </DepartmentTreeSelect>
                           </div>
                         </div>
                       </div>
                       <div class="col-md-3">
                         <div class="form-group row">
-                          <b class="col-12 col-lg-12 col-form-label"
-                            >Hạn giao hàng:<i class="text-danger">*</i></b
-                          >
+                          <b class="col-12 col-lg-12 col-form-label">Hạn giao hàng:<i class="text-danger">*</i></b>
                           <div class="col-12 col-lg-12 pt-1">
-                            <Calendar
-                              v-model="model.date"
-                              dateFormat="yy-mm-dd"
-                              class="date-custom"
-                              :manualInput="false"
-                              showIcon
-                              :minDate="minDate"
-                              :disabled="model.status_id != 1"
-                            />
+                            <Calendar v-model="model.date" dateFormat="yy-mm-dd" class="date-custom"
+                              :manualInput="false" showIcon :minDate="minDate" :disabled="model.status_id != 1" />
                           </div>
                         </div>
                       </div>
@@ -112,65 +83,35 @@
                             Tổng giá trị dự kiến
                           </b>
                           <div class="col-12 col-lg-12 pt-1">
-                            <input
-                              class="form-control"
-                              v-model="model.tonggiatri"
-                              :disabled="model.status_id != 1"
-                            />
+                            <input class="form-control" v-model="model.tonggiatri" :disabled="model.status_id != 1" />
                           </div>
                         </div>
                       </div>
                       <div class="col-md-12">
                         <div class="form-group row">
-                          <b class="col-12 col-lg-12 col-form-label"
-                            >Lý do mua hàng:<i class="text-danger">*</i></b
-                          >
+                          <b class="col-12 col-lg-12 col-form-label">Lý do mua hàng:<i class="text-danger">*</i></b>
                           <div class="col-12 col-lg-12 pt-1">
-                            <textarea
-                              class="form-control form-control-sm"
-                              v-model="model.note"
-                              required
-                              :disabled="model.status_id != 1"
-                            ></textarea>
+                            <textarea class="form-control form-control-sm" v-model="model.note" required
+                              :disabled="model.status_id != 1"></textarea>
                           </div>
                         </div>
                         <div class="form-group row">
-                          <b class="col-12 col-lg-12 col-form-label"
-                            >Hàng hóa:<i class="text-danger">*</i></b
-                          >
+                          <b class="col-12 col-lg-12 col-form-label">Hàng hóa:<i class="text-danger">*</i></b>
                           <div class="col-12 col-lg-12 pt-1">
                             <FormDutruChitiet></FormDutruChitiet>
                           </div>
-                          <div class="col-12 col-lg-12 pt-4" v-if="is_Cungung">
-                            <TableHanghoa
-                              :dutru_id="route.params.id"
-                            ></TableHanghoa>
+                          <div class="col-12 col-lg-12 pt-4">
+                            <TableHanghoa :dutru_id="route.params.id"></TableHanghoa>
                           </div>
                         </div>
                       </div>
-                      <div
-                        class="col-md-12 text-center"
-                        v-if="model.status_id == 1"
-                      >
-                        <Button
-                          label="Lưu lại"
-                          icon="pi pi-save"
-                          class="p-button-success p-button-sm mr-2"
-                          @click.prevent="submit()"
-                        ></Button>
-                        <Button
-                          label="Xem trước"
-                          icon="pi pi-eye"
-                          class="p-button-info p-button-sm mr-2"
-                          @click.prevent="view()"
-                        ></Button>
-                        <Button
-                          label="Xuất PDF và trình ký"
-                          icon="pi pi-file"
-                          class="p-button-sm mr-2"
-                          @click.once="xuatpdf()"
-                          :disabled="waiting"
-                        ></Button>
+                      <div class="col-md-12 text-center" v-if="model.status_id == 1">
+                        <Button label="Lưu lại" icon="pi pi-save" class="p-button-success p-button-sm mr-2"
+                          @click.prevent="submit()"></Button>
+                        <Button label="Xem trước" icon="pi pi-eye" class="p-button-info p-button-sm mr-2"
+                          @click.prevent="view()"></Button>
+                        <Button label="Xuất PDF và trình ký" icon="pi pi-file" class="p-button-sm mr-2"
+                          @click.once="xuatpdf()" :disabled="waiting"></Button>
                       </div>
                     </div>
                   </Panel>
@@ -179,16 +120,9 @@
                   <Panel header="Trình ký" :toggleable="true">
                     <div class="row">
                       <div class="col-md-12 text-center">
-                        <a
-                          :href="model.pdf"
-                          target="_blank"
-                          :download="download(model.pdf)"
-                          class="download-icon-link d-inline-flex align-items-center"
-                        >
-                          <i
-                            class="far fa-file text-danger"
-                            style="font-size: 40px; margin-right: 10px"
-                          ></i>
+                        <a :href="model.pdf" target="_blank" :download="download(model.pdf)"
+                          class="download-icon-link d-inline-flex align-items-center">
+                          <i class="far fa-file text-danger" style="font-size: 40px; margin-right: 10px"></i>
                           {{ model.pdf }}
                         </a>
                         <!-- <div class="d-inline-block ml-5" v-if="model.status_id == 2">
@@ -198,73 +132,39 @@
                           </a>
                         </div> -->
 
-                        <div
-                          class="d-inline-block ml-5"
-                          v-if="model.status_id == 3"
-                        >
-                          <a
-                            :href="
-                              path_esign +
-                              '/admin/document/details/' +
-                              model.esign_id
-                            "
-                          >
-                            <Button
-                              label="Đang trình ký"
-                              class="p-button-warning p-button-sm mr-2"
-                              icon="fas fa-spinner fa-spin"
-                            ></Button>
+                        <div class="d-inline-block ml-5" v-if="model.status_id == 3">
+                          <a :href="path_esign +
+                            '/admin/document/details/' +
+                            model.esign_id
+                            ">
+                            <Button label="Đang trình ký" class="p-button-warning p-button-sm mr-2"
+                              icon="fas fa-spinner fa-spin"></Button>
                           </a>
-                          <a
-                            :href="
-                              path_esign +
-                              '/admin/document/edit/' +
-                              model.esign_id
-                            "
-                          >
-                            <Button
-                              label="Đi đến cài đặt"
-                              class="p-button-sm mr-2"
-                              icon="fas fa-cog"
-                            ></Button>
+                          <a :href="path_esign +
+                            '/admin/document/edit/' +
+                            model.esign_id
+                            ">
+                            <Button label="Đi đến cài đặt" class="p-button-sm mr-2" icon="fas fa-cog"></Button>
                           </a>
                         </div>
 
-                        <div
-                          class="d-inline-block ml-5"
-                          v-else-if="model.status_id == 4"
-                        >
-                          <a
-                            :href="
-                              path_esign +
-                              '/admin/document/details/' +
-                              model.esign_id
-                            "
-                          >
-                            <Button
-                              label="Đã hoàn thành"
-                              class="p-button-success p-button-sm mr-2"
-                              icon="fas fa-thumbs-up"
-                            ></Button>
+                        <div class="d-inline-block ml-5" v-else-if="model.status_id == 4">
+                          <a :href="path_esign +
+                            '/admin/document/details/' +
+                            model.esign_id
+                            ">
+                            <Button label="Đã hoàn thành" class="p-button-success p-button-sm mr-2"
+                              icon="fas fa-thumbs-up"></Button>
                           </a>
                         </div>
 
-                        <div
-                          class="d-inline-block ml-5"
-                          v-else-if="model.status_id == 5"
-                        >
-                          <a
-                            :href="
-                              path_esign +
-                              '/admin/document/details/' +
-                              model.esign_id
-                            "
-                          >
-                            <Button
-                              label="Không duyệt"
-                              class="p-button-danger p-button-sm mr-2"
-                              icon="fas fa-times"
-                            ></Button>
+                        <div class="d-inline-block ml-5" v-else-if="model.status_id == 5">
+                          <a :href="path_esign +
+                            '/admin/document/details/' +
+                            model.esign_id
+                            ">
+                            <Button label="Không duyệt" class="p-button-danger p-button-sm mr-2"
+                              icon="fas fa-times"></Button>
                           </a>
                         </div>
                       </div>
@@ -276,19 +176,13 @@
                     <div class="row">
                       <div class="col-md-12" v-if="list_muahang.length > 0">
                         <TabView>
-                          <TabPanel
-                            v-for="(item, key) in list_muahang"
-                            :key="key"
-                          >
+                          <TabPanel v-for="(item, key) in list_muahang" :key="key">
                             <template #header>
                               {{ item.code }} - {{ item.name }}
                             </template>
                             <div class="row">
                               <div class="col-12">
-                                <Steps
-                                  :model="items"
-                                  :activeStep="muahangActive(item)"
-                                />
+                                <Steps :model="items" :activeStep="muahangActive(item)" />
                               </div>
                             </div>
                           </TabPanel>
@@ -302,10 +196,7 @@
                     <div class="row">
                       <div class="col-md-12" v-if="list_nhanhang.length > 0">
                         <TabView v-model:activeIndex="active">
-                          <TabPanel
-                            v-for="(item, key) in list_nhanhang"
-                            :key="key"
-                          >
+                          <TabPanel v-for="(item, key) in list_nhanhang" :key="key">
                             <template #header>
                               {{ item.muahang.code }} -
                               {{ item.muahang.muahang_chonmua.ncc.tenncc }}
@@ -314,32 +205,17 @@
                               <div class="col-md-4 form-group">
                                 <b class="">Ngày giao hàng dự kiến:</b>
                                 <div class="mt-2">
-                                  <Calendar
-                                    :modelValue="formatDate(item.muahang.date)"
-                                    dateFormat="yy-mm-dd"
-                                    class="date-custom"
-                                    :manualInput="false"
-                                    showIcon
-                                    :minDate="minDate"
-                                    :disabled="item.muahang.is_dathang"
-                                  />
+                                  <Calendar :modelValue="formatDate(item.muahang.date)" dateFormat="yy-mm-dd"
+                                    class="date-custom" :manualInput="false" showIcon :minDate="minDate"
+                                    :disabled="item.muahang.is_dathang" />
                                 </div>
                               </div>
                               <div class="col-md-12 mb-2">
-                                <FormDutruNhanhang
-                                  :index="key"
-                                ></FormDutruNhanhang>
+                                <FormDutruNhanhang :index="key"></FormDutruNhanhang>
                               </div>
-                              <div
-                                class="col-md-12 text-center mt-3"
-                                v-if="!model.date_finish"
-                              >
-                                <Button
-                                  label="Lưu lại"
-                                  icon="pi pi-save"
-                                  class="p-button-success p-button-sm mr-2"
-                                  @click.prevent="savenhanhang()"
-                                ></Button>
+                              <div class="col-md-12 text-center mt-3" v-if="!model.date_finish">
+                                <Button label="Lưu lại" icon="pi pi-save" class="p-button-success p-button-sm mr-2"
+                                  @click.prevent="savenhanhang()"></Button>
                               </div>
                             </div>
                           </TabPanel>

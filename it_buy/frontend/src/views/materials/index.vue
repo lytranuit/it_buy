@@ -2,54 +2,22 @@
   <div class="row clearfix">
     <div class="col-12">
       <h5 class="card-header drag-handle">
-        <Button
-          label="Tạo mới"
-          icon="pi pi-plus"
-          class="p-button-success p-button-sm mr-2"
-          @click="openNew"
-        ></Button>
-        <Button
-          label="Xóa"
-          icon="pi pi-trash"
-          class="p-button-danger p-button-sm"
-          @click="confirmDeleteSelected"
-          :disabled="!selectedProducts || !selectedProducts.length"
-        ></Button>
+        <Button label="Tạo mới" icon="pi pi-plus" class="p-button-success p-button-sm mr-2" @click="openNew"></Button>
+        <Button label="Xóa" icon="pi pi-trash" class="p-button-danger p-button-sm" @click="confirmDeleteSelected"
+          :disabled="!selectedProducts || !selectedProducts.length"></Button>
       </h5>
       <section class="card card-fluid">
         <div class="card-body" style="overflow: auto; position: relative">
-          <DataTable
-            class="p-datatable-customers"
-            showGridlines
-            :value="datatable"
-            :lazy="true"
-            ref="dt"
-            scrollHeight="70vh"
-            v-model:selection="selectedProducts"
-            :paginator="true"
-            :rowsPerPageOptions="[10, 50, 100]"
-            :rows="rows"
-            :totalRecords="totalRecords"
-            @page="onPage($event)"
-            :rowHover="true"
-            :loading="loading"
-            responsiveLayout="scroll"
-            :resizableColumns="true"
-            columnResizeMode="expand"
-            v-model:filters="filters"
-            filterDisplay="menu"
-            editMode="cell"
-            @cell-edit-complete="onCellEditComplete"
-          >
+          <DataTable class="p-datatable-customers" showGridlines :value="datatable" :lazy="true" ref="dt"
+            scrollHeight="70vh" v-model:selection="selectedProducts" :paginator="true"
+            :rowsPerPageOptions="[10, 50, 100]" :rows="rows" :totalRecords="totalRecords" @page="onPage($event)"
+            :rowHover="true" :loading="loading" responsiveLayout="scroll" :resizableColumns="true"
+            columnResizeMode="expand" v-model:filters="filters" filterDisplay="menu" editMode="cell"
+            @cell-edit-complete="onCellEditComplete">
             <template #header>
               <div style="width: 200px">
-                <TreeSelect
-                  :options="columns"
-                  v-model="showing"
-                  multiple
-                  :limit="0"
-                  :limitText="(count) => 'Hiển thị: ' + count + ' cột'"
-                >
+                <TreeSelect :options="columns" v-model="showing" multiple :limit="0"
+                  :limitText="(count) => 'Hiển thị: ' + count + ' cột'">
                 </TreeSelect>
               </div>
             </template>
@@ -57,18 +25,9 @@
             <template #empty>
               <div class="text-center">Không có dữ liệu.</div>
             </template>
-            <Column
-              selectionMode="multiple"
-              style="width: 3rem"
-              :exportable="false"
-            ></Column>
-            <Column
-              v-for="col of selectedColumns"
-              :field="col.data"
-              :header="col.label"
-              :key="col.data"
-              :showFilterMatchModes="false"
-            >
+            <Column selectionMode="multiple" style="width: 3rem" :exportable="false"></Column>
+            <Column v-for="col of selectedColumns" :field="col.data" :header="col.label" :key="col.data"
+              :class="col.className" :showFilterMatchModes="false">
               <template #body="slotProps">
                 <template v-if="col.data == 'mansx'">
                   ({{ slotProps.data.mansx }})
@@ -78,36 +37,35 @@
                   ({{ slotProps.data.mancc }})
                   {{ slotProps.data.nhacungcap?.tenncc }}
                 </template>
+
+                <template v-else-if="col.data == 'image_url'">
+                  <div>
+                    <a :href="VITE_BASEURL + slotProps.data.image_url + '?token=' + user.key_private" target="_blank">
+                      <img :src="VITE_BASEURL + slotProps.data.image_url + '?token=' + user.key_private"
+                        class="img-fluid" style="width: 100px;text-align: center;" />
+                    </a>
+                    <i class="pi pi-camera ml-2" style="cursor: pointer;" @click="uploadImage(slotProps.data.id)"></i>
+                    <input type="file" accept="image/*" class="d-none" capture="environment"
+                      :ref="(el) => (fileInput['fileInput-' + slotProps.data.id] = el)"
+                      @change="onFileChange($event, slotProps.data.mahh)" @click="$event.stopPropagation()" />
+                  </div>
+                </template>
                 <div v-else v-html="slotProps.data[col.data]"></div>
               </template>
 
-              <template
-                #filter="{ filterModel, filterCallback }"
-                v-if="col.filter == true"
-              >
-                <InputText
-                  type="text"
-                  v-model="filterModel.value"
-                  @keydown.enter="filterCallback()"
-                  class="p-column-filter"
-                />
+              <template #filter="{ filterModel, filterCallback }" v-if="col.filter == true">
+                <InputText type="text" v-model="filterModel.value" @keydown.enter="filterCallback()"
+                  class="p-column-filter" />
               </template>
             </Column>
 
             <Column style="width: 1rem">
               <template #body="slotProps">
-                <a
-                  class="p-link text-warning mr-2 font-16"
-                  @click="editProduct(slotProps.data)"
-                  v-if="slotProps.data.nhom == 'Khac'"
-                >
+                <a class="p-link text-warning mr-2 font-16" @click="editProduct(slotProps.data)">
                   <i class="pi pi-pencil"></i>
                 </a>
-                <a
-                  class="p-link text-danger font-16"
-                  @click="confirmDeleteProduct(slotProps.data)"
-                  v-if="slotProps.data.nhom == 'Khac'"
-                >
+                <a class="p-link text-danger font-16" @click="confirmDeleteProduct(slotProps.data)"
+                  v-if="slotProps.data.nhom == 'Khac'">
                   <i class="pi pi-trash"></i>
                 </a>
               </template>
@@ -117,58 +75,28 @@
       </section>
     </div>
 
-    <PopupAdd @save="loadLazyData"></PopupAdd>
-    <Dialog
-      v-model:visible="deleteProductDialog"
-      header="Xác nhận"
-      :modal="true"
-    >
+    <PopupAdd @save="loadLazyData" v-if="visibleDialog"></PopupAdd>
+    <Dialog v-model:visible="deleteProductDialog" header="Xác nhận" :modal="true">
       <div class="confirmation-content">
         <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-        <span v-if="model"
-          >Bạn có muốn xóa <b>{{ model.mahh }}</b> này không?</span
-        >
+        <span v-if="model">Bạn có muốn xóa <b>{{ model.mahh }}</b> này không?</span>
       </div>
 
       <template #footer>
-        <Button
-          label="Không"
-          icon="pi pi-times"
-          class="p-button-text"
-          @click="deleteProductDialog = false"
-        ></Button>
-        <Button
-          label="Đồng ý"
-          icon="pi pi-check"
-          class="p-button-text"
-          @click="deleteProduct"
-        ></Button>
+        <Button label="Không" icon="pi pi-times" class="p-button-text" @click="deleteProductDialog = false"></Button>
+        <Button label="Đồng ý" icon="pi pi-check" class="p-button-text" @click="deleteProduct"></Button>
       </template>
     </Dialog>
 
-    <Dialog
-      v-model:visible="deleteProductsDialog"
-      header="Xác nhận"
-      :modal="true"
-    >
+    <Dialog v-model:visible="deleteProductsDialog" header="Xác nhận" :modal="true">
       <div class="confirmation-content">
         <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
         <span>Bạn có muốn xóa tất cả những mục đã chọn không?</span>
       </div>
 
       <template #footer>
-        <Button
-          label="Không"
-          icon="pi pi-times"
-          class="p-button-text"
-          @click="deleteProductsDialog = false"
-        ></Button>
-        <Button
-          label="Đồng ý"
-          icon="pi pi-check"
-          class="p-button-text"
-          @click="deleteSelectedProducts"
-        ></Button>
+        <Button label="Không" icon="pi pi-times" class="p-button-text" @click="deleteProductsDialog = false"></Button>
+        <Button label="Đồng ý" icon="pi pi-check" class="p-button-text" @click="deleteSelectedProducts"></Button>
       </template>
     </Dialog>
     <Loading :waiting="waiting"></Loading>
@@ -197,45 +125,90 @@ import { storeToRefs } from "pinia";
 import { RouterLink } from "vue-router";
 const store = useAuth();
 const toast = useToast();
+
+const { user } = storeToRefs(store);
+const VITE_BASEURL = import.meta.env.VITE_BASEURL;
+const fileInput = ref({});
+const getfileInputRef = (id) => {
+  return fileInput.value[id];
+};
+const uploadImage = (id) => {
+  var input = getfileInputRef("fileInput-" + id);
+  input.click();
+};
+const onFileChange = (event, mahh) => {
+  const file = event.target.files[0];
+  if (file) {
+    console.log(file);
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("mahh", mahh);
+
+    materialApi.uploadImage(formData).then((res) => {
+      if (res.success) {
+        toast.add({
+          severity: "success",
+          summary: "Thành công",
+          detail: "Thay đổi thành công",
+          life: 3000,
+        });
+      } else {
+        toast.add({
+          severity: "error",
+          summary: "Lỗi",
+          detail: res.message,
+          life: 3000,
+        });
+      }
+      loadLazyData();
+    });
+  }
+};
 ////Datatable
 const datatable = ref();
 const columns = ref([
   {
     id: 0,
+    label: "Hình đại diện",
+    data: "image_url",
+    className: "text-center image_url",
+  },
+  {
+    id: 1,
     label: "Mã hàng hóa",
     data: "mahh",
     className: "text-center",
     filter: true,
   },
   {
-    id: 1,
+    id: 2,
     label: "Tên hàng hóa",
     data: "tenhh",
-    className: "text-center",
+    className: "",
     filter: true,
   },
   {
-    id: 2,
+    id: 3,
     label: "ĐVT",
     data: "dvt",
     className: "text-center",
   },
   {
-    id: 3,
+    id: 4,
     label: "Nhóm",
     data: "nhom",
     className: "text-center",
     filter: true,
   },
   {
-    id: 4,
+    id: 5,
     label: "Nhà sản xuất",
     data: "mansx",
     className: "text-center",
     filter: true,
   },
   {
-    id: 5,
+    id: 6,
     label: "Nhà cung cấp",
     data: "mancc",
     className: "text-center",
@@ -330,7 +303,7 @@ const onPage = (event) => {
 };
 
 const openNew = () => {
-  model.value = {};
+  model.value = { nhom: 'Khac' };
   headerForm.value = "Tạo mới";
   visibleDialog.value = true;
 };
@@ -425,3 +398,9 @@ watch(filters, async (newa, old) => {
   loadLazyData();
 });
 </script>
+<style>
+.image_url {
+  min-width: 150px;
+
+}
+</style>

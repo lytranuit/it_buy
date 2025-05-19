@@ -21,10 +21,15 @@ namespace it_template.Areas.V1.Controllers
     {
         private readonly IConfiguration _configuration;
         private UserManager<UserModel> UserManager;
-        public ApiController(ItContext context, IConfiguration configuration, UserManager<UserModel> UserMgr) : base(context)
+        private QLSXContext _QLSXContext;
+        private KTContext _KTContext;
+        public ApiController(ItContext context, QLSXContext QLSXContext, KTContext KTContext, IConfiguration configuration, UserManager<UserModel> UserMgr) : base(context)
+
         {
             _configuration = configuration;
             UserManager = UserMgr;
+            _QLSXContext = QLSXContext;
+            _KTContext = KTContext;
         }
 
         public async Task<JsonResult> DutruChitiet(int type_id)
@@ -51,7 +56,7 @@ namespace it_template.Areas.V1.Controllers
 
         public async Task<JsonResult> materials()
         {
-            var All = _context.MaterialModel.ToList();
+            var All = _context.MaterialModel.Include(d => d.nhasanxuat).ToList();
             //var jsonData = new { data = ProcessModel };
             return Json(All, new System.Text.Json.JsonSerializerOptions()
             {
@@ -69,6 +74,21 @@ namespace it_template.Areas.V1.Controllers
                 ReferenceHandler = ReferenceHandler.IgnoreCycles
             });
         }
+        public async Task<JsonResult> Kho()
+        {
+            var All = _QLSXContext.KhoModel.OrderBy(d => d.makho).ToList();
+            //var jsonData = new { data = ProcessModel };
+            return Json(All, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            });
+        }
+        public async Task<JsonResult> nhom()
+        {
+            var data = _context.MaterialGroupModel.OrderBy(d => d.manhom).ToList();
+
+            return Json(data);
+        }
         public async Task<JsonResult> nhacc()
         {
             var All = _context.NhacungcapModel.ToList();
@@ -81,6 +101,15 @@ namespace it_template.Areas.V1.Controllers
         public async Task<JsonResult> nhasx()
         {
             var All = _context.NsxModel.ToList();
+            //var jsonData = new { data = ProcessModel };
+            return Json(All, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            });
+        }
+        public async Task<JsonResult> PLHH()
+        {
+            var All = _KTContext.TBL_DANHMUCPLHANGHOA.ToList();
             //var jsonData = new { data = ProcessModel };
             return Json(All, new System.Text.Json.JsonSerializerOptions()
             {

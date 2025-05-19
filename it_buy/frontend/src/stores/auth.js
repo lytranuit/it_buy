@@ -25,6 +25,10 @@ export const useAuth = defineStore("auth", () => {
     // console.log(user);
     return user.value.list_users;
   });
+
+  const is_MasterData = computed(() => {
+    return in_groups(["MasterData"]);
+  });
   const is_admin = computed(() => {
     return in_groups(["Administrator"]);
   });
@@ -39,6 +43,9 @@ export const useAuth = defineStore("auth", () => {
   })
   const is_RD = computed(() => {
     return in_groups(["RD"]);
+  })
+  const is_Kho_VT = computed(() => {
+    return in_groups(["Kho_VT"]);
   })
   const is_Cungung = computed(() => {
     return in_departments([14, 29, 30]);
@@ -156,7 +163,9 @@ export const useAuth = defineStore("auth", () => {
     isAuth,
     user,
     is_admin,
+    is_Kho_VT,
     is_manager,
+    is_MasterData,
     is_Cungung,
     is_CungungGiantiep,
     is_CungungNVL,

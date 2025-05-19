@@ -5,12 +5,8 @@
         <tr>
           <th>Tên hàng hóa</th>
           <th>Số lượng</th>
-          <th
-            v-for="(item, key) in nccs"
-            :key="key"
-            class="text-center"
-            :class="{ highlight: model.muahang_chonmua_id == item.id }"
-          >
+          <th v-for="(item, key) in nccs" :key="key" class="text-center"
+            :class="{ highlight: model.muahang_chonmua_id == item.id }">
             {{ item.ncc?.tenncc }}
           </th>
         </tr>
@@ -19,12 +15,8 @@
         <tr v-for="(item, key) in datatable" :key="key">
           <td>{{ item.mahh }} - {{ item.tenhh }}</td>
           <td>{{ item.soluong }} {{ item.dvt }}</td>
-          <td
-            v-for="(item, key1) in nccs"
-            :key="key1"
-            class="text-center"
-            :class="{ highlight: model.muahang_chonmua_id == item.id }"
-          >
+          <td v-for="(item, key1) in nccs" :key="key1" class="text-center"
+            :class="{ highlight: model.muahang_chonmua_id == item.id }">
             {{ formatPrice(item.chitiet[key].thanhtien_vat, 2) }}
             {{ item.tiente }}
           </td>
@@ -32,86 +24,52 @@
         <tr>
           <td>Tổng giá trị</td>
           <td>--</td>
-          <td
-            v-for="(item, key) in nccs"
-            :key="key"
-            class="text-center"
-            :class="{ highlight: model.muahang_chonmua_id == item.id }"
-          >
+          <td v-for="(item, key) in nccs" :key="key" class="text-center"
+            :class="{ highlight: model.muahang_chonmua_id == item.id }">
             <b>{{ formatPrice(item.tonggiatri, 2) }} {{ item.tiente }}</b>
           </td>
         </tr>
         <tr>
           <td>Đáp ứng các yêu cầu về hàng hóa, dịch vụ</td>
           <td>--</td>
-          <td
-            v-for="(item, key) in nccs"
-            :key="key"
-            class="text-center"
-            :class="{ highlight: model.muahang_chonmua_id == item.id }"
-          >
-            <i
-              class="far fa-check-circle text-success"
-              v-if="item.dapung == true"
-            ></i>
+          <td v-for="(item, key) in nccs" :key="key" class="text-center"
+            :class="{ highlight: model.muahang_chonmua_id == item.id }">
+            <i class="far fa-check-circle text-success" v-if="item.dapung == true"></i>
           </td>
         </tr>
         <tr>
           <td>Thời gian giao hàng</td>
           <td>--</td>
-          <td
-            v-for="(item, key) in nccs"
-            :key="key"
-            class="text-center"
-            :class="{ highlight: model.muahang_chonmua_id == item.id }"
-          >
+          <td v-for="(item, key) in nccs" :key="key" class="text-center"
+            :class="{ highlight: model.muahang_chonmua_id == item.id }">
             {{ item.thoigiangiaohang }}
           </td>
         </tr>
         <tr>
           <td>Điều kiện thanh toán</td>
           <td>--</td>
-          <td
-            v-for="(item, key) in nccs"
-            :key="key"
-            class="text-center"
-            :class="{ highlight: model.muahang_chonmua_id == item.id }"
-          >
+          <td v-for="(item, key) in nccs" :key="key" class="text-center"
+            :class="{ highlight: model.muahang_chonmua_id == item.id }">
             {{ item.thanhtoan }}
           </td>
         </tr>
         <tr>
           <td>Chính sách bảo hành,dịch vụ hậu mãi</td>
           <td>--</td>
-          <td
-            v-for="(item, key) in nccs"
-            :key="key"
-            class="text-center"
-            :class="{ highlight: model.muahang_chonmua_id == item.id }"
-          >
+          <td v-for="(item, key) in nccs" :key="key" class="text-center"
+            :class="{ highlight: model.muahang_chonmua_id == item.id }">
             {{ item.baohanh }}
           </td>
         </tr>
         <tr>
           <td>Đính kèm</td>
           <td>--</td>
-          <td
-            v-for="(item, key) in nccs"
-            :key="key"
-            class="text-center"
-            :class="{ highlight: model.muahang_chonmua_id == item.id }"
-          >
+          <td v-for="(item, key) in nccs" :key="key" class="text-center"
+            :class="{ highlight: model.muahang_chonmua_id == item.id }">
             <div class="mb-2" v-for="(item1, key1) in item.dinhkem" :key="key1">
-              <a
-                :href="item1.url"
-                :download="download(model.name)"
-                class="download-icon-link d-inline-flex align-items-center"
-                target="_blank"
-              >
-                <i
-                  class="far fa-file text-danger"
-                  style="font-size: 30px; margin-right: 10px"
-                ></i>
+              <a :href="item1.url" :download="download(model.name)"
+                class="download-icon-link d-inline-flex align-items-center" target="_blank">
+                <i class="far fa-file text-danger" style="font-size: 30px; margin-right: 10px"></i>
                 {{ item1.name }}
               </a>
             </div>
@@ -120,50 +78,28 @@
         <tr>
           <td>Chọn mua</td>
           <td>--</td>
-          <td
-            v-for="(item, key) in nccs"
-            :key="key"
-            class="text-center chonmua"
-            :class="{ highlight: model.muahang_chonmua_id == item.id }"
-          >
+          <td v-for="(item, key) in nccs" :key="key" class="text-center chonmua"
+            :class="{ highlight: model.muahang_chonmua_id == item.id }">
             <template v-if="!model.is_multiple_ncc">
               <div class="form-check" v-if="readonly == false">
-                <input
-                  class="form-check-input"
-                  type="radio"
-                  name="exampleRadios"
-                  :id="'exampleRadios' + key"
-                  v-model="model.muahang_chonmua_id"
-                  :value="item.id"
-                />
+                <input class="form-check-input" type="radio" name="exampleRadios" :id="'exampleRadios' + key"
+                  v-model="model.muahang_chonmua_id" :value="item.id" />
                 <label class="form-check-label" :for="'exampleRadios' + key">
                 </label>
               </div>
               <div v-else>
-                <i
-                  class="fas fa-check text-success"
-                  v-if="model.muahang_chonmua_id == item.id"
-                ></i>
+                <i class="fas fa-check text-success" v-if="model.muahang_chonmua_id == item.id"></i>
               </div>
             </template>
             <template v-if="model.is_multiple_ncc == true">
               <div class="form-check" v-if="readonly == false">
-                <input
-                  class="form-check-input"
-                  type="checkbox"
-                  name="exampleRadios"
-                  :id="'exampleRadios' + key"
-                  v-model="item.chonmua"
-                  :value="item.id"
-                />
+                <input class="form-check-input" type="checkbox" name="exampleRadios" :id="'exampleRadios' + key"
+                  v-model="item.chonmua" :value="item.id" />
                 <label class="form-check-label" :for="'exampleRadios' + key">
                 </label>
               </div>
               <div v-else>
-                <i
-                  class="fas fa-check text-success"
-                  v-if="item.chonmua == true"
-                ></i>
+                <i class="fas fa-check text-success" v-if="item.chonmua == true"></i>
               </div>
             </template>
           </td>
@@ -174,67 +110,29 @@
       <div class="form-group row">
         <b class="col-12 col-lg-12 col-form-label">Lưu ý / Lý do chọn mua:</b>
         <div class="col-12 col-lg-12 pt-1">
-          <textarea
-            class="form-control"
-            v-model="model.note_chonmua"
-            :disabled="readonly"
-          ></textarea>
+          <textarea class="form-control" v-model="model.note_chonmua" :disabled="readonly"></textarea>
         </div>
       </div>
     </div>
-    <div
-      class="d-flex align-items-center justify-content-center"
-      v-if="readonly == false && model.type_id != 1"
-    >
-      <Button
-        label="Xem trước"
-        icon="pi pi-eye"
-        class="p-button-info p-button-sm mr-2"
-        @click.prevent="view()"
-      ></Button>
-      <Button
-        label="Xuất PDF và trình ký"
-        icon="pi pi-file"
-        class="p-button-sm mr-2"
-        @click.once="xuatpdf()"
-      ></Button>
+    <div class="d-flex align-items-center justify-content-center" v-if="readonly == false && model.type_id != 1">
+      <Button label="Xem trước" icon="pi pi-eye" class="p-button-info p-button-sm mr-2"
+        @click.prevent="view()"></Button>
+      <Button label="Xuất PDF và trình ký" icon="pi pi-file" class="p-button-sm mr-2" @click.once="xuatpdf()"></Button>
     </div>
-    <div
-      class="d-flex align-items-center justify-content-center mb-3"
-      v-if="readonly == false && model.type_id == 1"
-    >
+    <div class="d-flex align-items-center justify-content-center mb-3" v-if="readonly == false && model.type_id == 1">
       <span class="mr-2">Mẫu mua NVL mới:</span>
-      <Button
-        label="Xem trước"
-        icon="pi pi-eye"
-        class="p-button-info p-button-sm mr-2"
-        @click.prevent="view(1)"
-      ></Button>
-      <Button
-        label="Xuất PDF và trình ký"
-        icon="pi pi-file"
-        class="p-button-sm mr-2"
-        @click.once="xuatpdf(1)"
-      ></Button>
+      <Button label="Xem trước" icon="pi pi-eye" class="p-button-info p-button-sm mr-2"
+        @click.prevent="view(1)"></Button>
+      <Button label="Xuất PDF và trình ký" icon="pi pi-file" class="p-button-sm mr-2" @click.once="xuatpdf(1)"></Button>
     </div>
 
-    <div
-      class="d-flex align-items-center justify-content-center"
-      v-if="readonly == false && model.type_id == 1 && !model.is_multiple_ncc"
-    >
+    <div class="d-flex align-items-center justify-content-center"
+      v-if="readonly == false && model.type_id == 1 && !model.is_multiple_ncc">
       <span class="mr-2">Mẫu mua NVL cũ:</span>
-      <Button
-        label="Xem trước"
-        icon="pi pi-eye"
-        class="p-button-info p-button-sm mr-2"
-        @click.prevent="view()"
-      ></Button>
-      <Button
-        label="Xuất PDF và trình ký"
-        icon="pi pi-file"
-        class="p-button-sm mr-2"
-        @click.prevent="xuatpdf()"
-      ></Button>
+      <Button label="Xem trước" icon="pi pi-eye" class="p-button-info p-button-sm mr-2"
+        @click.prevent="view()"></Button>
+      <Button label="Xuất PDF và trình ký" icon="pi pi-file" class="p-button-sm mr-2"
+        @click.prevent="xuatpdf()"></Button>
     </div>
   </div>
 </template>
@@ -306,8 +204,17 @@ const view = async (loaimau = 0) => {
         params["file_" + key + "_" + stt] = file;
       }
     });
-
-    await muahangApi.saveNcc(params);
+    if (params.nccs[0].chitiet.length > 10) {
+      var PromiseAll = [];
+      for (var ncc of params.nccs) {
+        // console.log(ncc);
+        var promise = muahangApi.saveNcc({ nccs: [ncc] });
+        PromiseAll.push(promise);
+      }
+      Promise.all(PromiseAll);
+    } else {
+      await muahangApi.saveNcc(params);
+    }
   }
   waiting.value = true;
   muahangApi.xuatpdf(model.value.id, true, loaimau).then((response) => {
@@ -374,7 +281,17 @@ const xuatpdf = async (loaimau = 0) => {
       }
     });
 
-    await muahangApi.saveNcc(params);
+    if (params.nccs[0].chitiet.length > 10) {
+      var PromiseAll = [];
+      for (var ncc of params.nccs) {
+        // console.log(ncc);
+        var promise = muahangApi.saveNcc({ nccs: [ncc] });
+        PromiseAll.push(promise);
+      }
+      Promise.all(PromiseAll);
+    } else {
+      await muahangApi.saveNcc(params);
+    }
   }
   waiting.value = true;
   muahangApi.xuatpdf(model.value.id, false, loaimau).then((response) => {

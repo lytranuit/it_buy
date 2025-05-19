@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Spire.Xls;
 using System;
 using System.Collections;
 using System.Text.Json.Serialization;
@@ -26,7 +27,7 @@ namespace it_template.Areas.V1.Controllers
         public JsonResult Get(int id)
         {
             var data = _context.MaterialModel.Where(d => d.id == id).Include(d => d.nhacungcap).FirstOrDefault();
-
+            data.list_sp = _context.MaterialModel.Where(d => d.group != null && d.group == data.group).Select(d => d.mahh).ToList();
             return Json(data, new System.Text.Json.JsonSerializerOptions()
             {
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
@@ -34,16 +35,19 @@ namespace it_template.Areas.V1.Controllers
             });
         }
         [HttpPost]
-        public async Task<JsonResult> Save(MaterialModel HangHoaModel, string surfix)
+        public async Task<JsonResult> Save(MaterialModel HangHoaModel, string surfix, List<string> list_sp)
         {
+            System.Security.Claims.ClaimsPrincipal currentUser = this.User;
+            var user_id = UserManager.GetUserId(currentUser);
             var jsonData = new { success = true, message = "" };
             try
             {
                 HangHoaModel.tenhh = HangHoaModel.tenhh.Trim();
+                MaterialModel? HangHoaModel_old;
                 //HangHoaModel.dvt = HangHoaModel.dvt.Trim();
                 if (HangHoaModel.id > 0)
                 {
-                    var HangHoaModel_old = _context.MaterialModel.Where(d => d.id == HangHoaModel.id).FirstOrDefault();
+                    HangHoaModel_old = _context.MaterialModel.Where(d => d.id == HangHoaModel.id).FirstOrDefault();
                     CopyValues<MaterialModel>(HangHoaModel_old, HangHoaModel);
                     _context.Update(HangHoaModel_old);
                     _context.SaveChanges();
@@ -51,11 +55,26 @@ namespace it_template.Areas.V1.Controllers
                 }
                 else
                 {
-                    HangHoaModel.nhom = "Khac";
+                    HangHoaModel.nhom = HangHoaModel.nhom != null ? HangHoaModel.nhom : "Khac";
+                    HangHoaModel.created_at = DateTime.Now;
+                    HangHoaModel.created_by = user_id;
                     _context.Add(HangHoaModel);
                     _context.SaveChanges();
-                    return Json(new { success = true, data = HangHoaModel });
+                    HangHoaModel_old = HangHoaModel;
                 }
+                var new_group = new Guid().ToString();
+                HangHoaModel_old.group = new_group;
+                _context.Update(HangHoaModel_old);
+                if (list_sp.Count() > 0)
+                {
+                    foreach (var item in list_sp)
+                    {
+                        var hh = _context.MaterialModel.Where(d => d.mahh == item).FirstOrDefault();
+                        hh.group = new_group;
+                        _context.Update(hh);
+                    }
+                }
+                _context.SaveChanges();
             }
             catch (Exception ex)
             {
@@ -63,6 +82,48 @@ namespace it_template.Areas.V1.Controllers
             }
 
 
+            return Json(jsonData, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            });
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> uploadImage(string mahh)
+        {
+            System.Security.Claims.ClaimsPrincipal currentUser = this.User;
+            var user_id = UserManager.GetUserId(currentUser);
+            var hh = _context.MaterialModel.Where(d => d.mahh == mahh).FirstOrDefault();
+            var files = Request.Form.Files;
+            //return Json(files);
+            if (files != null && files.Count > 0)
+            {
+                var file = files[0];
+                var timeStamp = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
+                string name = file.FileName;
+                string ext = Path.GetExtension(name);
+                string mimeType = file.ContentType;
+
+                //var fileName = Path.GetFileName(name);
+                var newName = timeStamp + " - " + name;
+                newName = newName.Replace("+", "_");
+                newName = newName.Replace("%", "_");
+                newName = newName.Replace("#", "_");
+                var filePath = _configuration["Source:Path_Private"] + "\\materials\\" + newName;
+                string url = "/private/materials/" + newName;
+
+
+                using (var fileSrteam = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(fileSrteam);
+                }
+                hh.image_url = url;
+                _context.Update(hh);
+                _context.SaveChanges();
+            }
+
+            var jsonData = new { success = true };
             return Json(jsonData, new System.Text.Json.JsonSerializerOptions()
             {
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
@@ -131,31 +192,12 @@ namespace it_template.Areas.V1.Controllers
                 customerData = customerData.Where(d => d.nhom == nhom);
             }
             int recordsFiltered = customerData.Count();
-            var datapost = customerData.Include(d => d.nhasanxuat).Include(d => d.nhacungcap).OrderBy(d => d.mahh).Skip(skip).Take(pageSize).ToList();
+            var datapost = customerData.Include(d => d.nhasanxuat).Include(d => d.nhacungcap).OrderByDescending(d => d.created_at).Skip(skip).Take(pageSize).ToList();
             //var data = new ArrayList();
             //foreach (var record in datapost)
             //{
-            //	var ngaythietke = record.ngaythietke != null ? record.ngaythietke.Value.ToString("yyyy-MM-dd") : null;
-            //	var ngaysodk = record.ngaysodk != null ? record.ngaysodk.Value.ToString("yyyy-MM-dd") : null;
-            //	var ngayhethanthietke = record.ngayhethanthietke != null ? record.ngayhethanthietke.Value.ToString("yyyy-MM-dd") : null;
-            //	var data1 = new
-            //	{
-            //		mahh = record.mahh,
-            //		tenhh = record.tenhh,
-            //		dvt = record.dvt,
-            //		mansx = record.mansx,
-            //		mancc = record.mancc,
-            //		tennvlgoc = record.tennvlgoc,
-            //		masothietke = record.masothietke,
-            //		ghichu_thietke = record.ghichu_thietke,
-            //		masodk = record.masodk,
-            //		ghichu_sodk = record.ghichu_sodk,
-            //		nhuongquyen = record.nhuongquyen,
-            //		ngaythietke = ngaythietke,
-            //		ngaysodk = ngaysodk,
-            //		ngayhethanthietke = ngayhethanthietke
-            //	};
-            //	data.Add(data1);
+            //    record.list_sp = _context.MaterialModel.Where(d => d.group != null && d.group == record.group).Select(d => d.mahh).ToList();
+
             //}
             var jsonData = new { draw = draw, recordsFiltered = recordsFiltered, recordsTotal = recordsTotal, data = datapost };
             return Json(jsonData, new System.Text.Json.JsonSerializerOptions()
@@ -206,6 +248,7 @@ namespace it_template.Areas.V1.Controllers
         //    //var jsonData = new { data = ProcessModel };
         //    return Json(list);
         //}
+
 
         public JsonResult GetFiles(string mahh)
         {
@@ -307,7 +350,67 @@ namespace it_template.Areas.V1.Controllers
             return Json(new { success = true });
         }
 
+        public async Task<IActionResult> importmahh()
+        {
+            //return Ok();
+            // Khởi tạo workbook để đọc
+            Spire.Xls.Workbook book = new Spire.Xls.Workbook();
+            book.LoadFromFile("./wwwroot/report/excel/DS HH.xlsx", ExcelVersion.Version2013);
 
+            Spire.Xls.Worksheet sheet = book.Worksheets[0];
+            var lastrow = sheet.LastDataRow;
+            var lastcol = sheet.LastDataColumn;
+            // nếu vẫn chưa gặp end thì vẫn lấy data
+            Console.WriteLine(lastrow);
+            //var list_Result = new List<ResultModel>();
+            var newlist = new List<string>();
+            var error = new List<string>();
+            var list_add = new List<MaterialModel>();
+            for (int rowIndex = 5; rowIndex < lastrow; rowIndex++)
+            {
+                // lấy row hiện tại
+                var nowRow = sheet.Rows[rowIndex];
+                if (nowRow == null)
+                    continue;
+                // vì ta dùng 3 cột A, B, C => data của ta sẽ như sau
+                //int numcount = nowRow.Cells.Count;
+                //for(int y = 0;y<numcount - 1 ;y++)
+                //var nowRowVitri = sheet.Rows[8];
+
+                //var code_vitri = nowRow.Cells[15] != null ? nowRow.Cells[15].Value : null;
+                //if (code_vitri == null || code_vitri == "")
+                //    continue;
+                var mahh = nowRow.Cells[2] != null ? nowRow.Cells[2].DisplayedText : null;
+                if (mahh == null || mahh == "")
+                    continue;
+                var hh = _context.MaterialModel.Where(d => d.mahh == mahh).FirstOrDefault();
+                if (hh != null)
+                {
+                    error.Add(mahh);
+                    continue;///Lỗi
+				}
+                string manhom = mahh.Length >= 4 ? mahh.Substring(0, 4) : mahh;
+                var tenhh = nowRow.Cells[3] != null ? nowRow.Cells[3].Value : null;
+                var dvt = nowRow.Cells[4] != null ? nowRow.Cells[4].Value : null;
+
+
+                var new_hh = new MaterialModel()
+                {
+                    mahh = mahh,
+                    tenhh = tenhh,
+                    dvt = dvt,
+                    nhom = manhom,
+                    created_at = DateTime.Now
+                };
+
+                list_add.Add(new_hh);
+
+            }
+            _context.AddRange(list_add);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, error });
+        }
         public class RawFileMaterial
         {
             public string link { get; set; }

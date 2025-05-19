@@ -1,18 +1,8 @@
 <template>
   <div id="TablemuahangNhanhang">
-    <DataTable
-      showGridlines
-      :value="datatable"
-      ref="dt"
-      id="table-muahang-nhanhang"
-      class="p-datatable-ct"
-      :rowHover="true"
-      :loading="loading"
-      responsiveLayout="scroll"
-      :resizableColumns="true"
-      columnResizeMode="expand"
-      v-model:selection="selected"
-    >
+    <DataTable showGridlines :value="datatable" ref="dt" id="table-muahang-nhanhang" class="p-datatable-ct"
+      :rowHover="true" :loading="loading" responsiveLayout="scroll" :resizableColumns="true" columnResizeMode="expand"
+      v-model:selection="selected">
       <!-- <template #header>
                 <div class="d-inline-flex" style="width:200px" v-if="model.status_id == 1">
                     <Button label="Thêm" icon="pi pi-plus" class="p-button-success p-button-sm mr-2"
@@ -28,95 +18,56 @@
       <template #empty>
         <div class="text-center">Không có dữ liệu.</div>
       </template>
-      <Column
-        v-for="col in columns"
-        :field="col.data"
-        :header="col.label"
-        :key="col.data"
-        :showFilterMatchModes="false"
-        :class="col.data"
-      >
+      <Column v-for="col in columns" :field="col.data" :header="col.label" :key="col.data" :showFilterMatchModes="false"
+        :class="col.data">
         <template #body="slotProps">
-          <template
-            v-if="
-              editable == true &&
-              col.data == 'date_nhanhang' &&
-              slotProps.data.user_nhanhang_id == user.id
-            "
-          >
-            <Calendar
-              v-model="slotProps.data[col.data]"
-              dateFormat="yy-mm-dd"
-              class="date-custom"
-              :manualInput="false"
-              showIcon
-              :disabled="model.date_finish"
-            />
+          <template v-if="
+            editable == true &&
+            col.data == 'date_nhanhang' &&
+            slotProps.data.user_nhanhang_id == user.id
+          ">
+            <Calendar v-model="slotProps.data[col.data]" dateFormat="yy-mm-dd" class="date-custom" :manualInput="false"
+              showIcon :disabled="model.date_finish" />
           </template>
           <template v-else-if="editable == false && col.data == 'grade'">
             <!-- Cung ứng điền -->
-            <input
-              v-model="slotProps.data[col.data]"
-              class="form-control"
-              :disabled="model.date_finish"
-            />
+            <input v-model="slotProps.data[col.data]" class="form-control" :disabled="model.date_finish" />
           </template>
           <template v-else-if="editable == false && col.data == 'nhasx'">
-            <input
-              v-model="slotProps.data[col.data]"
-              class="form-control"
-              :disabled="model.date_finish"
-            />
+            <input v-model="slotProps.data[col.data]" class="form-control" :disabled="model.date_finish" />
+          </template>
+          <template v-else-if="editable == false && col.data == 'leadtime'">
+            <input v-model="slotProps.data[col.data]" class="form-control" :disabled="model.date_finish" />
           </template>
           <template v-else-if="editable == false && col.data == 'mahh'">
-            <input
-              v-model="slotProps.data[col.data]"
-              class="form-control form-control-sm"
-              :disabled="model.date_finish"
-            />
+            <input v-model="slotProps.data[col.data]" class="form-control form-control-sm"
+              :disabled="model.date_finish" />
           </template>
-          <template
-            v-else-if="
-              editable == true &&
-              col.data == 'soluong_nhanhang' &&
-              slotProps.data.user_nhanhang_id == user.id
-            "
-          >
-            <InputNumber
-              v-model="slotProps.data[col.data]"
-              class="p-inputtext-sm"
-              :disabled="model.date_finish"
-              :maxFractionDigits="2"
-            />
+          <template v-else-if="
+            editable == true &&
+            col.data == 'soluong_nhanhang' &&
+            slotProps.data.user_nhanhang_id == user.id
+          ">
+            <InputNumber v-model="slotProps.data[col.data]" class="p-inputtext-sm" :disabled="model.date_finish"
+              :maxFractionDigits="2" />
           </template>
 
-          <template
-            v-else-if="
-              editable == true &&
-              col.data == 'note_nhanhang' &&
-              slotProps.data.user_nhanhang_id == user.id
-            "
-          >
-            <textarea
-              v-model="slotProps.data[col.data]"
-              class="form-control form-control-sm"
-              :disabled="model.date_finish"
-            ></textarea>
+          <template v-else-if="
+            editable == true &&
+            col.data == 'note_nhanhang' &&
+            slotProps.data.user_nhanhang_id == user.id
+          ">
+            <textarea v-model="slotProps.data[col.data]" class="form-control form-control-sm"
+              :disabled="model.date_finish"></textarea>
           </template>
 
-          <template
-            v-else-if="
-              editable == true &&
-              col.data == 'status_nhanhang' &&
-              slotProps.data.user_nhanhang_id == user.id
-            "
-          >
-            <select
-              class="form-control form-control-sm"
-              v-model="slotProps.data[col.data]"
-              :disabled="model.date_finish"
-              @change="changeNhanhang(slotProps.data)"
-            >
+          <template v-else-if="
+            editable == true &&
+            col.data == 'status_nhanhang' &&
+            slotProps.data.user_nhanhang_id == user.id
+          ">
+            <select class="form-control form-control-sm" v-model="slotProps.data[col.data]"
+              :disabled="model.date_finish" @change="changeNhanhang(slotProps.data)">
               <option value="0">Chưa nhận hàng</option>
               <option value="1">Đã nhận hàng</option>
               <option value="2">Khiếu nại</option>
@@ -125,48 +76,30 @@
 
           <template v-else-if="col.data == 'user_nhanhang'">
             <div v-if="slotProps.data['user_nhanhang']" class="d-flex">
-              <Avatar
-                :image="slotProps.data.user_nhanhang.image_url"
-                :title="slotProps.data.user_nhanhang.FullName"
-                size="small"
-                shape="circle"
-              />
+              <Avatar :image="slotProps.data.user_nhanhang.image_url" :title="slotProps.data.user_nhanhang.FullName"
+                size="small" shape="circle" />
               <span class="align-self-center ml-2">{{
                 slotProps.data.user_nhanhang.FullName
               }}</span>
             </div>
           </template>
-          <template
-            v-else-if="
-              col.data == 'status_nhanhang' && slotProps.data[col.data] == 1
-            "
-          >
-            <Chip
-              label="Đã nhận hàng"
-              icon="pi pi-check"
-              class="bg-success text-white"
-            />
+          <template v-else-if="
+            col.data == 'status_nhanhang' && slotProps.data[col.data] == 1
+          ">
+            <Chip label="Đã nhận hàng" icon="pi pi-check" class="bg-success text-white" />
           </template>
 
-          <template
-            v-else-if="
-              col.data == 'status_nhanhang' && slotProps.data[col.data] == 2
-            "
-          >
-            <Chip
-              label="Khiếu nại"
-              icon="pi pi-times"
-              class="bg-danger text-white"
-            />
+          <template v-else-if="
+            col.data == 'status_nhanhang' && slotProps.data[col.data] == 2
+          ">
+            <Chip label="Khiếu nại" icon="pi pi-times" class="bg-danger text-white" />
           </template>
 
           <template v-else-if="col.data == 'status_nhanhang'">
             <Chip label="Chưa nhận hàng" icon="fas fa-spinner fa-spin" />
           </template>
 
-          <template
-            v-else-if="col.data == 'date_nhanhang' && slotProps.data[col.data]"
-          >
+          <template v-else-if="col.data == 'date_nhanhang' && slotProps.data[col.data]">
             {{ formatDate(slotProps.data[col.data]) }}
           </template>
           <template v-else-if="col.data == 'mahh'">
@@ -231,6 +164,17 @@ const columns = ref([
     className: "text-center",
   },
   {
+    label: "Leadtime",
+    data: "leadtime",
+    className: "text-center",
+  },
+
+  {
+    label: "MOQ",
+    data: "moq",
+    className: "text-center",
+  },
+  {
     label: "ĐVT",
     data: "dvt",
     className: "text-center",
@@ -290,12 +234,15 @@ onMounted(() => {
 
 <style lang="scss">
 #table-muahang-nhanhang {
+
   .mahh,
   .grade {
     min-width: 150px;
   }
+
   .tenhh,
-  .nhasx {
+  .nhasx,
+  .leadtime {
     min-width: 300px;
   }
 }

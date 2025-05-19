@@ -36,6 +36,7 @@ namespace Vue.Models
         public string? grade { get; set; }
         public string? nhasx { get; set; }
         public string? mansx { get; set; }
+        public string? moq { get; set; }
         [NotMapped]
 
         public int? stt { get; set; }

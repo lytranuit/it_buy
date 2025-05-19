@@ -10,6 +10,9 @@ using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using Spire.Xls;
 using System.Data;
+using static it_template.Areas.V1.Controllers.MaterialController;
+using System.Text.Json.Serialization;
+using System;
 
 namespace Vue.Controllers
 {
@@ -17,12 +20,14 @@ namespace Vue.Controllers
     public class HomeController : Controller
     {
         protected readonly ItContext _context;
+        protected readonly QLSXContext _QLSXcontext;
         private readonly ViewRender _view;
 
 
-        public HomeController(ItContext context, ViewRender view)
+        public HomeController(ItContext context, QLSXContext QLSXContext, ViewRender view)
         {
             _context = context;
+            _QLSXcontext = QLSXContext;
             _view = view;
             var listener = _context.GetService<DiagnosticSource>();
             (listener as DiagnosticListener).SubscribeWithAdapter(new CommandInterceptor());
@@ -586,10 +591,47 @@ namespace Vue.Controllers
             var jsonData = new { success = true, link = documentPath };
             return Json(jsonData);
         }
-    }
-    class SuccesMail
-    {
-        public int success { get; set; }
-        public Exception ex { get; set; }
+        public async Task<JsonResult> SyncMaterial()
+        {
+
+            var list_add = new List<MaterialModel>();
+            var list = _QLSXcontext.TBL_DANHMUCHANGHOA.ToList();
+            foreach (var item in list)
+            {
+                var hh = _context.MaterialModel.Where(d => d.mahh == item.mahh).FirstOrDefault();
+                if (hh != null)
+                {
+                    continue;
+                }
+                var new_hh = new MaterialModel()
+                {
+                    mahh = item.mahh,
+                    tenhh = item.tenhh,
+                    dvt = item.dvt,
+                    mancc = item.mancc,
+                    mansx = item.mansx,
+                    nhom = item.nhom,
+                    quicach = item.quicach,
+                    created_at = DateTime.Now
+                };
+
+                list_add.Add(new_hh);
+            }
+            _context.AddRange(list_add);
+            await _context.SaveChangesAsync();
+            return Json(new { success = true, list_add }, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            });
+
+        }
+
+
+        class SuccesMail
+        {
+            public int success { get; set; }
+            public Exception ex { get; set; }
+        }
     }
 }

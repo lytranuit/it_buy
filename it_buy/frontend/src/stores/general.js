@@ -9,13 +9,28 @@ export const useGeneral = defineStore("general", () => {
   const materialGroup = ref([]);
   const khuvuc = ref([]);
   const products = ref([]);
+  const kho = ref([]);
+  const nhom = ref([]);
+  const PLHH = ref([]);
 
+  const is_get_nhom = ref();
+  const is_get_kho = ref();
   const is_get_materials = ref();
   const is_get_supliers = ref();
   const is_get_producers = ref();
   const is_get_materialGroup = ref();
   const is_get_khuvuc = ref();
   const is_get_products = ref();
+  const is_get_PLHH = ref();
+
+  const fetchNhom = (cache = true) => {
+    if (cache == true && is_get_nhom.value) return nhom.value;
+    is_get_nhom.value = true;
+    return Api.nhom().then((response) => {
+      nhom.value = response;
+      return response;
+    });
+  };
 
   const fetchMaterials = (cache = true) => {
     if (cache == true && is_get_materials.value) return materials.value;
@@ -42,6 +57,23 @@ export const useGeneral = defineStore("general", () => {
       return response;
     });
   };
+  const fetchPLHH = (cache = true) => {
+    if (cache == true && is_get_PLHH.value) return PLHH.value;
+    is_get_PLHH.value = true;
+    return Api.PLHH().then((response) => {
+      PLHH.value = response;
+      return response;
+    });
+  };
+  const fetchKho = (cache = true) => {
+    if (cache == true && is_get_kho.value) return kho.value;
+    is_get_kho.value = true;
+    return Api.kho().then((response) => {
+      kho.value = response;
+      return response;
+    });
+  };
+
 
   const changeMaterial = (row) => {
     // console.log(materials);
@@ -116,7 +148,10 @@ export const useGeneral = defineStore("general", () => {
     supliers,
     producers,
     khuvuc,
+    kho,
     products,
+    nhom,
+    PLHH,
     fetchMaterials,
     fetchMaterialGroup,
     fetchNhacc,
@@ -124,7 +159,9 @@ export const useGeneral = defineStore("general", () => {
     changeMaterial,
     changeProducer,
     fetchKhuvuc,
-    fetchProducts
-
+    fetchKho,
+    fetchProducts,
+    fetchNhom,
+    fetchPLHH
   };
 });

@@ -22,8 +22,12 @@ namespace Vue.Models
         public string? tieuchuan { get; set; }
         [Column("ghichu")]
         public string? note { get; set; }
+        public string? leadtime { get; set; }
+        public string? moq { get; set; }
+        public string? quicach { get; set; }
 
 
+        public string? group { get; set; }
         public string? mansx { get; set; }
 
         public virtual NsxModel? nhasanxuat { get; set; }
@@ -38,6 +42,28 @@ namespace Vue.Models
 
         public DateTime? deleted_at { get; set; }
         public DateTime? created_at { get; set; }
+
+        public string? user_notify { get; set; }
+
+
+        [NotMapped]
+        public List<string>? list_user_notify
+        {
+            get
+            {
+                return user_notify != null ? user_notify.Split(",").ToList() : null;
+            }
+            set
+            {
+                user_notify = value != null ? string.Join(",", value) : null;
+            }
+        }
+
+        public decimal? tonkho_duoi { get; set; }
+        public string? image_url { get; set; }
+
+        [NotMapped]
+        public virtual List<string> list_sp { get; set; }
 
 
 

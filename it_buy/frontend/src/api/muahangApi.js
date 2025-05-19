@@ -222,9 +222,15 @@ export default {
       })
       .then((res) => res.data);
   },
-  getHistory(mahh) {
+  getHistory(mahh, is_sametype = false) {
     return repository
-      .get(`/v1/${resoure}/getHistory`, { params: { mahh: mahh } })
+      .get(`/v1/${resoure}/getHistory`, { params: { mahh: mahh, is_sametype: is_sametype } })
+      .then((res) => res.data);
+  },
+
+  laydongiahoachat(params) {
+    return repository
+      .get(`/v1/${resoure}/laydongiahoachat`, { params: params })
       .then((res) => res.data);
   },
   get(id) {

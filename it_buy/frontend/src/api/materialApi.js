@@ -15,7 +15,15 @@ export default {
       .post(`/v1/${resoure}/edit`, formData)
       .then((res) => res.data);
   },
-
+  uploadImage(params) {
+    return repository
+      .post(`/v1/${resoure}/uploadImage`, params, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((res) => res.data);
+  },
   table(params) {
     return repository
       .post(`/v1/${resoure}/table`, params, {

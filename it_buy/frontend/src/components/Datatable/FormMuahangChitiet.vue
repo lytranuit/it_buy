@@ -1,18 +1,8 @@
 <template>
   <div id="TablemuahangChitiet">
-    <DataTable
-      showGridlines
-      :value="datatable"
-      ref="dt"
-      id="table-muahang-chitiet"
-      class="p-datatable-ct"
-      :rowHover="true"
-      :loading="loading"
-      responsiveLayout="scroll"
-      :resizableColumns="true"
-      columnResizeMode="expand"
-      v-model:selection="selected"
-    >
+    <DataTable showGridlines :value="datatable" ref="dt" id="table-muahang-chitiet" class="p-datatable-ct"
+      :rowHover="true" :loading="loading" responsiveLayout="scroll" :resizableColumns="true" columnResizeMode="expand"
+      v-model:selection="selected">
       <!-- <template #header>
                 <div class="d-inline-flex" style="width:200px" v-if="!readonly">
                     <Button label="Thêm" icon="pi pi-plus" class="p-button-success p-button-sm mr-2"
@@ -27,21 +17,11 @@
       <template #empty>
         <div class="text-center">Không có dữ liệu.</div>
       </template>
-      <Column
-        v-for="col in selectedColumns"
-        :field="col.data"
-        :header="col.label"
-        :key="col.data"
-        :showFilterMatchModes="false"
-        :class="col.data"
-      >
+      <Column v-for="col in selectedColumns" :field="col.data" :header="col.label" :key="col.data"
+        :showFilterMatchModes="false" :class="col.data">
         <template #body="slotProps">
           <template v-if="col.data == 'soluong' && !readonly">
-            <InputNumber
-              v-model="slotProps.data[col.data]"
-              class="p-inputtext-sm"
-              :maxFractionDigits="2"
-            />
+            <InputNumber v-model="slotProps.data[col.data]" class="p-inputtext-sm" :maxFractionDigits="2" />
           </template>
           <template v-else-if="col.data == 'note' && !readonly">
             <textarea v-model="slotProps.data[col.data]" class="form-control" />
@@ -55,21 +35,17 @@
           <template v-else-if="col.data == 'nhasx' && !readonly">
             <input v-model="slotProps.data[col.data]" class="form-control" />
           </template>
+          <template v-else-if="col.data == 'moq' && !readonly">
+            <input v-model="slotProps.data[col.data]" class="form-control" />
+          </template>
           <template v-else-if="col.data == 'dvt' && !readonly">
             {{ slotProps.data["dvt"] }}
-            <i
-              class="fas fa-sync-alt"
-              style="cursor: pointer"
-              @click="openOp($event, slotProps.data)"
-            ></i>
+            <i class="fas fa-sync-alt" style="cursor: pointer" @click="openOp($event, slotProps.data)"></i>
           </template>
           <template v-else-if="col.data == 'mahh' && !readonly">
             <div class="d-flex align-items-center">
-              <material-auto-complete
-                v-model="slotProps.data[col.data]"
-                :type_id="model.type_id"
-                @item-select="select($event, slotProps.data)"
-              >
+              <material-auto-complete v-model="slotProps.data[col.data]" :type_id="model.type_id"
+                @item-select="select($event, slotProps.data)">
               </material-auto-complete>
               <!-- <span class="fas fa-plus ml-3 text-success" style="cursor: pointer;"
                                 @click="openNew(slotProps.index)" v-if="model.type_id != 1"></span> -->
@@ -84,18 +60,11 @@
     <OverlayPanel ref="op">
       <div>
         Qui đổi từ {{ editingRow.soluong }}
-        <input
-          class="form-control form-control-sm d-inline-block"
-          style="width: 60px; margin-right: 5px"
-          v-model="editingRow.dvt"
-        />
+        <input class="form-control form-control-sm d-inline-block" style="width: 60px; margin-right: 5px"
+          v-model="editingRow.dvt" />
         mua hàng =
-        <input
-          class="form-control form-control-sm d-inline-block"
-          style="width: 60px; margin-right: 5px"
-          v-model="editingRow.soluong_quidoi"
-          @change="changeQuidoi(editingRow)"
-        />
+        <input class="form-control form-control-sm d-inline-block" style="width: 60px; margin-right: 5px"
+          v-model="editingRow.soluong_quidoi" @change="changeQuidoi(editingRow)" />
         <b>{{ editingRow.dvt_dutru }}</b> dự trù (Tỉ lệ 1:{{
           editingRow.quidoi
         }})
@@ -151,6 +120,10 @@ const columns = computed(() => {
       {
         label: "Grade",
         data: "grade",
+        className: "text-center",
+      }, {
+        label: "MOQ",
+        data: "moq",
         className: "text-center",
       },
       {
@@ -249,10 +222,13 @@ onMounted(async () => {
 
 <style lang="scss">
 #table-muahang-chitiet {
+
   .mahh,
-  .grade {
+  .grade,
+  .moq {
     min-width: 150px;
   }
+
   .tenhh,
   .nhasx {
     min-width: 300px;

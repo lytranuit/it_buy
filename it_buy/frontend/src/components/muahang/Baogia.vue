@@ -4,21 +4,13 @@
       <div class="col-4">
         <div class="d-flex align-items-center">
           <NccTreeSelect v-model="nccmodel"></NccTreeSelect>
-          <span
-            class="fas fa-plus text-success ml-3"
-            style="cursor: pointer"
-            @click="openNew()"
-          ></span>
+          <span class="fas fa-plus text-success ml-3" style="cursor: pointer" @click="openNew()"></span>
         </div>
         <PopupAdd @save="addNewNhacc"></PopupAdd>
       </div>
       <div class="col-2">
-        <Button
-          label="Thêm nhà cung cấp"
-          icon="pi pi-plus"
-          class="p-button-success p-button-sm mr-2"
-          @click.prevent="addNCC()"
-        ></Button>
+        <Button label="Thêm nhà cung cấp" icon="pi pi-plus" class="p-button-success p-button-sm mr-2"
+          @click.prevent="addNCC()"></Button>
       </div>
     </div>
   </div>
@@ -30,36 +22,18 @@
         </template>
         <div class="row m-0">
           <div class="col-12 text-right" v-if="readonly == false">
-            <Button
-              label="Loại bỏ"
-              icon="pi pi-times"
-              class="p-button-danger"
-              size="small"
-              @click.prevent="removeNCC(item)"
-            ></Button>
+            <Button label="Loại bỏ" icon="pi pi-times" class="p-button-danger" size="small"
+              @click.prevent="removeNCC(item)"></Button>
           </div>
 
           <div class="col-md-6">
             <div class="form-group row">
-              <b class="col-12 col-lg-12 col-form-label"
-                >Đáp ứng các yêu cầu về hàng hóa:</b
-              >
+              <b class="col-12 col-lg-12 col-form-label">Đáp ứng các yêu cầu về hàng hóa:</b>
               <div class="col-12 col-lg-12 pt-1">
-                <div
-                  class="custom-control custom-switch switch-success"
-                  style="height: 36px"
-                >
-                  <input
-                    type="checkbox"
-                    :id="'dapung_' + key"
-                    class="custom-control-input"
-                    v-model="item.dapung"
-                    :disabled="readonly"
-                  />
-                  <label
-                    :for="'dapung_' + key"
-                    class="custom-control-label"
-                  ></label>
+                <div class="custom-control custom-switch switch-success" style="height: 36px">
+                  <input type="checkbox" :id="'dapung_' + key" class="custom-control-input" v-model="item.dapung"
+                    :disabled="readonly" />
+                  <label :for="'dapung_' + key" class="custom-control-label"></label>
                 </div>
               </div>
             </div>
@@ -67,77 +41,48 @@
               <b class="col-12 col-lg-12 col-form-label">Tiền tệ:</b>
               <div class="col-12 col-lg-12 pt-1">
                 {{ item.tiente }}
-                <i
-                  class="fas fa-sync-alt"
-                  style="cursor: pointer"
-                  @click="openOp($event, item)"
-                  v-if="readonly == false"
-                ></i>
+                <i class="fas fa-sync-alt" style="cursor: pointer" @click="openOp($event, item)"
+                  v-if="readonly == false"></i>
               </div>
             </div>
 
             <div class="form-group row">
               <b class="col-12 col-lg-12 col-form-label">Bao gồm VAT:</b>
               <div class="col-12 col-lg-12 pt-1">
-                <div
-                  class="custom-control custom-switch switch-success"
-                  style="height: 36px"
-                >
-                  <input
-                    type="checkbox"
-                    :id="'novat_' + key"
-                    class="custom-control-input"
-                    v-model="item.is_vat"
-                    :disabled="readonly"
-                  />
-                  <label
-                    :for="'novat_' + key"
-                    class="custom-control-label"
-                  ></label>
+                <div class="custom-control custom-switch switch-success" style="height: 36px">
+                  <input type="checkbox" :id="'novat_' + key" class="custom-control-input" v-model="item.is_vat"
+                    :disabled="readonly" />
+                  <label :for="'novat_' + key" class="custom-control-label"></label>
                 </div>
               </div>
             </div>
           </div>
           <div class="col-md-6">
             <div class="form-group row">
-              <b class="col-12 col-lg-12 col-form-label"
-                >Chính sách bảo hành:</b
-              >
+              <b class="col-12 col-lg-12 col-form-label">Chính sách bảo hành:</b>
               <div class="col-12 col-lg-12 pt-1">
-                <input
-                  class="form-control form-control-sm"
-                  v-model="item.baohanh"
-                  :disabled="readonly"
-                />
+                <input class="form-control form-control-sm" v-model="item.baohanh" :disabled="readonly" />
               </div>
             </div>
             <div class="form-group row">
-              <b class="col-12 col-lg-12 col-form-label"
-                >Thời gian giao hàng:</b
-              >
+              <b class="col-12 col-lg-12 col-form-label">Thời gian giao hàng:</b>
               <div class="col-12 col-lg-12 pt-1">
-                <input
-                  class="form-control form-control-sm"
-                  v-model="item.thoigiangiaohang"
-                  :disabled="readonly"
-                />
+                <input class="form-control form-control-sm" v-model="item.thoigiangiaohang" :disabled="readonly" />
               </div>
             </div>
             <div class="form-group row">
-              <b class="col-12 col-lg-12 col-form-label"
-                >Điều kiện thanh toán:</b
-              >
+              <b class="col-12 col-lg-12 col-form-label">Điều kiện thanh toán:</b>
               <div class="col-12 col-lg-12 pt-1">
-                <input
-                  class="form-control form-control-sm"
-                  v-model="item.thanhtoan"
-                  :disabled="readonly"
-                />
+                <input class="form-control form-control-sm" v-model="item.thanhtoan" :disabled="readonly" />
+              </div>
+              <div class="col-12 col-lg-12 pt-3" v-if="readonly == false && model.type_id == 3">
+                <Button label="Lấy đơn giá" icon="pi pi-plus" size="small" @click="laydongiahoachat(item, key)"
+                  class="float-right"></Button>
               </div>
             </div>
           </div>
           <div class="col-md-12 mb-2">
-            <FormMuahangChitietNcc :index="key"></FormMuahangChitietNcc>
+            <FormMuahangChitietNcc :index="key" :ref="el => (formMuahangRefs[key] = el)"></FormMuahangChitietNcc>
           </div>
 
           <div class="row col-12 mt-2">
@@ -147,13 +92,8 @@
               <div class="row">
                 <b class="col">Thành tiền (Chưa VAT):</b>
                 <span class="col text-right">
-                  <InputNumber
-                    v-model="item.thanhtien"
-                    class="p-inputtext-sm"
-                    :suffix="' ' + item.tiente"
-                    :disabled="readonly || !item.is_edit"
-                    :maxFractionDigits="2"
-                  />
+                  <InputNumber v-model="item.thanhtien" class="p-inputtext-sm" :suffix="' ' + item.tiente"
+                    :disabled="readonly || !item.is_edit" :maxFractionDigits="2" />
                 </span>
               </div>
             </div>
@@ -166,13 +106,8 @@
               <div class="row">
                 <b class="col">Tiền VAT:</b>
                 <span class="col text-right">
-                  <InputNumber
-                    v-model="item.tienvat"
-                    class="p-inputtext-sm"
-                    :suffix="' ' + item.tiente"
-                    :disabled="readonly || !item.is_edit"
-                    :maxFractionDigits="2"
-                  />
+                  <InputNumber v-model="item.tienvat" class="p-inputtext-sm" :suffix="' ' + item.tiente"
+                    :disabled="readonly || !item.is_edit" :maxFractionDigits="2" />
                 </span>
               </div>
             </div>
@@ -185,13 +120,8 @@
               <div class="row">
                 <b class="col">Thành tiền:</b>
                 <span class="col text-right">
-                  <InputNumber
-                    v-model="item.thanhtien_vat"
-                    class="p-inputtext-sm"
-                    :suffix="' ' + item.tiente"
-                    :disabled="readonly || !item.is_edit"
-                    :maxFractionDigits="2"
-                  />
+                  <InputNumber v-model="item.thanhtien_vat" class="p-inputtext-sm" :suffix="' ' + item.tiente"
+                    :disabled="readonly || !item.is_edit" :maxFractionDigits="2" />
                 </span>
               </div>
             </div>
@@ -204,14 +134,8 @@
               <div class="row">
                 <b class="col">Phí giao hàng:</b>
                 <span class="col text-right">
-                  <InputNumber
-                    v-model="item.phigiaohang"
-                    class="p-inputtext-sm"
-                    :suffix="' ' + item.tiente"
-                    @update:modelValue="changetien(key)"
-                    :disabled="readonly"
-                    :maxFractionDigits="2"
-                  />
+                  <InputNumber v-model="item.phigiaohang" class="p-inputtext-sm" :suffix="' ' + item.tiente"
+                    @update:modelValue="changetien(key)" :disabled="readonly" :maxFractionDigits="2" />
                 </span>
               </div>
             </div>
@@ -223,14 +147,8 @@
               <div class="row">
                 <b class="col">Chiết khấu:</b>
                 <span class="col text-right">
-                  <InputNumber
-                    v-model="item.ck"
-                    class="p-inputtext-sm"
-                    :suffix="' ' + item.tiente"
-                    @update:modelValue="changetien(key)"
-                    :disabled="readonly"
-                    :maxFractionDigits="2"
-                  />
+                  <InputNumber v-model="item.ck" class="p-inputtext-sm" :suffix="' ' + item.tiente"
+                    @update:modelValue="changetien(key)" :disabled="readonly" :maxFractionDigits="2" />
                 </span>
               </div>
             </div>
@@ -240,23 +158,12 @@
 
             <div class="col-md-4">
               <div class="row">
-                <b class="col"
-                  >Tổng giá trị:
-                  <span
-                    class="pi pi-pencil ml-2"
-                    style="cursor: pointer"
-                    v-if="readonly == false"
-                    @click="item.is_edit = true"
-                  ></span
-                ></b>
+                <b class="col">Tổng giá trị:
+                  <span class="pi pi-pencil ml-2" style="cursor: pointer" v-if="readonly == false"
+                    @click="item.is_edit = true"></span></b>
                 <span class="col text-right">
-                  <InputNumber
-                    v-model="item.tonggiatri"
-                    class="p-inputtext-sm"
-                    :suffix="' ' + item.tiente"
-                    :disabled="readonly || !item.is_edit"
-                    :maxFractionDigits="2"
-                  />
+                  <InputNumber v-model="item.tonggiatri" class="p-inputtext-sm" :suffix="' ' + item.tiente"
+                    :disabled="readonly || !item.is_edit" :maxFractionDigits="2" />
                 </span>
               </div>
             </div>
@@ -264,32 +171,14 @@
           <div class="col-12" v-if="readonly == false">
             <b class="">Đính kèm:</b>
             <div class="custom-file mt-2">
-              <input
-                type="file"
-                class="custom-file-input"
-                :id="'customFile' + key"
-                :multiple="true"
-                :data-key="key"
-                @change="fileChange($event)"
-              />
-              <label class="custom-file-label" :for="'customFile' + key"
-                >Choose file</label
-              >
+              <input type="file" class="custom-file-input" :id="'customFile' + key" :multiple="true" :data-key="key"
+                @change="fileChange($event)" />
+              <label class="custom-file-label" :for="'customFile' + key">Choose file</label>
             </div>
           </div>
           <div class="col-12 pt-2 list_attachment file-box-content">
-            <div
-              class="file-box"
-              v-for="(item1, key1) in item.dinhkem"
-              :key="key1"
-              :data-key="item1.id"
-            >
-              <a
-                :href="item1.url"
-                target="_blank"
-                :download="download(item1.name)"
-                class="download-icon-link"
-              >
+            <div class="file-box" v-for="(item1, key1) in item.dinhkem" :key="key1" :data-key="item1.id">
+              <a :href="item1.url" target="_blank" :download="download(item1.name)" class="download-icon-link">
                 <i class="dripicons-download file-download-icon"></i>
 
                 <div class="text-center">
@@ -297,11 +186,7 @@
                   <h6 class="text-truncate" :title="item1.name">
                     {{ item1.name }}
                   </h6>
-                  <div
-                    style="cursor: pointer"
-                    @click.prevent="xoadinhkemncc(key1, item)"
-                    v-if="readonly == false"
-                  >
+                  <div style="cursor: pointer" @click.prevent="xoadinhkemncc(key1, item)" v-if="readonly == false">
                     <i class="fas fa-times-circle text-danger font-16"></i>
                   </div>
                 </div>
@@ -319,17 +204,9 @@
   <OverlayPanel ref="op">
     <div>
       Qui đổi tạm tính từ 1
-      <input
-        class="form-control form-control-sm d-inline-block"
-        style="width: 60px"
-        v-model="editingRow.tiente"
-      />
+      <input class="form-control form-control-sm d-inline-block" style="width: 60px" v-model="editingRow.tiente" />
       =
-      <input
-        class="form-control form-control-sm d-inline-block"
-        style="width: 60px"
-        v-model="editingRow.quidoi"
-      />
+      <input class="form-control form-control-sm d-inline-block" style="width: 60px" v-model="editingRow.quidoi" />
       <b>VND</b>
     </div>
   </OverlayPanel>
@@ -354,6 +231,7 @@ import { useSupplier } from "../../stores/supplier";
 import { rand } from "../../utilities/rand";
 import { download, formatPrice } from "../../utilities/util";
 import { useConfirm } from "primevue/useconfirm";
+const formMuahangRefs = ref([]);
 const confirm = useConfirm();
 const toast = useToast();
 const store_muahang = useMuahang();
@@ -469,8 +347,8 @@ const xoadinhkemncc = (key1, item) => {
           if (response.success) {
             $(
               ".list_attachment .file-box[data-key='" +
-                item.dinhkem[key1].id +
-                "']"
+              item.dinhkem[key1].id +
+              "']"
             ).remove();
             toast.add({
               severity: "success",
@@ -530,7 +408,7 @@ const submit1 = () => {
   ////
 
   waiting.value = true;
-  if (params.nccs[0].chitiet.length > 20) {
+  if (params.nccs[0].chitiet.length > 10) {
     var PromiseAll = [];
     for (var ncc of params.nccs) {
       // console.log(ncc);
@@ -563,6 +441,31 @@ const submit1 = () => {
       // console.log(response)
     });
   }
+};
+const laydongiahoachat = async (item, index) => {
+  // console.log(item);
+  if (!item.ncc_id) {
+    alert("Chưa chọn nhà cung cấp!");
+    return false;
+  }
+  var params = {
+    mancc: item.ncc.mancc,
+    muahang_id: model.value.id,
+  };
+  waiting.value = true;
+  var response = await muahangApi.laydongiahoachat(params);
+  waiting.value = false;
+  for (var key in response) {
+    var dongia = response[key];
+    var findIndex = item.chitiet.findIndex((item1) => item1.muahang_chitiet_id == key);
+    // console.log(findIndex);
+    if (findIndex != -1) {
+      item.chitiet[findIndex].dongia = dongia;
+    }
+  }
+  // console.log(item);
+  // console.log(formMuahangRefs.value[index]);
+  formMuahangRefs.value[index].changeDongia();
 };
 const readonly = ref(false);
 onMounted(() => {

@@ -29,11 +29,13 @@ namespace it_template.Areas.V1.Controllers
         private readonly IConfiguration _configuration;
         private UserManager<UserModel> UserManager;
         private readonly ViewRender _view;
-        public DutruController(ItContext context, IConfiguration configuration, UserManager<UserModel> UserMgr, ViewRender view) : base(context)
+        private QLSXContext _QLSXContext;
+        public DutruController(ItContext context, QLSXContext qlsxcontext, IConfiguration configuration, UserManager<UserModel> UserMgr, ViewRender view) : base(context)
         {
             _configuration = configuration;
             UserManager = UserMgr;
             _view = view;
+            _QLSXContext = qlsxcontext;
         }
         public JsonResult Get(int id)
         {
@@ -848,11 +850,16 @@ namespace it_template.Areas.V1.Controllers
                 customerData = customerData.Where(d => d.status_id == status_id);
             }
             int recordsFiltered = customerData.Count();
-            var datapost = customerData.OrderByDescending(d => d.id).Skip(skip).Take(pageSize).Include(d => d.user_created_by).Include(d => d.chitiet).ThenInclude(d => d.muahang_chitiet).ThenInclude(d => d.muahang).ToList();
+            var datapost = customerData.OrderByDescending(d => d.id).Skip(skip).Take(pageSize)
+                .Include(d => d.user_created_by).Include(d => d.chitiet)
+                .ThenInclude(d => d.muahang_chitiet).ThenInclude(d => d.muahang).ToList();
             var data = new ArrayList();
             foreach (var record in datapost)
             {
-                var muahang = record.chitiet.SelectMany(d => d.muahang_chitiet.Where(d => d.muahang.deleted_at == null && d.muahang.status_id != (int)Status.MuahangEsignError).Select(d => d.muahang).ToList()).Distinct()
+                var muahang = record.chitiet
+                    .SelectMany(d =>
+                    d.muahang_chitiet.Where(d => d.muahang.deleted_at == null && d.muahang.status_id != (int)Status.MuahangEsignError).Select(d => d.muahang).ToList())
+                    .Distinct()
                     .Select(d => new MuahangModel()
                     {
                         id = d.id,
@@ -863,7 +870,8 @@ namespace it_template.Areas.V1.Controllers
                         is_thanhtoan = d.is_thanhtoan,
                         is_nhanhang = d.is_nhanhang,
                         loaithanhtoan = d.loaithanhtoan,
-                        status_id = d.status_id,
+                        status_id = d.status_id
+
                     })
                     .ToList();
                 var data1 = new
@@ -934,7 +942,7 @@ namespace it_template.Areas.V1.Controllers
             //var tenhh = Request.Form["filters[tenhh]"].FirstOrDefault();
             int skip = start != null ? Convert.ToInt32(start) : 0;
             var customerData = _context.DutruChitietModel
-                .Include(d => d.muahang_chitiet).ThenInclude(d => d.muahang)
+                .Include(d => d.muahang_chitiet).ThenInclude(d => d.muahang).ThenInclude(d => d.muahang_chonmua).ThenInclude(d => d.ncc)
                 .Include(d => d.dutru).Where(d => d.dutru.status_id == (int)Status.EsignSuccess && d.date_huy == null);
 
             Expression<Func<DutruChitietModel, bool>> filter = p => p.dutru.created_by == user_id; // Biểu thức ban đầu là true (chấp nhận tất cả)
@@ -954,16 +962,26 @@ namespace it_template.Areas.V1.Controllers
             }
             customerData = customerData.Where(filter);
 
+            var list_muahang_id = _QLSXContext.VattuNhapChiTietModel.Select(d => d.muahang_id).ToList();
 
-
-            if (filterTable != null && filterTable == "Chưa xử lý")
+            if (filterTable != null && filterTable == "1")
             {
                 customerData = customerData.Where(d => d.muahang_chitiet.Count() == 0);
             }
-            else if (filterTable != null && filterTable == "Đã xử lý")
+            else if (filterTable != null && filterTable == "2")
             {
                 customerData = customerData.Where(d => d.muahang_chitiet.Count() > 0);
             }
+            else if (filterTable != null && filterTable == "3")
+            {
+                customerData = customerData.Where(d => d.mahh != null && d.muahang_chitiet.Any(m => !list_muahang_id.Contains(m.muahang_id)));
+            }
+            else if (filterTable != null && filterTable == "4")
+            {
+                customerData = customerData.Where(d => d.mahh != null && d.muahang_chitiet.Any(m => list_muahang_id.Contains(m.muahang_id)));
+            }
+
+
 
 
 
@@ -1170,15 +1188,18 @@ namespace it_template.Areas.V1.Controllers
                 var soluong_mua = muahang_chitiet.Where(d => d.muahang.parent_id == null).Sum(d => d.soluong * d.quidoi);
 
                 var soluong = soluong_mua < soluong_dutru ? soluong_dutru - soluong_mua : 0;
-                var list_muahang = new List<MuahangModel>();
+                var list_muahang = new List<dynamic>();
                 foreach (var m in muahang_chitiet)
                 {
+
                     var muahang = m.muahang;
                     if (muahang.parent_id > 0)
                     {
                         continue;
                     }
-                    list_muahang.Add(new MuahangModel()
+                    var soluong_mua_chitiet = m.soluong * m.quidoi;
+                    bool is_nhap = _QLSXContext.VattuNhapChiTietModel.Where(d => d.muahang_id == muahang.id).Count() > 0;
+                    list_muahang.Add(new
                     {
                         id = muahang.id,
                         name = muahang.name,
@@ -1189,6 +1210,10 @@ namespace it_template.Areas.V1.Controllers
                         is_nhanhang = muahang.is_nhanhang,
                         loaithanhtoan = muahang.loaithanhtoan,
                         status_id = muahang.status_id,
+                        mancc = muahang.muahang_chonmua?.ncc?.mancc,
+                        soluong = soluong_mua_chitiet,
+                        pay_at = muahang.pay_at, //// Ngày ký xong
+                        is_nhap = is_nhap
                     });
                 }
                 data.Add(new
@@ -1462,6 +1487,7 @@ namespace it_template.Areas.V1.Controllers
             //dt.Columns.Add("stt", typeof(int));
             dt.Columns.Add("code", typeof(string));
             dt.Columns.Add("name", typeof(string));
+            dt.Columns.Add("id", typeof(string));
             dt.Columns.Add("mahh", typeof(string));
             dt.Columns.Add("tenhh", typeof(string));
             dt.Columns.Add("tensp", typeof(string));
@@ -1554,6 +1580,8 @@ namespace it_template.Areas.V1.Controllers
                 //dr1["stt"] = (++stt);
                 dr1["code"] = dutru.code;
                 dr1["name"] = dutru.name;
+
+                dr1["id"] = record.id;
                 dr1["mahh"] = record.mahh;
                 dr1["tenhh"] = record.tenhh;
                 dr1["tensp"] = record.tensp;

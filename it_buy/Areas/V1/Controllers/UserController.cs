@@ -112,7 +112,7 @@ namespace it_template.Areas.V1.Controllers
 
         // POST: UserController/Edit/5
         [HttpPost]
-        public async Task<JsonResult> Edit(UserModel User, List<string> roles, List<int> departments)
+        public async Task<JsonResult> Edit(UserModel User, List<string> roles, List<int> departments, List<string> warehouses_vt)
         {
             UserModel User_old = _context.UserModel.Where(d => d.Id == User.Id).FirstOrDefault();
             var OldValues = JsonConvert.SerializeObject(User_old);
@@ -121,6 +121,7 @@ namespace it_template.Areas.V1.Controllers
             User_old.FullName = User.FullName;
             User_old.image_url = User.image_url;
             User_old.image_sign = User.image_sign;
+            User_old.warehouses_vt = warehouses_vt;
 
             _context.Update(User_old);
             _context.SaveChanges();
@@ -203,7 +204,19 @@ namespace it_template.Areas.V1.Controllers
             var role_avaliable = _configuration.GetSection("Roles").Get<string[]>().ToList();
             var roles_old = RoleManager.Roles.Where(d => role_avaliable.Contains(d.Name)).Select(a => a.Id).ToList();
             var roles = _context.UserRoleModel.Where(d => d.UserId == id && roles_old.Contains(d.RoleId)).Select(d => d.RoleId).ToList();
-            return Json(new { success = true, id = User.Id, roles = roles, departments = User.departments.Select(d => d.department_id.ToString()).ToList(), email = User.Email, FullName = User.FullName, image_url = User.image_url, image_sign = User.image_sign, PhoneNumber = User.PhoneNumber }, new System.Text.Json.JsonSerializerOptions()
+            return Json(new
+            {
+                success = true,
+                id = User.Id,
+                roles = roles,
+                warehouses_vt = User.warehouses_vt,
+                departments = User.departments.Select(d => d.department_id.ToString()).ToList(),
+                email = User.Email,
+                FullName = User.FullName,
+                image_url = User.image_url,
+                image_sign = User.image_sign,
+                PhoneNumber = User.PhoneNumber
+            }, new System.Text.Json.JsonSerializerOptions()
             {
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                 ReferenceHandler = ReferenceHandler.IgnoreCycles,

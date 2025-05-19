@@ -3,37 +3,19 @@
     <div class="row">
       <div class="col-md-6">
         <div class="form-group row">
-          <b class="col-12 col-lg-12 col-form-label"
-            >Tiêu đề:<i class="text-danger">*</i></b
-          >
+          <b class="col-12 col-lg-12 col-form-label">Tiêu đề:<i class="text-danger">*</i></b>
           <div class="col-12 col-lg-12 pt-1">
-            <input
-              class="form-control"
-              v-model="model.name"
-              required
-              :disabled="readonly"
-            />
+            <input class="form-control" v-model="model.name" required :disabled="readonly" />
           </div>
         </div>
       </div>
       <div class="col-md-1" v-if="model.type_id == 1">
         <div class="form-group row">
-          <b class="col-12 col-lg-12 col-form-label"
-            >Hàng mẫu:<i class="text-danger">*</i></b
-          >
+          <b class="col-12 col-lg-12 col-form-label">Hàng mẫu:<i class="text-danger">*</i></b>
           <div class="col-12 col-lg-12 pt-1">
-            <div
-              class="custom-control custom-switch switch-success"
-              style="height: 36px"
-            >
-              <input
-                type="checkbox"
-                :id="'hangmau'"
-                class="custom-control-input"
-                v-model="model.is_sample"
-                :disabled="readonly"
-                @change="changeHangMau()"
-              />
+            <div class="custom-control custom-switch switch-success" style="height: 36px">
+              <input type="checkbox" :id="'hangmau'" class="custom-control-input" v-model="model.is_sample"
+                :disabled="readonly" @change="changeHangMau()" />
               <label :for="'hangmau'" class="custom-control-label"></label>
             </div>
           </div>
@@ -41,62 +23,35 @@
       </div>
       <div class="col-md-2" v-if="!model.is_sample">
         <div class="form-group row">
-          <b class="col-12 col-lg-12 col-form-label"
-            >Nhiều nhà cung cấp:<i class="text-danger">*</i></b
-          >
+          <b class="col-12 col-lg-12 col-form-label">Nhiều nhà cung cấp:<i class="text-danger">*</i></b>
           <div class="col-12 col-lg-12 pt-1">
-            <div
-              class="custom-control custom-switch switch-success"
-              style="height: 36px"
-            >
-              <input
-                type="checkbox"
-                :id="'is_multiple_ncc'"
-                class="custom-control-input"
-                v-model="model.is_multiple_ncc"
-                :disabled="readonly"
-              />
-              <label
-                :for="'is_multiple_ncc'"
-                class="custom-control-label"
-              ></label>
+            <div class="custom-control custom-switch switch-success" style="height: 36px">
+              <input type="checkbox" :id="'is_multiple_ncc'" class="custom-control-input"
+                v-model="model.is_multiple_ncc" :disabled="readonly" />
+              <label :for="'is_multiple_ncc'" class="custom-control-label"></label>
             </div>
           </div>
         </div>
       </div>
       <div class="col-md-3" v-if="model.type_id == 1 && model.is_sample">
         <div class="form-group row">
-          <b class="col-12 col-lg-12 col-form-label"
-            >Nhà cung cấp:<i class="text-danger">*</i></b
-          >
+          <b class="col-12 col-lg-12 col-form-label">Nhà cung cấp:<i class="text-danger">*</i></b>
           <div class="col-12 col-lg-12 pt-1">
-            <NccTreeSelect
-              v-model="model.nhacungcap_id"
-              :disabled="readonly"
-            ></NccTreeSelect>
+            <NccTreeSelect v-model="model.nhacungcap_id" :disabled="readonly"></NccTreeSelect>
           </div>
         </div>
       </div>
       <div class="col-md-12">
         <div class="form-group row">
-          <b class="col-12 col-lg-12 col-form-label"
-            >Lý do mua hàng:<i class="text-danger">*</i></b
-          >
+          <b class="col-12 col-lg-12 col-form-label">Lý do mua hàng:<i class="text-danger">*</i></b>
           <div class="col-12 col-lg-12 pt-1">
-            <textarea
-              class="form-control"
-              v-model="model.note"
-              required
-              :disabled="readonly"
-            ></textarea>
+            <textarea class="form-control" v-model="model.note" required :disabled="readonly"></textarea>
           </div>
         </div>
       </div>
       <div class="col-md-12">
         <div class="form-group row">
-          <b class="col-12 col-lg-12 col-form-label"
-            >Hàng hóa:<i class="text-danger">*</i></b
-          >
+          <b class="col-12 col-lg-12 col-form-label">Hàng hóa:<i class="text-danger">*</i></b>
           <div class="col-12 col-lg-12 pt-1">
             <FormMuahangChitiet></FormMuahangChitiet>
           </div>
@@ -110,12 +65,8 @@
                       </div> -->
       </div>
       <div class="col-md-12 text-center" v-if="!readonly">
-        <Button
-          label="Lưu lại"
-          icon="pi pi-save"
-          class="p-button-success p-button-sm mr-2"
-          @click.prevent="submit()"
-        ></Button>
+        <Button label="Lưu lại" icon="pi pi-save" class="p-button-success p-button-sm mr-2"
+          @click.prevent="submit()"></Button>
         <!-- <Button label="Gửi và nhận báo giá" icon="far fa-paper-plane" class="p-button-sm mr-2" @click.prevent="baogia()"
           v-if="!model.is_sample"></Button> -->
       </div>
