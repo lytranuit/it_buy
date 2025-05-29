@@ -78,10 +78,10 @@
           <li class="nav-item">
             <router-link class="nav-link" to="/materials"><i class="ti-control-record"></i>Hàng hóa</router-link>
           </li>
-          <li class="nav-item" v-if="is_Cungung">
+          <li class="nav-item">
             <router-link class="nav-link" to="/supplier"><i class="ti-control-record"></i>Nhà cung cấp</router-link>
           </li>
-          <li class="nav-item" v-if="is_Cungung">
+          <li class="nav-item">
             <router-link class="nav-link" to="/producer"><i class="ti-control-record"></i>Nhà sản xuất</router-link>
           </li>
           <!-- <li class="nav-item" v-if="is_KHSX || is_RD || is_admin">

@@ -127,7 +127,6 @@ import { formatDate, formatPrice } from "../../utilities/util";
 import { useMuahang } from "../../stores/muahang";
 import { useAuth } from "../../stores/auth";
 import { useGeneral } from "../../stores/general";
-import NsxTreeSelect from "../TreeSelect/NsxTreeSelect.vue";
 
 const store_auth = useAuth();
 const store_muahang = useMuahang();
@@ -211,10 +210,6 @@ const columns = ref([
   },
 ]);
 
-const changeProducer = store_general.changeProducer;
-const selectedColumns = computed(() => {
-  return columns.value.filter((col) => col.hide != true);
-});
 const changeNhanhang = (row) => {
   if (row.status_nhanhang == 1) {
     row.user_nhanhang_id = user.value.id;

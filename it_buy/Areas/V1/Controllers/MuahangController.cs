@@ -799,49 +799,50 @@ namespace it_template.Areas.V1.Controllers
                     list_dutru_chitiet_id.Add(item.dutru_chitiet_id);
                     _context.Update(item);
                 }
-            }
-            _context.SaveChanges();
-            ////Check nhận hàng mua hàng
-            var muahang = _context.MuahangModel.Where(d => d.id == muahang_id).FirstOrDefault();
 
-            var list_nhanhang = list.Where(d => d.status_nhanhang == 1).Count();
-            if (list_nhanhang == list.Count())
-            {
-                muahang.is_nhanhang = true;
-                //if (muahang.is_thanhtoan == true && muahang.is_nhanhang == true)
-                //{
-                //    muahang.date_finish = DateTime.Now;
-                //    _context.Update(muahang);
-                //}
-                _context.Update(muahang);
                 _context.SaveChanges();
+                ////Check nhận hàng mua hàng
+                var muahang = _context.MuahangModel.Where(d => d.id == muahang_id).FirstOrDefault();
 
-            }
-            //// Check du trù finish
-            var list_dutru_id = _context.DutruChitietModel.Where(d => list_dutru_chitiet_id.Contains(d.id)).Select(d => d.dutru_id).Distinct().ToList();
-            var list_dutru = _context.DutruModel.Where(d => list_dutru_id.Contains(d.id)).Include(d => d.chitiet).ToList();
-            foreach (var dutru in list_dutru)
-            {
-                var soluong_ht = 0;
-                var chitiet = dutru.chitiet.Where(d => d.date_huy == null).ToList();
-                foreach (var item in chitiet)
+                var list_nhanhang = list.Where(d => d.status_nhanhang == 1).Count();
+                if (list_nhanhang == list.Count())
                 {
-                    var soluong_dutru = item.soluong;
-                    var muahang_chitiet = _context.MuahangChitietModel.Where(d => d.dutru_chitiet_id == item.id && d.status_nhanhang == 1).ToList();
-                    var soluong_mua = muahang_chitiet.Sum(d => d.soluong * d.quidoi);
-                    if (soluong_dutru == soluong_mua)
+                    muahang.is_nhanhang = true;
+                    //if (muahang.is_thanhtoan == true && muahang.is_nhanhang == true)
+                    //{
+                    //    muahang.date_finish = DateTime.Now;
+                    //    _context.Update(muahang);
+                    //}
+                    _context.Update(muahang);
+                    _context.SaveChanges();
+
+                }
+                //// Check du trù finish
+                var list_dutru_id = _context.DutruChitietModel.Where(d => list_dutru_chitiet_id.Contains(d.id)).Select(d => d.dutru_id).Distinct().ToList();
+                var list_dutru = _context.DutruModel.Where(d => list_dutru_id.Contains(d.id)).Include(d => d.chitiet).ToList();
+                foreach (var dutru in list_dutru)
+                {
+                    var soluong_ht = 0;
+                    var chitiet = dutru.chitiet.Where(d => d.date_huy == null).ToList();
+                    foreach (var item in chitiet)
                     {
-                        soluong_ht++;
+                        var soluong_dutru = item.soluong;
+                        var muahang_chitiet = _context.MuahangChitietModel.Where(d => d.dutru_chitiet_id == item.id && d.status_nhanhang == 1).ToList();
+                        var soluong_mua = muahang_chitiet.Sum(d => d.soluong * d.quidoi);
+                        if (soluong_dutru == soluong_mua)
+                        {
+                            soluong_ht++;
+                        }
+                    }
+                    if (soluong_ht == chitiet.Count())
+                    {
+                        dutru.date_finish = DateTime.Now;
+                        _context.Update(dutru);
+                        _context.SaveChanges();
                     }
                 }
-                if (soluong_ht == chitiet.Count())
-                {
-                    dutru.date_finish = DateTime.Now;
-                    _context.Update(dutru);
-                    _context.SaveChanges();
-                }
-            }
 
+            }
             return Json(new { success = true });
 
         }
@@ -2437,8 +2438,8 @@ namespace it_template.Areas.V1.Controllers
         }
         public async Task<JsonResult> updateUserNhanhang()
         {
-            return Json(new { });
-            var muahang_chitiet = _context.MuahangChitietModel.Include(d => d.dutru_chitiet).ThenInclude(d => d.dutru).ToList();
+            //return Json(new { });
+            var muahang_chitiet = _context.MuahangChitietModel.Where(d=>d.user_nhanhang_id == null).Include(d => d.dutru_chitiet).ThenInclude(d => d.dutru).ToList();
             foreach (var item in muahang_chitiet)
             {
                 item.user_nhanhang_id = item.dutru_chitiet.dutru.created_by;

@@ -8,51 +8,33 @@
             <div class="col-md-4 form-group">
               <b class="">Ngày giao hàng dự kiến:</b>
               <div class="mt-2">
-                <Calendar
-                  :modelValue="formatDate(model.date)"
-                  dateFormat="yy-mm-dd"
-                  class="date-custom"
-                  :manualInput="false"
-                  showIcon
-                  :disabled="true"
-                />
+                <Calendar :modelValue="formatDate(model.date)" dateFormat="yy-mm-dd" class="date-custom"
+                  :manualInput="false" showIcon :disabled="true" />
               </div>
             </div>
             <div class="col-md-4 form-group">
               <b class="">Nhà cung cấp:</b>
               <div class="mt-2">
-                <InputText
-                  :modelValue="chonmua.ncc?.tenncc"
-                  :disabled="true"
-                  size="small"
-                  class="form-control"
-                ></InputText>
+                <InputText :modelValue="chonmua.ncc?.tenncc" :disabled="true" size="small" class="form-control">
+                </InputText>
               </div>
             </div>
             <div class="col-md-4 form-group">
               <b class="">Mã đặt hàng:</b>
               <div class="mt-2">
-                <InputText
-                  :modelValue="model?.code"
-                  :disabled="true"
-                  size="small"
-                  class="form-control"
-                ></InputText>
+                <InputText :modelValue="model?.code" :disabled="true" size="small" class="form-control"></InputText>
               </div>
             </div>
             <div class="col-md-12 mb-2">
               <b class="">Hàng hóa:</b>
               <FormMuahangNhanhang
-                :editable="!model.is_nhanhang"
-              ></FormMuahangNhanhang>
+                :editable="list_user_nhanhang.length > 0 && list_user_nhanhang.indexOf(user.id) != -1">
+              </FormMuahangNhanhang>
             </div>
-            <div class="col-md-12 text-center mt-3" v-if="!model.is_nhanhang">
-              <Button
-                label="Lưu lại"
-                icon="pi pi-save"
-                class="p-button-success p-button-sm mr-2"
-                @click.prevent="savenhanhang()"
-              ></Button>
+            <div class="col-md-12 text-center mt-3"
+              v-if="list_user_nhanhang.length > 0 && list_user_nhanhang.indexOf(user.id) != -1">
+              <Button label="Lưu lại" icon="pi pi-save" class="p-button-success p-button-sm mr-2"
+                @click.prevent="savenhanhang()"></Button>
             </div>
           </div>
         </div>
@@ -77,12 +59,15 @@ import moment from "moment";
 import { formatDate } from "../../../utilities/util";
 import FormMuahangNhanhang from "../../../components/Datatable/FormMuahangNhanhang.vue";
 import { useToast } from "primevue/usetoast";
+import { useAuth } from "../../../stores/auth";
 const minDate = ref(new Date());
 const confirm = useConfirm();
 const toast = useToast();
 const route = useRoute();
 const storeMuahang = useMuahang();
-const { model, waiting, datatable, chonmua } = storeToRefs(storeMuahang);
+const store = useAuth();
+const { user } = storeToRefs(store);
+const { model, waiting, datatable, chonmua, list_user_nhanhang } = storeToRefs(storeMuahang);
 
 const savenhanhang = () => {
   // console.log(list_nhanhang);
@@ -138,7 +123,7 @@ const load_data = async (id) => {
   model.value = res;
   datatable.value = chitiet;
   chonmua.value = muahang_chonmua;
-
+  list_user_nhanhang.value = listuser;
   waiting.value = false;
 };
 onMounted(() => {

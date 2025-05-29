@@ -212,10 +212,12 @@ namespace Vue.Controllers
                                 _context.Add(muahang_data);
                                 await _context.SaveChangesAsync();
                                 var list_chitiet = new Dictionary<int, int>();
+                                var list_chitiet_user_nhanhang = new Dictionary<int, string>();
                                 var model_chitiet = _context.MuahangChitietModel.Where(d => d.muahang_id == model.id).ToList();
                                 foreach (var item in model_chitiet)
                                 {
                                     list_chitiet.Add(item.id, item.dutru_chitiet_id);
+                                    list_chitiet_user_nhanhang.Add(item.id, item.user_nhanhang_id);
                                 }
                                 ////MUAHANG DINHKEM
                                 var model_dinhkem = _context.MuahangDinhkemModel.Where(d => d.muahang_id == model.id && d.deleted_at == null).ToList();
@@ -268,9 +270,11 @@ namespace Vue.Controllers
                                 foreach (var item in chitiet)
                                 {
                                     var dutru_chitiet_id = list_chitiet[item.muahang_chitiet_id];
+                                    var user_nhanhang_id = list_chitiet_user_nhanhang[item.muahang_chitiet_id];
                                     var muahang_chitiet_data1 = new MuahangChitietModel()
                                     {
                                         muahang_id = muahang_data.id,
+                                        user_nhanhang_id = user_nhanhang_id,
                                         dutru_chitiet_id = dutru_chitiet_id,
                                         grade = item.grade,
                                         mansx = item.mansx,

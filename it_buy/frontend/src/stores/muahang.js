@@ -75,6 +75,7 @@ export const useMuahang = defineStore("muahang", () => {
     tabviewActive,
     QrNhanhang,
     user_created_by,
+    list_user_nhanhang,
     chonmua,
     load_data,
     getQrNhanhang,

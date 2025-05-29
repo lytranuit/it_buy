@@ -336,7 +336,7 @@ const onSort = (event) => {
   loadLazyData();
 };
 const changeFilterTable = () => {
-  selected.value = null;
+  //selected.value = null;
   loadLazyData();
 };
 const checkdanhgia = computed(() => {

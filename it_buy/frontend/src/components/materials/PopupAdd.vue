@@ -17,25 +17,25 @@
             <div class="row">
               <div class="field col-md">
                 <label for="name">Mã nhóm<span class="text-danger">*</span></label>
-                <Nhom v-model="model.nhom" :multiple="false" :disabled="model.nhom != 'Khac'"></Nhom>
+                <Nhom v-model="model.nhom" :multiple="false"></Nhom>
                 <small class="p-error" v-if="submitted && !model.nhom">Required.</small>
               </div>
               <div class="field col">
                 <label for="name">Mã hàng hóa <span class="text-danger">*</span></label>
                 <input-text id="name" class="p-inputtext-sm" v-model.trim="model.mahh" required="true"
-                  :class="{ 'p-invalid': submitted && !model.mahh }" :disabled="model.nhom != 'Khac'" />
+                  :class="{ 'p-invalid': submitted && !model.mahh }" />
                 <small class="p-error" v-if="submitted && !model.mahh">Required.</small>
               </div>
               <div class="field col">
                 <label for="name">Tên hàng hóa <span class="text-danger">*</span></label>
                 <input-text id="name" class="p-inputtext-sm" v-model.trim="model.tenhh" required="true"
-                  :class="{ 'p-invalid': submitted && !model.tenhh }" :disabled="model.nhom != 'Khac'" />
+                  :class="{ 'p-invalid': submitted && !model.tenhh }" />
                 <small class="p-error" v-if="submitted && !model.tenhh">Required.</small>
               </div>
               <div class="field col">
                 <label for="name">ĐVT<span class="text-danger">*</span></label>
                 <input-text id="name" class="p-inputtext-sm" v-model.trim="model.dvt" required="true"
-                  :class="{ 'p-invalid': submitted && !model.dvt }" :disabled="model.nhom != 'Khac'" />
+                  :class="{ 'p-invalid': submitted && !model.dvt }" />
                 <small class="p-error" v-if="submitted && !model.dvt">Required.</small>
               </div>
             </div>
@@ -43,12 +43,12 @@
             <div class="row mb-2">
               <div class="field col">
                 <label for="name">Nhà sản xuất</label>
-                <NsxTreeSelect v-model="model.mansx" :required="true" :useID="false" :disabled="model.nhom != 'Khac'">
+                <NsxTreeSelect v-model="model.mansx" :required="true" :useID="false">
                 </NsxTreeSelect>
               </div>
               <div class="field col">
                 <label for="name">Nhà cung cấp</label>
-                <NccTreeSelect v-model="model.mancc" :required="true" :useID="false" :disabled="model.nhom != 'Khac'">
+                <NccTreeSelect v-model="model.mancc" :required="true" :useID="false">
                 </NccTreeSelect>
               </div>
             </div>
@@ -57,12 +57,11 @@
         <div class="row mb-2">
           <div class="field col">
             <label for="name">Mã Artwork</label>
-            <input-text id="name" class="p-inputtext-sm" v-model.trim="model.masothietke"
-              :disabled="model.nhom != 'Khac'" />
+            <input-text id="name" class="p-inputtext-sm" v-model.trim="model.masothietke" />
           </div>
           <div class="field col">
             <label for="name">Grade</label>
-            <input-text id="name" class="p-inputtext-sm" v-model.trim="model.grade" :disabled="model.nhom != 'Khac'" />
+            <input-text id="name" class="p-inputtext-sm" v-model.trim="model.grade" />
           </div>
         </div>
         <div class="row mb-2">
