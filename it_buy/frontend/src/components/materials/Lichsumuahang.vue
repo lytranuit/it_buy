@@ -17,6 +17,7 @@
             <th>Đơn giá</th>
             <th>Thành tiền</th>
             <th>Ngày giao/nhận</th>
+            <th>Mô tả</th>
           </tr>
         </thead>
         <tbody>
@@ -30,6 +31,7 @@
             <th>{{ formatPrice(item.dongia, 2) }} {{ item.tiente }}</th>
             <th>{{ formatPrice(item.thanhtien, 2) }} {{ item.tiente }}</th>
             <th>{{ formatDate(item.muahang?.date) }}</th>
+            <th>{{ item.note }}</th>
           </tr>
         </tbody>
       </table>

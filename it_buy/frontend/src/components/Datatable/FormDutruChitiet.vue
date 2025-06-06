@@ -1,37 +1,13 @@
 <template>
   <div id="TableDutruChitiet">
-    <DataTable
-      showGridlines
-      :value="datatable"
-      ref="dt"
-      class="p-datatable-ct"
-      :rowHover="true"
-      :loading="loading"
-      responsiveLayout="scroll"
-      :resizableColumns="true"
-      columnResizeMode="expand"
-      v-model:selection="selected"
-      :rowClass="rowClass"
-    >
+    <DataTable showGridlines :value="datatable" ref="dt" class="p-datatable-ct" :rowHover="true" :loading="loading"
+      responsiveLayout="scroll" :resizableColumns="true" columnResizeMode="expand" v-model:selection="selected"
+      :rowClass="rowClass">
       <template #header>
-        <div
-          class="d-inline-flex"
-          style="width: 200px"
-          v-if="model.status_id == 1"
-        >
-          <Button
-            label="Thêm"
-            icon="pi pi-plus"
-            class="p-button-success p-button-sm mr-2"
-            @click="addRow"
-          ></Button>
-          <Button
-            label="Xóa"
-            icon="pi pi-trash"
-            class="p-button-danger p-button-sm"
-            :disabled="!selected || !selected.length"
-            @click="confirmDeleteSelected"
-          ></Button>
+        <div class="d-inline-flex" style="width: 200px" v-if="model.status_id == 1">
+          <Button label="Thêm" icon="pi pi-plus" class="p-button-success p-button-sm mr-2" @click="addRow"></Button>
+          <Button label="Xóa" icon="pi pi-trash" class="p-button-danger p-button-sm"
+            :disabled="!selected || !selected.length" @click="confirmDeleteSelected"></Button>
         </div>
         <div class="d-inline-flex float-right"></div>
       </template>
@@ -40,65 +16,38 @@
         <div class="text-center">Không có dữ liệu.</div>
       </template>
       <Column selectionMode="multiple" v-if="model.status_id == 1"></Column>
-      <Column
-        v-for="col in selectedColumns"
-        :field="col.data"
-        :header="col.label"
-        :key="col.data"
-        :showFilterMatchModes="false"
-        :class="col.data"
-      >
+      <Column v-for="col in selectedColumns" :field="col.data" :header="col.label" :key="col.data"
+        :showFilterMatchModes="false" :class="col.data">
         <template #body="slotProps">
           <template v-if="col.data == 'tenhh' && model.status_id == 1">
             <div class="d-flex align-items-center">
-              <material-auto-complete
-                v-model="slotProps.data[col.data]"
-                :disabled="slotProps.data['mahh'] != null"
-                :type_id="model.type_id"
-                @item-select="select($event, slotProps.data)"
-              >
+              <material-auto-complete v-model="slotProps.data[col.data]" :disabled="slotProps.data['mahh'] != null"
+                :type_id="model.type_id" @item-select="select($event, slotProps.data)">
               </material-auto-complete>
               <!-- <span class="fas fa-plus ml-3 text-success" style="cursor: pointer;"
                                 @click="openNew(slotProps.index)" v-if="model.type_id != 1"></span> -->
             </div>
           </template>
           <template v-else-if="col.data == 'grade' && model.status_id == 1">
-            <select
-              class="form-control form-control-sm"
-              v-model="slotProps.data[col.data]"
-            >
+            <select class="form-control form-control-sm" v-model="slotProps.data[col.data]">
               <option value="Dược phẩm">Dược phẩm</option>
               <option value="Mỹ phẩm">Mỹ phẩm</option>
               <option value="Thực phẩm">Thực phẩm</option>
             </select>
           </template>
-          <template
-            v-else-if="col.data == 'list_dangbaoche' && model.status_id == 1"
-          >
-            <DangbaocheTreeSelect
-              v-model="slotProps.data.list_dangbaoche"
-              @update:modelValue="changeDangbaoche($event, slotProps.data)"
-              :multiple="true"
-            ></DangbaocheTreeSelect>
+          <template v-else-if="col.data == 'list_dangbaoche' && model.status_id == 1">
+            <DangbaocheTreeSelect v-model="slotProps.data.list_dangbaoche"
+              @update:modelValue="changeDangbaoche($event, slotProps.data)" :multiple="true"></DangbaocheTreeSelect>
           </template>
           <template v-else-if="col.data == 'list_sp' && model.status_id == 1">
-            <ProductTreeSelect
-              v-model="slotProps.data.list_sp"
-              @update:modelValue="changeProduct($event, slotProps.data)"
-              :multiple="true"
-            ></ProductTreeSelect>
+            <ProductTreeSelect v-model="slotProps.data.list_sp"
+              @update:modelValue="changeProduct($event, slotProps.data)" :multiple="true"></ProductTreeSelect>
           </template>
-          <template
-            v-else-if="
-              (col.data == 'dvt' || col.data == 'masothietke') &&
-              model.status_id == 1
-            "
-          >
-            <input
-              v-model="slotProps.data[col.data]"
-              class="p-inputtext p-inputtext-sm"
-              required
-            />
+          <template v-else-if="
+            (col.data == 'dvt' || col.data == 'masothietke') &&
+            model.status_id == 1
+          ">
+            <input v-model="slotProps.data[col.data]" class="p-inputtext p-inputtext-sm" required />
           </template>
           <template v-else-if="col.data == 'is_new' && model.status_id == 1">
             <input-switch v-model="slotProps.data[col.data]" />
@@ -109,82 +58,37 @@
             }}</span>
           </template>
           <template v-else-if="col.data == 'nhasx' && model.status_id == 1">
-            <NsxTreeSelect
-              v-model="slotProps.data['mansx']"
-              :required="true"
-              :useID="false"
-              @update:modelValue="changeProducer(slotProps.data)"
-            >
+            <NsxTreeSelect v-model="slotProps.data['mansx']" :required="true" :useID="false"
+              @update:modelValue="changeProducer(slotProps.data)">
             </NsxTreeSelect>
           </template>
           <template v-else-if="col.data == 'soluong' && model.status_id == 1">
-            <input-number
-              v-model="slotProps.data[col.data]"
-              class="p-inputtext-sm"
-              :maxFractionDigits="2"
-            />
+            <input-number v-model="slotProps.data[col.data]" class="p-inputtext-sm" :maxFractionDigits="2" />
           </template>
 
           <template v-else-if="col.data == 'note' && model.status_id == 1">
             <textarea v-model="slotProps.data[col.data]" class="form-control" />
           </template>
           <template v-else-if="col.data == 'date' && model.status_id == 1">
-            <Calendar
-              v-model="slotProps.data.date"
-              dateFormat="yy-mm-dd"
-              class="date-custom"
-              :manualInput="false"
-              showIcon
-            />
+            <Calendar v-model="slotProps.data.date" dateFormat="yy-mm-dd" class="date-custom" :manualInput="false"
+              showIcon />
           </template>
           <template v-else-if="col.data == 'dinhkem' && model.status_id == 1">
             <div class="custom-file mt-2">
-              <input
-                type="file"
-                class="hinhanh-file-input"
-                :id="'hinhanhFile' + slotProps.data['stt']"
-                :multiple="true"
-                :data-key="slotProps.data['stt']"
-                @change="fileChange($event)"
-              />
-              <label
-                class="custom-file-label"
-                :for="'hinhanhFile' + slotProps.data['stt']"
-                >Choose file</label
-              >
+              <input type="file" class="hinhanh-file-input" :id="'hinhanhFile' + slotProps.data['stt']" :multiple="true"
+                :data-key="slotProps.data['stt']" @change="fileChange($event)" />
+              <label class="custom-file-label" :for="'hinhanhFile' + slotProps.data['stt']">Choose file</label>
             </div>
-            <div
-              class="mt-2 dinhkemchitiet"
-              v-for="(item, index) in slotProps.data['dinhkem']"
-              :key="index"
-            >
-              <a
-                target="_blank"
-                :href="item.url"
-                class="text-blue"
-                :download="download(item.name)"
-                >{{ item.name }}</a
-              ><i
-                class="text-danger fas fa-trash ml-2"
-                style="cursor: pointer"
-                @click="xoachitietdinhkem(index, slotProps.data['dinhkem'])"
-              ></i>
+            <div class="mt-2 dinhkemchitiet" v-for="(item, index) in slotProps.data['dinhkem']" :key="index">
+              <a target="_blank" :href="item.url" class="text-blue" :download="download(item.name)">{{ item.name
+              }}</a><i class="text-danger fas fa-trash ml-2" style="cursor: pointer"
+                @click="xoachitietdinhkem(index, slotProps.data['dinhkem'])"></i>
             </div>
           </template>
 
           <template v-else-if="col.data == 'dinhkem'">
-            <div
-              class="mt-2 dinhkemchitiet"
-              v-for="(item, index) in slotProps.data['dinhkem']"
-              :key="index"
-            >
-              <a
-                target="_blank"
-                :href="item.url"
-                class="text-blue"
-                :download="download(item.name)"
-                >{{ item.name }}</a
-              >
+            <div class="mt-2 dinhkemchitiet" v-for="(item, index) in slotProps.data['dinhkem']" :key="index">
+              <a target="_blank" :href="item.url" class="text-blue" :download="download(item.name)">{{ item.name }}</a>
             </div>
           </template>
 
@@ -194,9 +98,7 @@
           <template v-else-if="col.data == 'list_sp' && model.status_id != 1">
             {{ slotProps.data.tensp }}
           </template>
-          <template
-            v-else-if="col.data == 'list_dangbaoche' && model.status_id != 1"
-          >
+          <template v-else-if="col.data == 'list_dangbaoche' && model.status_id != 1">
             {{ slotProps.data.dangbaoche }}
           </template>
           <template v-else-if="col.data == 'date' && model.status_id != 1">
@@ -207,20 +109,10 @@
           </template>
         </template>
       </Column>
-      <Column
-        header="Hủy"
-        field="action"
-        key="action"
-        v-if="model.status_id == 4"
-      >
+      <Column header="Hủy" field="action" key="action" v-if="model.status_id == 4">
         <template #body="slotProps">
-          <a
-            href="#"
-            class="text-danger"
-            @click="huyitem(slotProps.data)"
-            v-if="slotProps.data['can_huy'] && user.id == model.created_by"
-            ><i class="fas fa-trash"></i> Hủy</a
-          >
+          <a href="#" class="text-danger" @click="huyitem(slotProps.data)"
+            v-if="slotProps.data['can_huy'] && user.id == model.created_by"><i class="fas fa-trash"></i> Hủy</a>
           <div v-else-if="slotProps.data['date_huy']">
             <div>{{ slotProps.data.note_huy }}</div>
             <div class="small">
@@ -234,35 +126,14 @@
       </Column>
     </DataTable>
   </div>
-  <Dialog
-    v-model:visible="visible"
-    modal
-    header="Lý do hủy"
-    style="width: 50vw"
-    :breakpoints="{ '1199px': '75vw', '575px': '95vw' }"
-  >
-    <textarea
-      class="form-control form-control-sm"
-      v-model="editRow.note_huy"
-      rows="5"
-    ></textarea>
+  <Dialog v-model:visible="visible" modal header="Lý do hủy" style="width: 50vw"
+    :breakpoints="{ '1199px': '75vw', '575px': '95vw' }">
+    <textarea class="form-control form-control-sm" v-model="editRow.note_huy" rows="5"></textarea>
 
     <div class="d-flex justify-content-center mt-2">
-      <Button
-        type="button"
-        label="Cancel"
-        severity="secondary"
-        @click="visible = false"
-        size="small"
-        class="mr-2"
-      ></Button>
-      <Button
-        type="button"
-        label="Save"
-        severity="danger"
-        @click="HuyChitiet"
-        size="small"
-      ></Button>
+      <Button type="button" label="Cancel" severity="secondary" @click="visible = false" size="small"
+        class="mr-2"></Button>
+      <Button type="button" label="Save" severity="danger" @click="HuyChitiet" size="small"></Button>
     </div>
   </Dialog>
 </template>
@@ -397,6 +268,11 @@ const columns = computed(() => {
         className: "text-center",
       },
       {
+        label: "Mã hàng",
+        data: "mahh",
+        className: "text-center",
+      },
+      {
         label: "Hàng hóa(*)",
         data: "tenhh",
         className: "text-center",
@@ -457,6 +333,10 @@ const columns = computed(() => {
       {
         label: "STT(*)",
         data: "stt",
+        className: "text-center",
+      }, {
+        label: "Mã hàng",
+        data: "mahh",
         className: "text-center",
       },
       {
@@ -568,7 +448,7 @@ onMounted(async () => {
 
 <style>
 .mahh {
-  min-width: 300px;
+  min-width: 150px;
 }
 
 .tenhh,
@@ -582,11 +462,13 @@ onMounted(async () => {
   word-wrap: break-word;
   white-space: pre-line;
 }
+
 .list_sp,
 .nhasx,
 .list_dangbaoche {
   min-width: 300px;
 }
+
 .grade {
   min-width: 150px;
 }
@@ -598,6 +480,7 @@ onMounted(async () => {
 .note {
   min-width: 150px;
 }
+
 tr.bg-gray {
   background-color: rgb(229 229 229) !important;
 }

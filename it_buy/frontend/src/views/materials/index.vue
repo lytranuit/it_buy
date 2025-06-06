@@ -13,7 +13,7 @@
             :rowsPerPageOptions="[10, 50, 100]" :rows="rows" :totalRecords="totalRecords" @page="onPage($event)"
             :rowHover="true" :loading="loading" responsiveLayout="scroll" :resizableColumns="true"
             columnResizeMode="expand" v-model:filters="filters" filterDisplay="menu" editMode="cell"
-            @cell-edit-complete="onCellEditComplete">
+            @cell-edit-complete="onCellEditComplete" @sort="onSort($event)">
             <template #header>
               <div style="width: 200px">
                 <TreeSelect :options="columns" v-model="showing" multiple :limit="0"
@@ -27,7 +27,7 @@
             </template>
             <Column selectionMode="multiple" style="width: 3rem" :exportable="false"></Column>
             <Column v-for="col of selectedColumns" :field="col.data" :header="col.label" :key="col.data"
-              :class="col.className" :showFilterMatchModes="false">
+              :class="col.className" :showFilterMatchModes="false" :sortable="col.sortable">
               <template #body="slotProps">
                 <template v-if="col.data == 'mansx'">
                   ({{ slotProps.data.mansx }})
@@ -165,6 +165,7 @@ const onFileChange = (event, mahh) => {
   }
 };
 ////Datatable
+const sorts = ref({});
 const datatable = ref();
 const columns = ref([
   {
@@ -179,6 +180,7 @@ const columns = ref([
     data: "mahh",
     className: "text-center",
     filter: true,
+    sortable: true,
   },
   {
     id: 2,
@@ -186,6 +188,7 @@ const columns = ref([
     data: "tenhh",
     className: "",
     filter: true,
+    sortable: true,
   },
   {
     id: 3,
@@ -238,14 +241,25 @@ const lazyParams = computed(() => {
   for (let key in filters.value) {
     data_filters[key] = filters.value[key].value;
   }
+  let data_sorts = {};
+  // console.log(sorts.value);
+  for (let key in sorts.value) {
+    data_sorts[key] = sorts.value[key];
+  }
   return {
     draw: draw.value,
     start: first.value,
     length: rows.value,
+    sorts: data_sorts,
     filters: data_filters,
   };
 });
-
+const onSort = (event) => {
+  // console.log(event);
+  sorts.value = {};
+  sorts.value[event.sortField] = event.sortOrder;
+  loadLazyData();
+};
 const onCellEditComplete = (event) => {
   let { newValue, value, newData, index } = event;
   if (newValue == value) {

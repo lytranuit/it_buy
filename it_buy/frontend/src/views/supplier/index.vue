@@ -3,98 +3,45 @@
     <Toast />
     <div class="col-12">
       <h5 class="card-header drag-handle">
-        <Button
-          label="Tạo mới"
-          icon="pi pi-plus"
-          class="p-button-success p-button-sm mr-2"
-          @click="openNew"
-        ></Button>
-        <Button
-          label="Xóa"
-          icon="pi pi-trash"
-          class="p-button-danger p-button-sm"
-          @click="confirmDeleteSelected"
-          :disabled="!selectedProducts || !selectedProducts.length"
-        ></Button>
+        <Button label="Tạo mới" icon="pi pi-plus" class="p-button-success p-button-sm mr-2" @click="openNew"></Button>
+        <Button label="Xóa" icon="pi pi-trash" class="p-button-danger p-button-sm" @click="confirmDeleteSelected"
+          :disabled="!selectedProducts || !selectedProducts.length"></Button>
       </h5>
       <section class="card card-fluid">
         <div class="card-body" style="overflow: auto; position: relative">
-          <DataTable
-            class="p-datatable-customers"
-            showGridlines
-            :value="datatable"
-            :lazy="true"
-            ref="dt"
-            scrollHeight="70vh"
-            v-model:selection="selectedProducts"
-            :paginator="true"
-            :rowsPerPageOptions="[10, 50, 100]"
-            :rows="rows"
-            :totalRecords="totalRecords"
-            @page="onPage($event)"
-            :rowHover="true"
-            :loading="loading"
-            responsiveLayout="scroll"
-            :resizableColumns="true"
-            columnResizeMode="expand"
-            v-model:filters="filters"
-            filterDisplay="menu"
-          >
+          <DataTable class="p-datatable-customers" showGridlines :value="datatable" :lazy="true" ref="dt"
+            scrollHeight="70vh" v-model:selection="selectedProducts" :paginator="true"
+            :rowsPerPageOptions="[10, 50, 100]" :rows="rows" :totalRecords="totalRecords" @page="onPage($event)"
+            :rowHover="true" :loading="loading" responsiveLayout="scroll" :resizableColumns="true"
+            columnResizeMode="expand" v-model:filters="filters" filterDisplay="menu" @sort="onSort($event)">
             <template #header>
               <div style="width: 200px">
-                <TreeSelect
-                  :options="columns"
-                  v-model="showing"
-                  multiple
-                  :limit="0"
-                  :limitText="(count) => 'Hiển thị: ' + count + ' cột'"
-                >
+                <TreeSelect :options="columns" v-model="showing" multiple :limit="0"
+                  :limitText="(count) => 'Hiển thị: ' + count + ' cột'">
                 </TreeSelect>
               </div>
             </template>
 
             <template #empty> Không có dữ liệu. </template>
-            <Column
-              selectionMode="multiple"
-              style="width: 3rem"
-              :exportable="false"
-            ></Column>
-            <Column
-              v-for="col of selectedColumns"
-              :field="col.data"
-              :header="col.label"
-              :key="col.data"
-              :showFilterMatchModes="false"
-            >
+            <Column selectionMode="multiple" style="width: 3rem" :exportable="false"></Column>
+            <Column v-for="col of selectedColumns" :field="col.data" :header="col.label" :key="col.data"
+              :showFilterMatchModes="false" :sortable="col.sortable">
               <template #body="slotProps">
                 <div v-html="slotProps.data[col.data]"></div>
               </template>
 
-              <template
-                #filter="{ filterModel, filterCallback }"
-                v-if="col.filter == true"
-              >
-                <InputText
-                  type="text"
-                  v-model="filterModel.value"
-                  @keydown.enter="filterCallback()"
-                  class="p-column-filter"
-                />
+              <template #filter="{ filterModel, filterCallback }" v-if="col.filter == true">
+                <InputText type="text" v-model="filterModel.value" @keydown.enter="filterCallback()"
+                  class="p-column-filter" />
               </template>
             </Column>
 
             <Column style="width: 1rem">
               <template #body="slotProps">
-                <a
-                  class="p-link text-warning mr-2 font-16"
-                  @click="editProduct(slotProps.data)"
-                  ><i class="pi pi-pencil"></i
-                ></a>
-                <a
-                  class="p-link text-danger font-16"
-                  @click="confirmDeleteProduct(slotProps.data)"
-                  ><i class="pi pi-trash"></i
-                ></a>
+                <a class="p-link text-warning mr-2 font-16" @click="editProduct(slotProps.data)"><i
+                    class="pi pi-pencil"></i></a>
+                <a class="p-link text-danger font-16" @click="confirmDeleteProduct(slotProps.data)"><i
+                    class="pi pi-trash"></i></a>
               </template>
             </Column>
           </DataTable>
@@ -104,57 +51,27 @@
 
     <PopupAdd @save="loadLazyData"></PopupAdd>
 
-    <Dialog
-      v-model:visible="deleteProductDialog"
-      header="Xác nhận"
-      :modal="true"
-    >
+    <Dialog v-model:visible="deleteProductDialog" header="Xác nhận" :modal="true">
       <div class="confirmation-content">
         <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-        <span v-if="model"
-          >Bạn có muốn xóa <b>{{ model.mancc }}</b> này không?</span
-        >
+        <span v-if="model">Bạn có muốn xóa <b>{{ model.mancc }}</b> này không?</span>
       </div>
 
       <template #footer>
-        <Button
-          label="Không"
-          icon="pi pi-times"
-          class="p-button-text"
-          @click="deleteProductDialog = false"
-        ></Button>
-        <Button
-          label="Đồng ý"
-          icon="pi pi-check"
-          class="p-button-text"
-          @click="deleteProduct"
-        ></Button>
+        <Button label="Không" icon="pi pi-times" class="p-button-text" @click="deleteProductDialog = false"></Button>
+        <Button label="Đồng ý" icon="pi pi-check" class="p-button-text" @click="deleteProduct"></Button>
       </template>
     </Dialog>
 
-    <Dialog
-      v-model:visible="deleteProductsDialog"
-      header="Xác nhận"
-      :modal="true"
-    >
+    <Dialog v-model:visible="deleteProductsDialog" header="Xác nhận" :modal="true">
       <div class="confirmation-content">
         <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"></i>
         <span>Bạn có muốn xóa tất cả những mục đã chọn không?</span>
       </div>
 
       <template #footer>
-        <Button
-          label="Không"
-          icon="pi pi-times"
-          class="p-button-text"
-          @click="deleteProductsDialog = false"
-        ></Button>
-        <Button
-          label="Đồng ý"
-          icon="pi pi-check"
-          class="p-button-text"
-          @click="deleteSelectedProducts"
-        ></Button>
+        <Button label="Không" icon="pi pi-times" class="p-button-text" @click="deleteProductsDialog = false"></Button>
+        <Button label="Đồng ý" icon="pi pi-check" class="p-button-text" @click="deleteSelectedProducts"></Button>
       </template>
     </Dialog>
     <Loading :waiting="waiting"></Loading>
@@ -184,6 +101,7 @@ const toast = useToast();
 
 const store = useAuth();
 ////Datatable
+const sorts = ref({});
 const datatable = ref();
 const columns = ref([
   {
@@ -192,6 +110,7 @@ const columns = ref([
     data: "mancc",
     className: "text-center",
     filter: true,
+    sortable: true,
   },
   {
     id: 1,
@@ -199,6 +118,7 @@ const columns = ref([
     data: "tenncc",
     className: "text-center",
     filter: true,
+    sortable: true,
   },
 ]);
 const filters = ref({
@@ -221,13 +141,26 @@ const lazyParams = computed(() => {
   for (let key in filters.value) {
     data_filters[key] = filters.value[key].value;
   }
+  let data_sorts = {};
+  // console.log(sorts.value);
+  for (let key in sorts.value) {
+    data_sorts[key] = sorts.value[key];
+  }
   return {
     draw: draw.value,
     start: first.value,
     length: rows.value,
+    sorts: data_sorts,
     filters: data_filters,
   };
 });
+
+const onSort = (event) => {
+  // console.log(event);
+  sorts.value = {};
+  sorts.value[event.sortField] = event.sortOrder;
+  loadLazyData();
+};
 const dt = ref(null);
 
 ////Form

@@ -914,6 +914,7 @@ namespace it_template.Areas.V1.Controllers
             var filter_user_id = Request.Form["filters[user_id]"].FirstOrDefault();
             var filter_tags = Request.Form["filters[tags]"].FirstOrDefault();
             var list_dutru = Request.Form["filters[list_dutru]"].FirstOrDefault();
+            var id_string = Request.Form["filters[id]"].FirstOrDefault();
             var priority_id_string = Request.Form["filters[priority_id]"].FirstOrDefault();
             int priority_id = priority_id_string != null ? Convert.ToInt32(priority_id_string) : 0;
             var tensp = Request.Form["filters[tensp]"].FirstOrDefault();
@@ -921,6 +922,7 @@ namespace it_template.Areas.V1.Controllers
             var filterTable = Request.Form["filterTable"].FirstOrDefault();
             var dutru_id_string = Request.Form["dutru_id"].FirstOrDefault();
             var department_id_string = Request.Form["filters[bophan]"].FirstOrDefault();
+            int id = id_string != null ? Convert.ToInt32(id_string) : 0;
             int dutru_id = dutru_id_string != null ? Convert.ToInt32(dutru_id_string) : 0;
             int department_id = department_id_string != null ? Convert.ToInt32(department_id_string) : 0;
 
@@ -1023,6 +1025,10 @@ namespace it_template.Areas.V1.Controllers
                 customerData = customerData.Where(d => d.muahang_chitiet.Any(m => m.muahang != null && m.muahang.date_finish != null));
             }
 
+            if (id != null && id != 0)
+            {
+                customerData = customerData.Where(d => d.id == id);
+            }
             if (type_id != null && type_id != 0)
             {
                 customerData = customerData.Where(d => d.dutru.type_id == type_id);
@@ -1236,6 +1242,7 @@ namespace it_template.Areas.V1.Controllers
                     list_tag = record.list_tag,
                     tensp = record.tensp,
                     dutru_chitiet_id = record.id,
+                    note = record.note,
                     date = record.date != null ? record.date : dutru.date,
                     dutru = new DutruModel()
                     {

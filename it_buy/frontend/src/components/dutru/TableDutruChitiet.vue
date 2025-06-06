@@ -535,7 +535,7 @@ const nhaphanhoa = () => {
       }
 
       if (!item.list_muahang.length) {
-        alert("Hàng hóa chưa có DNMH!");
+        alert("Mã " + item.mahh + " chưa có DNMH!");
         return false;
       }
 
@@ -590,6 +590,7 @@ const taodenghimuahang = () => {
     item.dvt_dutru = item.dvt;
     item.quidoi = 1;
     item.soluong_dutru = item.soluong;
+
     // item.soluong_quidoi = item.soluong;
     item.stt = key + 1;
     item.ids = rand();

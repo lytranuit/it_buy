@@ -83,10 +83,15 @@ namespace it_template.Areas.V1.Controllers
             var length = Request.Form["length"].FirstOrDefault();
             int pageSize = length != null ? Convert.ToInt32(length) : 0;
             var mansx = Request.Form["filters[mansx]"].FirstOrDefault();
-            var tennsx = Request.Form["filters[tennsx]"].FirstOrDefault();
+            var tennsx = Request.Form["filters[tennsx]"].FirstOrDefault(); 
+            
+            var sort_mansx = Request.Form["sorts[mansx]"].FirstOrDefault();
+            var sort_tennsx = Request.Form["sorts[tennsx]"].FirstOrDefault();
+
             int skip = start != null ? Convert.ToInt32(start) : 0;
             var customerData = _context.NsxModel.Where(d => 1 == 1);
             int recordsTotal = customerData.Count();
+
             if (mansx != null && mansx != "")
             {
                 customerData = customerData.Where(d => d.mansx.Contains(mansx));
@@ -97,7 +102,33 @@ namespace it_template.Areas.V1.Controllers
                 customerData = customerData.Where(d => d.tennsx.Contains(tennsx));
             }
             int recordsFiltered = customerData.Count();
-            var datapost = customerData.OrderBy(d => d.mansx).Skip(skip).Take(pageSize).ToList();
+            if (sort_mansx != null)
+            {
+                if (sort_mansx == "1")
+                {
+                    customerData = customerData.OrderBy(d => d.mansx);
+                }
+                else if (sort_mansx == "-1")
+                {
+                    customerData = customerData.OrderByDescending(d => d.mansx);
+                }
+            }
+            else if (sort_tennsx != null)
+            {
+                if (sort_tennsx == "1")
+                {
+                    customerData = customerData.OrderBy(d => d.tennsx);
+                }
+                else if (sort_tennsx == "-1")
+                {
+                    customerData = customerData.OrderByDescending(d => d.tennsx);
+                }
+            }
+            else
+            {
+                customerData = customerData.OrderBy(d => d.mansx);
+            }
+            var datapost = customerData.Skip(skip).Take(pageSize).ToList();
             //var data = new ArrayList();
             //foreach (var record in datapost)
             //{

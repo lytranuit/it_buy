@@ -1,18 +1,8 @@
 <template>
-  <AutoComplete
-    :modelValue="modelValue"
-    @update:modelValue="emit('update:modelValue', $event)"
-    optionLabel="label"
-    optionGroupLabel="label"
-    optionGroupChildren="items"
-    :disabled="disabled"
-    :suggestions="filterItems"
-    @complete="search"
-    class="w-100"
-    :virtualScrollerOptions="{ itemSize: 38 }"
-    inputClass="form-control form-control-sm"
-    @item-select="emit('item-select', $event)"
-  >
+  <AutoComplete :modelValue="modelValue" @update:modelValue="emit('update:modelValue', $event)" optionLabel="label"
+    optionGroupLabel="label" optionGroupChildren="items" :disabled="disabled" :suggestions="filterItems"
+    @complete="search" class="w-100" :forceSelection="type_id != 3" :virtualScrollerOptions="{ itemSize: 38 }"
+    inputClass="form-control form-control-sm" @item-select="emit('item-select', $event)">
     <template #option="slotProps">
       <div class="flex align-options-center">
         {{ slotProps.option.mahh }} - {{ slotProps.option.tenhh }}

@@ -487,53 +487,53 @@ namespace it_template.Areas.V1.Controllers
             _QLSXcontext.SaveChanges();
 
             ///Xóa phiếu cũ
-            //var DTA_HOADON_XUAT = _QLSXcontext.DTA_HOADON_XUAT.Where(d => d.sohd.StartsWith(VattuDieuchuyenModel.sohd)).ToList();
-            //var DTA_CT_HOADON_XUAT = _QLSXcontext.DTA_CT_HOADON_XUAT.Where(d => d.sohd == VattuDieuchuyenModel.sohd).ToList();
-            //var HOADON_KHOA = DTA_HOADON_XUAT.Where(d => d.khoa == true).Count();
-            //if (HOADON_KHOA == 0)
-            //{
-            //    _QLSXcontext.RemoveRange(DTA_CT_HOADON_XUAT);
-            //    _QLSXcontext.RemoveRange(DTA_HOADON_XUAT);
-            //    _QLSXcontext.SaveChanges();
+            var DTA_HOADON_XUAT = _QLSXcontext.DTA_HOADON_XUAT.Where(d => d.sohd.StartsWith(VattuDieuchuyenModel.sohd)).ToList();
+            var DTA_CT_HOADON_XUAT = _QLSXcontext.DTA_CT_HOADON_XUAT.Where(d => d.sohd == VattuDieuchuyenModel.sohd).ToList();
+            var HOADON_KHOA = DTA_HOADON_XUAT.Where(d => d.khoa == true).Count();
+            if (HOADON_KHOA == 0)
+            {
+                _QLSXcontext.RemoveRange(DTA_CT_HOADON_XUAT);
+                _QLSXcontext.RemoveRange(DTA_HOADON_XUAT);
+                _QLSXcontext.SaveChanges();
 
-            //    ////Thêm phiếu mới
+                ////Thêm phiếu mới
 
-            //    var DTA_HOADON_XUAT_NEW = new DTA_HOADON_XUAT()
-            //    {
-            //        sohd = VattuDieuchuyenModel.sohd,
-            //        ngaylaphd = VattuDieuchuyenModel.ngaylap,
-            //        mapl = VattuDieuchuyenModel.noiden,
-            //        makh = VattuDieuchuyenModel.noiden,
-            //        mach = VattuDieuchuyenModel.created_by,
-            //        tennguoigd = VattuDieuchuyenModel.ghichu,
-            //        pl = VattuDieuchuyenModel.pl,
-            //        noixuat = VattuDieuchuyenModel.noidi,
-            //    };
-            //    _QLSXcontext.Add(DTA_HOADON_XUAT_NEW);
+                var DTA_HOADON_XUAT_NEW = new DTA_HOADON_XUAT()
+                {
+                    sohd = VattuDieuchuyenModel.sohd,
+                    ngaylaphd = VattuDieuchuyenModel.ngaylap,
+                    mapl = VattuDieuchuyenModel.noiden,
+                    makh = VattuDieuchuyenModel.noiden,
+                    mach = VattuDieuchuyenModel.created_by,
+                    tennguoigd = VattuDieuchuyenModel.ghichu,
+                    pl = VattuDieuchuyenModel.pl,
+                    noixuat = VattuDieuchuyenModel.noidi,
+                };
+                _QLSXcontext.Add(DTA_HOADON_XUAT_NEW);
 
-            //    var stt = 1;
-            //    foreach (var item in list)
-            //    {
-            //        var hh = _context.MaterialModel.Where(d => d.mahh == item.mahh).FirstOrDefault();
-            //        var DTA_CT_HOADON_XUAT_NEW = new DTA_CT_HOADON_XUAT()
-            //        {
-            //            kt = true,
-            //            sohd = DTA_HOADON_XUAT_NEW.sohd,
-            //            ngaylaphd = DTA_HOADON_XUAT_NEW.ngaylaphd,
-            //            mach = DTA_HOADON_XUAT_NEW.mach,
-            //            mahh = item.mahh,
-            //            tenhh = hh.tenhh,
-            //            dvt = hh.dvt,
-            //            soluong = item.soluong,
-            //            stt = stt++,
-            //            ghichu = item.ghichu,
+                var stt = 1;
+                foreach (var item in list)
+                {
+                    var hh = _context.MaterialModel.Where(d => d.mahh == item.mahh).FirstOrDefault();
+                    var DTA_CT_HOADON_XUAT_NEW = new DTA_CT_HOADON_XUAT()
+                    {
+                        kt = true,
+                        sohd = DTA_HOADON_XUAT_NEW.sohd,
+                        ngaylaphd = DTA_HOADON_XUAT_NEW.ngaylaphd,
+                        mach = DTA_HOADON_XUAT_NEW.mach,
+                        mahh = item.mahh,
+                        tenhh = hh.tenhh,
+                        dvt = hh.dvt,
+                        soluong = item.soluong,
+                        stt = stt++,
+                        ghichu = item.ghichu,
 
-            //        };
-            //        _QLSXcontext.Add(DTA_CT_HOADON_XUAT_NEW);
-            //    }
+                    };
+                    _QLSXcontext.Add(DTA_CT_HOADON_XUAT_NEW);
+                }
 
-            //    _QLSXcontext.SaveChanges();
-            //}
+                _QLSXcontext.SaveChanges();
+            }
 
 
             return Json(new { success = true, id = VattuDieuchuyenModel.id });

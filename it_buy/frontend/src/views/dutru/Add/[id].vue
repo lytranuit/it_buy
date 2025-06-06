@@ -8,9 +8,7 @@
             <div class="row">
               <div class="col-md-12">
                 <div class="form-group row">
-                  <b class="col-12 col-lg-12 col-form-label"
-                    >Tiêu đề:<i class="text-danger">*</i></b
-                  >
+                  <b class="col-12 col-lg-12 col-form-label">Tiêu đề:<i class="text-danger">*</i></b>
                   <div class="col-12 col-lg-12 pt-1">
                     <input class="form-control" v-model="model.name" required />
                   </div>
@@ -18,9 +16,7 @@
               </div>
               <div class="col-md-3">
                 <div class="form-group row">
-                  <b class="col-12 col-lg-12 col-form-label"
-                    >Độ ưu tiên:<i class="text-danger">*</i></b
-                  >
+                  <b class="col-12 col-lg-12 col-form-label">Độ ưu tiên:<i class="text-danger">*</i></b>
                   <div class="col-12 col-lg-12 pt-1">
                     <select class="form-control" v-model="model.priority_id">
                       <option value="1">Bình thường</option>
@@ -32,32 +28,19 @@
               </div>
               <div class="col-md-3">
                 <div class="form-group row">
-                  <b class="col-12 col-lg-12 col-form-label"
-                    >Bộ phận dự trù:<i class="text-danger">*</i></b
-                  >
+                  <b class="col-12 col-lg-12 col-form-label">Bộ phận dự trù:<i class="text-danger">*</i></b>
                   <div class="col-12 col-lg-12 pt-1">
-                    <DepartmentTreeSelect
-                      v-model="model.bophan_id"
-                      :clearable="false"
-                    >
+                    <DepartmentTreeSelect v-model="model.bophan_id" :clearable="false">
                     </DepartmentTreeSelect>
                   </div>
                 </div>
               </div>
               <div class="col-md-3">
                 <div class="form-group row">
-                  <b class="col-12 col-lg-12 col-form-label"
-                    >Hạn giao hàng:<i class="text-danger">*</i></b
-                  >
+                  <b class="col-12 col-lg-12 col-form-label">Hạn giao hàng:<i class="text-danger">*</i></b>
                   <div class="col-12 col-lg-12 pt-1">
-                    <Calendar
-                      v-model="model.date"
-                      dateFormat="yy-mm-dd"
-                      class="date-custom"
-                      :manualInput="false"
-                      showIcon
-                      :minDate="minDate"
-                    />
+                    <Calendar v-model="model.date" dateFormat="yy-mm-dd" class="date-custom" :manualInput="false"
+                      showIcon :minDate="minDate" />
                   </div>
                 </div>
               </div>
@@ -73,34 +56,21 @@
               </div>
               <div class="col-md-12">
                 <div class="form-group row">
-                  <b class="col-12 col-lg-12 col-form-label"
-                    >Lý do mua hàng:<i class="text-danger">*</i></b
-                  >
+                  <b class="col-12 col-lg-12 col-form-label">Lý do mua hàng:<i class="text-danger">*</i></b>
                   <div class="col-12 col-lg-12 pt-1">
-                    <textarea
-                      class="form-control form-control-sm"
-                      v-model="model.note"
-                      required
-                    ></textarea>
+                    <textarea class="form-control form-control-sm" v-model="model.note" required></textarea>
                   </div>
                 </div>
                 <div class="form-group row">
-                  <b class="col-12 col-lg-12 col-form-label"
-                    >Hàng hóa:<i class="text-danger">*</i></b
-                  >
+                  <b class="col-12 col-lg-12 col-form-label">Hàng hóa:<i class="text-danger">*</i></b>
                   <div class="col-12 col-lg-12 pt-1">
                     <FormDutruChitiet></FormDutruChitiet>
                   </div>
                 </div>
               </div>
               <div class="col-md-12 text-center">
-                <Button
-                  label="Lưu lại"
-                  icon="pi pi-save"
-                  class="p-button-success p-button-sm mr-2"
-                  @click="submit()"
-                  :disabled="buttonDisabled"
-                ></Button>
+                <Button label="Lưu lại" icon="pi pi-save" class="p-button-success p-button-sm mr-2" @click="submit()"
+                  :disabled="buttonDisabled"></Button>
               </div>
             </div>
           </div>
@@ -185,6 +155,14 @@ const submit = () => {
   }
   if (datatable.value.length) {
     for (let product of datatable.value) {
+      if (model.value.type_id != 3) {
+        if (!product.mahh) {
+          alert("Chưa có mã hàng hóa!");
+          buttonDisabled.value = false;
+          return false;
+        }
+
+      }
       if (!product.tenhh) {
         alert("Chưa nhập hàng hóa!");
         buttonDisabled.value = false;

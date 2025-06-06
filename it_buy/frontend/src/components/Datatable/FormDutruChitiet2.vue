@@ -272,6 +272,7 @@ const onPage = (event) => {
   loadLazyData();
 };
 const taodenghimuahang = () => {
+  return false;
   // console.log(selected);
   if (selected.value.length) {
     for (var item of selected.value) {

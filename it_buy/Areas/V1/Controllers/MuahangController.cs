@@ -350,7 +350,8 @@ namespace it_template.Areas.V1.Controllers
                     dongia = chonmua.dongia,
                     thanhtien = chonmua.thanhtien_vat,
                     ncc = muahang_chonmua.ncc,
-                    tiente = muahang.muahang_chonmua.tiente
+                    tiente = muahang.muahang_chonmua.tiente,
+                    note = d.note
                 };
                 data.Add(data1);
             }
@@ -2439,7 +2440,7 @@ namespace it_template.Areas.V1.Controllers
         public async Task<JsonResult> updateUserNhanhang()
         {
             //return Json(new { });
-            var muahang_chitiet = _context.MuahangChitietModel.Where(d=>d.user_nhanhang_id == null).Include(d => d.dutru_chitiet).ThenInclude(d => d.dutru).ToList();
+            var muahang_chitiet = _context.MuahangChitietModel.Where(d => d.user_nhanhang_id == null).Include(d => d.dutru_chitiet).ThenInclude(d => d.dutru).ToList();
             foreach (var item in muahang_chitiet)
             {
                 item.user_nhanhang_id = item.dutru_chitiet.dutru.created_by;

@@ -83,27 +83,53 @@ namespace it_template.Areas.V1.Controllers
             var start = Request.Form["start"].FirstOrDefault();
             var length = Request.Form["length"].FirstOrDefault();
             int pageSize = length != null ? Convert.ToInt32(length) : 0;
-            var maNCC = Request.Form["filters[maNCC]"].FirstOrDefault();
-            var tenNCC = Request.Form["filters[tenNCC]"].FirstOrDefault();
-            var tenNCC_VN = Request.Form["filters[tenNCC_VN]"].FirstOrDefault();
+            var mancc = Request.Form["filters[mancc]"].FirstOrDefault();
+            var tenncc = Request.Form["filters[tenncc]"].FirstOrDefault();
+
+            var sort_mancc = Request.Form["sorts[mancc]"].FirstOrDefault();
+            var sort_tenncc = Request.Form["sorts[tenncc]"].FirstOrDefault();
+
             int skip = start != null ? Convert.ToInt32(start) : 0;
             var customerData = _context.NhacungcapModel.Where(d => 1 == 1);
             int recordsTotal = customerData.Count();
-            if (maNCC != null && maNCC != "")
+            if (mancc != null && mancc != "")
             {
-                customerData = customerData.Where(d => d.mancc.Contains(maNCC));
+                customerData = customerData.Where(d => d.mancc.Contains(mancc));
             }
 
-            if (tenNCC != null && tenNCC != "")
+            if (tenncc != null && tenncc != "")
             {
-                customerData = customerData.Where(d => d.tenncc.Contains(tenNCC));
-            }
-            if (tenNCC_VN != null && tenNCC_VN != "")
-            {
-                customerData = customerData.Where(d => d.tenncc_vn.Contains(tenNCC_VN));
+                customerData = customerData.Where(d => d.tenncc.Contains(tenncc));
             }
             int recordsFiltered = customerData.Count();
-            var datapost = customerData.OrderBy(d => d.mancc).Skip(skip).Take(pageSize).ToList();
+
+            if (sort_mancc != null)
+            {
+                if (sort_mancc == "1")
+                {
+                    customerData = customerData.OrderBy(d => d.mancc);
+                }
+                else if (sort_mancc == "-1")
+                {
+                    customerData = customerData.OrderByDescending(d => d.mancc);
+                }
+            }
+            else if (sort_tenncc != null)
+            {
+                if (sort_tenncc == "1")
+                {
+                    customerData = customerData.OrderBy(d => d.tenncc);
+                }
+                else if (sort_tenncc == "-1")
+                {
+                    customerData = customerData.OrderByDescending(d => d.tenncc);
+                }
+            }
+            else
+            {
+                customerData = customerData.OrderBy(d => d.mancc);
+            }
+            var datapost = customerData.Skip(skip).Take(pageSize).ToList();
             //var data = new ArrayList();
             //foreach (var record in datapost)
             //{

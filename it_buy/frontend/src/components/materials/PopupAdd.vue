@@ -166,7 +166,14 @@ const saveProduct = () => {
   if (!valid()) return;
   // waiting.value = true;
   //   model.value.surfix = props.type;
-  materialApi.save(model.value).then((res) => {
+  var params = model.value;
+  // delete params.group;
+  if (!params.list_user_notify || params.list_user_notify.length == 0) {
+    params.user_notify = "";
+  } else {
+    delete params.user_notify;
+  }
+  materialApi.save(params).then((res) => {
     // waiting.value = false;
     visibleDialog.value = false;
     if (res.success) {

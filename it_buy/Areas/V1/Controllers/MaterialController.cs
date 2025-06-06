@@ -27,7 +27,7 @@ namespace it_template.Areas.V1.Controllers
         public JsonResult Get(int id)
         {
             var data = _context.MaterialModel.Where(d => d.id == id).Include(d => d.nhacungcap).FirstOrDefault();
-            data.list_sp = _context.MaterialModel.Where(d => d.group != null && d.group == data.group).Select(d => d.mahh).ToList();
+            data.list_sp = _context.MaterialModel.Where(d => d.group != null && d.group != "" && d.group == data.group).Select(d => d.mahh).ToList();
             return Json(data, new System.Text.Json.JsonSerializerOptions()
             {
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
@@ -35,7 +35,7 @@ namespace it_template.Areas.V1.Controllers
             });
         }
         [HttpPost]
-        public async Task<JsonResult> Save(MaterialModel HangHoaModel, string surfix, List<string> list_sp)
+        public async Task<JsonResult> Save(MaterialModel HangHoaModel, string surfix, List<string>? list_sp)
         {
             System.Security.Claims.ClaimsPrincipal currentUser = this.User;
             var user_id = UserManager.GetUserId(currentUser);
@@ -62,7 +62,7 @@ namespace it_template.Areas.V1.Controllers
                     _context.SaveChanges();
                     HangHoaModel_old = HangHoaModel;
                 }
-                var new_group = new Guid().ToString();
+                var new_group = Guid.NewGuid().ToString();
                 HangHoaModel_old.group = new_group;
                 _context.Update(HangHoaModel_old);
                 if (list_sp.Count() > 0)
@@ -168,6 +168,10 @@ namespace it_template.Areas.V1.Controllers
             var nhom = Request.Form["filters[nhom]"].FirstOrDefault();
             int skip = start != null ? Convert.ToInt32(start) : 0;
             var customerData = _context.MaterialModel.Where(d => d.deleted_at == null);
+
+            var sort_mahh = Request.Form["sorts[mahh]"].FirstOrDefault();
+            var sort_tenhh = Request.Form["sorts[tenhh]"].FirstOrDefault();
+
             int recordsTotal = customerData.Count();
             if (mancc != null && mancc != "")
             {
@@ -179,7 +183,7 @@ namespace it_template.Areas.V1.Controllers
             }
             if (mahh != null && mahh != "")
             {
-                customerData = customerData.Where(d => d.mahh == mahh);
+                customerData = customerData.Where(d => d.mahh.Contains(mahh));
             }
 
             if (tenhh != null && tenhh != "")
@@ -192,7 +196,37 @@ namespace it_template.Areas.V1.Controllers
                 customerData = customerData.Where(d => d.nhom == nhom);
             }
             int recordsFiltered = customerData.Count();
-            var datapost = customerData.Include(d => d.nhasanxuat).Include(d => d.nhacungcap).OrderByDescending(d => d.created_at).Skip(skip).Take(pageSize).ToList();
+
+
+            if (sort_mahh != null)
+            {
+                if (sort_mahh == "1")
+                {
+                    customerData = customerData.OrderBy(d => d.mahh);
+                }
+                else if (sort_mahh == "-1")
+                {
+                    customerData = customerData.OrderByDescending(d => d.mahh);
+                }
+            }
+            else if (sort_tenhh != null)
+            {
+                if (sort_tenhh == "1")
+                {
+                    customerData = customerData.OrderBy(d => d.tenhh);
+                }
+                else if (sort_tenhh == "-1")
+                {
+                    customerData = customerData.OrderByDescending(d => d.tenhh);
+                }
+            }
+            else
+            {
+                customerData = customerData.OrderByDescending(d => d.created_at);
+            }
+
+
+            var datapost = customerData.Include(d => d.nhasanxuat).Include(d => d.nhacungcap).Skip(skip).Take(pageSize).ToList();
             //var data = new ArrayList();
             //foreach (var record in datapost)
             //{
