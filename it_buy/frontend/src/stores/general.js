@@ -4,6 +4,8 @@ import Api from "../api/Api";
 
 export const useGeneral = defineStore("general", () => {
   const materials = ref([]);
+  const VattuGroup = ref([]);
+  const NVLGroup = ref([]);
   const supliers = ref([]);
   const producers = ref([]);
   const materialGroup = ref([]);
@@ -13,6 +15,8 @@ export const useGeneral = defineStore("general", () => {
   const nhom = ref([]);
   const PLHH = ref([]);
 
+  const is_get_tonkhoNVL = ref();
+  const is_get_tonkhoVattu = ref();
   const is_get_nhom = ref();
   const is_get_kho = ref();
   const is_get_materials = ref();
@@ -22,6 +26,24 @@ export const useGeneral = defineStore("general", () => {
   const is_get_khuvuc = ref();
   const is_get_products = ref();
   const is_get_PLHH = ref();
+
+  const fetchTonkhoVattu = (cache = true) => {
+    if (cache == true && is_get_tonkhoVattu.value) return VattuGroup.value;
+    is_get_tonkhoVattu.value = true;
+    return Api.tonkhoVattu().then((response) => {
+      VattuGroup.value = response;
+      return response;
+    });
+  };
+
+  const fetchTonkhoNVL = (cache = true) => {
+    if (cache == true && is_get_tonkhoNVL.value) return NVLGroup.value;
+    is_get_tonkhoNVL.value = true;
+    return Api.tonkhoNVL().then((response) => {
+      NVLGroup.value = response;
+      return response;
+    });
+  };
 
   const fetchNhom = (cache = true) => {
     if (cache == true && is_get_nhom.value) return nhom.value;
@@ -152,6 +174,8 @@ export const useGeneral = defineStore("general", () => {
     products,
     nhom,
     PLHH,
+    VattuGroup,
+    NVLGroup,
     fetchMaterials,
     fetchMaterialGroup,
     fetchNhacc,
@@ -162,6 +186,8 @@ export const useGeneral = defineStore("general", () => {
     fetchKho,
     fetchProducts,
     fetchNhom,
-    fetchPLHH
+    fetchPLHH,
+    fetchTonkhoVattu,
+    fetchTonkhoNVL,
   };
 });

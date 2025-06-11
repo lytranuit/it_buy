@@ -223,7 +223,7 @@ onMounted(() => {
     let cache = localStorage.getItem(column_cache);
     if (!cache) {
         showing.value = columns.value.map((item) => {
-            return item.id;
+            return item.data;
         });
     } else {
         showing.value = JSON.parse(cache);

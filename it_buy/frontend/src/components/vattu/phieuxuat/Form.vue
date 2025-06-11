@@ -21,7 +21,7 @@
           <template v-if="col.data == 'mahh'">
             <div class="d-flex align-items-center">
               <MaterialTreeSelect :multiple="false" v-model="slotProps.data[col.data]"
-                @update:modelValue="changeMaterial(slotProps.data, $event)" :disabled="slotProps.data.kt_nhap">
+                @update:modelValue="changeMaterial(slotProps.data, $event)" :disabled="true">
                 <template #header>
                   <div class="d-flex justify-content-between align-items-center">
                     <span>Chọn hàng hóa</span>
@@ -35,12 +35,18 @@
           <template v-else-if="col.data == 'mancc'">
             <NccTreeSelect v-model="slotProps.data[col.data]" :multiple="false" :useID="false"
               style="width: 100%; display: inline-block;vertical-align: middle;"
-              @update:modelValue="changeSupplier(slotProps.data, $event)" :disabled="slotProps.data.kt_nhap" />
+              @update:modelValue="changeSupplier(slotProps.data, $event)" :disabled="true" />
 
             <!-- <i class="fas fa-receipt mx-2" style="cursor: pointer" @click="view_tonkho(slotProps.data)"></i> -->
 
           </template>
-
+          <template v-else-if="col.data == 'malo'">
+            <input v-model="slotProps.data[col.data]" class="form-control" :disabled="true" />
+          </template>
+          <template v-else-if="col.data == 'handung'">
+            <Calendar v-model="slotProps.data[col.data]" dateFormat="dd/mm/yy" class="date-custom" showIcon
+              :disabled="true" />
+          </template>
           <template v-else-if="col.data == 'kt_xuat'">
             <div class="custom-control custom-switch switch-success" style="height: 36px">
               <input type="checkbox" :id="'kt_xuat_' + slotProps.index" class="custom-control-input"
@@ -129,9 +135,19 @@ const columns = ref(
       className: "text-center mahh",
     },
     {
-      label: "Nhà cung cấp(*)",
+      label: "Nhà cung cấp",
       data: "mancc",
       className: "text-center mancc",
+    },
+    {
+      label: "Số lô",
+      data: "malo",
+      className: "text-center malo",
+    },
+    {
+      label: "Hạn dùng",
+      data: "handung",
+      className: "text-center handung",
     },
     {
       label: "Số lượng(*)",
@@ -182,14 +198,14 @@ const getTonkho = async (row) => {
     alert("Chưa chọn kho xuất!");
     return false;
   }
-  if (!row.mancc) {
-    // alert("Vui lòng nhập mã hàng hóa!");
-    return false;
-  }
+  // if (!row.mancc) {
+  //   // alert("Vui lòng nhập mã hàng hóa!");
+  //   return false;
+  // }
   if (!start_event.value) {
     return false;
   }
-  var res = await vattuApi.getTonkho({ mahh: row.mahh, makho: model.value.noidi, mancc: row.mancc });
+  var res = await vattuApi.getTonkho({ mahh: row.mahh, makho: model.value.noidi, mancc: row.mancc, malo: row.malo, handung: row.handung });
   if (res) {
     row.tonkho = res.soluong;
   } else {
@@ -293,6 +309,15 @@ defineExpose({
 .mahh,
 .mancc {
   min-width: 300px;
+}
+
+
+.malo {
+  min-width: 150px;
+}
+
+.handung {
+  min-width: 200px;
 }
 
 .ghichu {

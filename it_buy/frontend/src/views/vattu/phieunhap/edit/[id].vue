@@ -52,11 +52,14 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-12 text-center">
-                                <Button label="Lưu lại" icon="pi pi-save" class="p-button-success p-button-sm mr-2"
-                                    @click="submit()" :disabled="buttonDisabled"></Button>
-                            </div>
+
                         </div>
+                    </div>
+                    <div class="card-footer text-center">
+                        <Button label="Lưu lại" icon="pi pi-save" class="p-button-success p-button-sm mr-2"
+                            @click="submit()" :disabled="buttonDisabled"></Button>
+                        <Button label="In phiếu" icon="pi pi-file" class="p-button-warning p-button-sm mr-2"
+                            @click="print()"></Button>
                     </div>
                 </section>
             </form>
@@ -96,7 +99,10 @@ onMounted(async () => {
     storeVattu.reset();
     var params = route.params.id;
     var data = await VattuApi.getNhap({ id: params });
-    let chitiet = data.chitiet;
+    let chitiet = data.chitiet.map((item, index) => {
+        item.handung = item.handung != null ? new Date(item.handung) : null;
+        return item;
+    });
     delete data.chitiet;
     // store_general.fetchMaterialGroup();
     await store_general.fetchMaterials();
@@ -107,9 +113,27 @@ onMounted(async () => {
     datatable.value = chitiet;
     table.value.calculate_stt();
     for (let i = 0; i < datatable.value.length; i++) {
+
         table.value.changeMaterial(datatable.value[i]);
     }
 });
+
+const print = () => {
+    const resoure = import.meta.env.VITE_URL_REPORT;
+    var params = { sohd: model.value.sohd };
+    window.open(`${resoure}/printNHAPVATTU${generateUrl(params)}`, "_blank");
+};
+
+function generateUrl(object) {
+    const params = new URLSearchParams();
+
+    for (const key in object) {
+        params.append(key, object[key]);
+    }
+
+    return `?${params.toString()}`;
+}
+
 const submit = () => {
     buttonDisabled.value = true;
 

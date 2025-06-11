@@ -445,7 +445,7 @@ const submit = async () => {
     }
   });
   waiting.value = true;
-  var response = await dutruApi.save(params);
+  var response = await dutruApi.save(model.value);
   waiting.value = false;
   if (response.success) {
     toast.add({

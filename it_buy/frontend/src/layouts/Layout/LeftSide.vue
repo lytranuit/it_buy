@@ -20,6 +20,18 @@
         </router-link>
       </li>
       <li>
+        <router-link class="nav-link" to="/xuatvattu">
+          <i class="fas fa-wrench"></i>
+          <span>Đề nghị xuất vật tư</span>
+        </router-link>
+      </li>
+      <li>
+        <router-link class="nav-link" to="/xuatnguyenlieu">
+          <i class="fas fa-hockey-puck"></i>
+          <span>Đề nghị xuất nguyên vật liệu</span>
+        </router-link>
+      </li>
+      <li>
         <router-link class="nav-link" to="/hanghoa">
           <i class="fab fa-product-hunt"></i>
           <span>Tổng hợp hàng hóa</span>

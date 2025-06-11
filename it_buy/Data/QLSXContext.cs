@@ -20,6 +20,8 @@ namespace Vue.Data
 
         public DbSet<KhoModel> KhoModel { get; set; }
         public DbSet<VattuNhapModel> VattuNhapModel { get; set; }
+        public DbSet<XuatVattuModel> XuatVattuModel { get; set; }
+        public DbSet<XuatNVLModel> XuatNVLModel { get; set; }
         public DbSet<VattuNhapChiTietModel> VattuNhapChiTietModel { get; set; }
         public DbSet<VattuDieuchuyenModel> VattuDieuchuyenModel { get; set; }
         public DbSet<VattuDieuchuyenChiTietModel> VattuDieuchuyenChiTietModel { get; set; }

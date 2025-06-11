@@ -54,7 +54,11 @@
               </template>
 
               <template #filter="{ filterModel, filterCallback }" v-if="col.filter == true">
-                <InputText type="text" v-model="filterModel.value" @keydown.enter="filterCallback()"
+                <template v-if="col.data == 'nhom'">
+                  <Nhom v-model="filterModel.value" :multiple="false" @change="filterCallback()" class="p-column-filter"
+                    style="width: 300px;"></Nhom>
+                </template>
+                <InputText type="text" v-model="filterModel.value" @keydown.enter="filterCallback()" v-else
                   class="p-column-filter" />
               </template>
             </Column>
@@ -123,6 +127,7 @@ import PopupAdd from "../../components/materials/PopupAdd.vue";
 import { useMaterials } from "../../stores/materials";
 import { storeToRefs } from "pinia";
 import { RouterLink } from "vue-router";
+import Nhom from "../../components/TreeSelect/Nhom.vue";
 const store = useAuth();
 const toast = useToast();
 

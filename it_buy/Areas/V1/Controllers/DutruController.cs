@@ -747,6 +747,7 @@ namespace it_template.Areas.V1.Controllers
                 data.activeStep = 1;
                 data.esign_id = DocumentModel.id;
                 data.code = DocumentModel.code;
+                _context.Update(data);
 
                 _context.SaveChanges();
 
@@ -1185,10 +1186,10 @@ namespace it_template.Areas.V1.Controllers
                 var list_muahang_ncc_id = record.muahang_chitiet.Select(d => d.muahang.muahang_chonmua_id).ToList();
                 var list_muahang_chitiet_id = record.muahang_chitiet.Select(d => d.id).ToList();
 
-                var thanhtien1 = _context.MuahangNccChitietModel.Include(d => d.muahang_ncc).ThenInclude(d => d.muahang)
+                var MuahangNccChitietModel = _context.MuahangNccChitietModel.Include(d => d.muahang_ncc).ThenInclude(d => d.muahang)
                     .Where(d => d.muahang_ncc.muahang.deleted_at == null && d.muahang_ncc.muahang.status_id != (int)Status.MuahangEsignError && list_muahang_ncc_id.Contains(d.muahang_ncc_id) && list_muahang_chitiet_id.Contains(d.muahang_chitiet_id))
                     .ToList();
-                var thanhtien = thanhtien1.Sum(d => d.thanhtien_vat);
+                var thanhtien = MuahangNccChitietModel.Sum(d => d.thanhtien_vat);
                 var muahang_chitiet = record.muahang_chitiet.Where(d => d.muahang.deleted_at == null && d.muahang.status_id != (int)Status.MuahangEsignError).ToList();
                 var soluong_dutru = record.soluong;
                 var soluong_mua = muahang_chitiet.Where(d => d.muahang.parent_id == null).Sum(d => d.soluong * d.quidoi);
@@ -1199,10 +1200,16 @@ namespace it_template.Areas.V1.Controllers
                 {
 
                     var muahang = m.muahang;
-                    if (muahang.parent_id > 0)
+                    if (muahang.is_multiple_ncc == true) /// Xét trường hợp mua nhiều nhà cc
                     {
-                        continue;
+                        if (muahang.pay_at != null) /// Đã ký xong
+                            continue;
+                        //if (muahang.parent_id > 0)
+                        //{
+                        //    continue;
+                        //}
                     }
+
                     var soluong_mua_chitiet = m.soluong * m.quidoi;
                     bool is_nhap = _QLSXContext.VattuNhapChiTietModel.Where(d => d.muahang_id == muahang.id).Count() > 0;
                     list_muahang.Add(new
@@ -1257,7 +1264,7 @@ namespace it_template.Areas.V1.Controllers
                     },
                     user_nhanhang_id = dutru.created_by,
                     list_muahang = list_muahang
-                }); ;
+                });
             }
 
             var jsonData = new { draw = draw, recordsFiltered = recordsFiltered, recordsTotal = recordsTotal, data = data };

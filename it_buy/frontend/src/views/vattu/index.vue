@@ -101,6 +101,18 @@ const columns = ref([
     filter: true,
   },
   {
+    label: "Mã nhà sản xuất",
+    data: "mansx",
+    className: "text-center",
+    filter: true,
+  },
+  {
+    label: "Tên nhà sản xuất",
+    data: "tennsx",
+    className: "text-center",
+    filter: true,
+  },
+  {
     label: "Số lượng",
     data: "soluong",
     className: "text-center",
@@ -196,23 +208,11 @@ const onPage = (event) => {
   loadLazyData();
 };
 
-const confirmDelete = (id) => {
-  confirm.require({
-    message: "Bạn có muốn xóa user này?",
-    header: "Xác nhận",
-    icon: "pi pi-exclamation-triangle",
-    accept: () => {
-      vattuApi.delete(id).then((res) => {
-        loadLazyData();
-      });
-    },
-  });
-};
 onMounted(() => {
   let cache = localStorage.getItem(column_cache);
   if (!cache) {
     showing.value = columns.value.map((item) => {
-      return item.id;
+      return item.data;
     });
   } else {
     showing.value = JSON.parse(cache);

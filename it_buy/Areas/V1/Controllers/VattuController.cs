@@ -41,6 +41,9 @@ namespace it_template.Areas.V1.Controllers
             var tenhh = Request.Form["filters[tenhh]"].FirstOrDefault();
             var tenncc = Request.Form["filters[tenncc]"].FirstOrDefault();
             var mancc = Request.Form["filters[mancc]"].FirstOrDefault();
+            var tennsx = Request.Form["filters[tennsx]"].FirstOrDefault();
+            var mansx = Request.Form["filters[mansx]"].FirstOrDefault();
+            var malo = Request.Form["filters[malo]"].FirstOrDefault();
             var makho = Request.Form["filters[makho]"].FirstOrDefault();
             var ngay = Request.Form["filters[ngay]"].FirstOrDefault();
             int skip = start != null ? Convert.ToInt32(start) : 0;
@@ -53,6 +56,8 @@ namespace it_template.Areas.V1.Controllers
                 mahh = d.mahh,
                 //tenhh = hanghoa.Where(e => e.mahh == d.mahh).FirstOrDefault()?.tenhh,
                 //dvt = hanghoa.Where(e => e.mahh == d.mahh).FirstOrDefault()?.dvt,
+                malo = d.malo,
+                handung = d.handung,
                 mancc = d.mancc,
                 makho = d.hoadon.makho,
                 soluong = d.soluong,
@@ -62,22 +67,49 @@ namespace it_template.Areas.V1.Controllers
                 mahh = d.mahh,
                 //tenhh = d.package.tenhh,
                 //dvt = d.package.dvt,
+                malo = d.malo,
+                handung = d.handung,
                 mancc = d.mancc,
                 makho = d.hoadon.noidi,
                 soluong = -d.soluong,
             }).ToList()).ToList();
             var list_hh = _context.MaterialModel.Where(d => d.deleted_at == null).ToList();
             var list_ncc = _context.NhacungcapModel.ToList();
-            var datalist = customerData.GroupBy(d => new { d.mahh, d.mancc, d.makho }).Select(d => new VattuInventory()
+            var list_nsx = _context.NsxModel.ToList();
+            var datalist = customerData.GroupBy(d => new { d.mahh, d.mancc, d.makho, d.malo, d.handung }).Select(d => new VattuInventory()
             {
                 mahh = d.Key.mahh,
                 makho = d.Key.makho,
                 mancc = d.Key.mancc,
-                tenhh = list_hh.Where(e => e.mahh == d.Key.mahh).FirstOrDefault()?.tenhh,
-                dvt = list_hh.Where(e => e.mahh == d.Key.mahh).FirstOrDefault()?.dvt,
-                tenncc = list_ncc.Where(e => e.mancc == d.Key.mancc).FirstOrDefault()?.tenncc,
+                malo = d.Key.malo,
+                handung = d.Key.handung,
+                //tenhh = list_hh.Where(e => e.mahh == d.Key.mahh).FirstOrDefault()?.tenhh,
+                //dvt = list_hh.Where(e => e.mahh == d.Key.mahh).FirstOrDefault()?.dvt,
+                //tenncc = list_ncc.Where(e => e.mancc == d.Key.mancc).FirstOrDefault()?.tenncc,
+                //mansx = list_hh.Where(e => e.mahh == d.Key.mahh).FirstOrDefault()?.mansx,
+                //tennsx = list_nsx.Where(f => f.mansx == list_hh.Where(e => e.mahh == d.Key.mahh).FirstOrDefault()?.mansx).FirstOrDefault()?.tennsx,
                 soluong = d.Sum(e => e.soluong),
             }).Where(d => d.soluong != 0 && warehouse.Contains(d.makho)).ToList();
+
+
+            foreach (var d in datalist)
+            {
+                var ncc = list_ncc.Where(e => e.mancc == d.mancc).FirstOrDefault();
+                if (ncc != null)
+                {
+                    d.tenncc = ncc.tenncc;
+                }
+
+                var hh = list_hh.Where(e => e.mahh == d.mahh).FirstOrDefault();
+                if (hh != null)
+                {
+                    d.mansx = hh.mansx;
+                    d.tenhh = hh.tenhh;
+                    d.dvt = hh.dvt;
+                    var nsx = list_nsx.Where(f => f.mansx == hh.mansx).FirstOrDefault();
+                    d.tennsx = nsx != null ? nsx.tennsx : null;
+                }
+            }
 
             int recordsTotal = datalist.Count();
             if (mahh != null && mahh != "")
@@ -96,6 +128,18 @@ namespace it_template.Areas.V1.Controllers
             if (tenncc != null && tenncc != "")
             {
                 datalist = datalist.Where(d => d.tenncc != null && d.tenncc.Contains(tenncc)).ToList();
+            }
+            if (mansx != null && mansx != "")
+            {
+                datalist = datalist.Where(d => d.mansx == mansx).ToList();
+            }
+            if (tennsx != null && tennsx != "")
+            {
+                datalist = datalist.Where(d => d.tennsx != null && d.tennsx.Contains(tennsx)).ToList();
+            }
+            if (malo != null && malo != "")
+            {
+                datalist = datalist.Where(d => d.malo == malo).ToList();
             }
             if (makho != null && makho != "")
             {
@@ -179,6 +223,7 @@ namespace it_template.Areas.V1.Controllers
             int pageSize = length != null ? Convert.ToInt32(length) : 0;
             var sohd = Request.Form["filters[sohd]"].FirstOrDefault();
             var mahh = Request.Form["filters[mahh]"].FirstOrDefault();
+            var malo = Request.Form["filters[malo]"].FirstOrDefault();
             var makho = Request.Form["filters[makho]"].FirstOrDefault();
             int skip = start != null ? Convert.ToInt32(start) : 0;
             //var hanghoa = _context.MaterialModel.Where(d => d.deleted_at == null).ToList();
@@ -193,6 +238,10 @@ namespace it_template.Areas.V1.Controllers
             if (mahh != null && mahh != "")
             {
                 datalist = datalist.Where(d => d.mahh == mahh);
+            }
+            if (malo != null && malo != "")
+            {
+                datalist = datalist.Where(d => d.malo == malo);
             }
             if (makho != null && makho != "")
             {
@@ -372,6 +421,7 @@ namespace it_template.Areas.V1.Controllers
             var mahh = Request.Form["filters[mahh]"].FirstOrDefault();
             var noidi = Request.Form["filters[noidi]"].FirstOrDefault();
             var noiden = Request.Form["filters[noiden]"].FirstOrDefault();
+            var malo = Request.Form["filters[malo]"].FirstOrDefault();
             int skip = start != null ? Convert.ToInt32(start) : 0;
             //var hanghoa = _context.MaterialModel.Where(d => d.deleted_at == null).ToList();
             var datalist = _QLSXcontext.VattuDieuchuyenChiTietModel.Include(d => d.hoadon).Where(d => d.hoadon.deleted_at == null && warehouse.Contains(d.hoadon.noidi));
@@ -390,7 +440,10 @@ namespace it_template.Areas.V1.Controllers
             {
                 datalist = datalist.Where(d => d.hoadon.noidi == noidi);
             }
-
+            if (malo != null && malo != "")
+            {
+                datalist = datalist.Where(d => d.malo == malo);
+            }
             if (noiden != null && noiden != "")
             {
                 datalist = datalist.Where(d => d.hoadon.noiden == noiden);
@@ -497,12 +550,13 @@ namespace it_template.Areas.V1.Controllers
                 _QLSXcontext.SaveChanges();
 
                 ////Thêm phiếu mới
-
+                var khoden = _QLSXcontext.KhoModel.Where(d => d.makho == VattuDieuchuyenModel.noiden).FirstOrDefault();
                 var DTA_HOADON_XUAT_NEW = new DTA_HOADON_XUAT()
                 {
                     sohd = VattuDieuchuyenModel.sohd,
                     ngaylaphd = VattuDieuchuyenModel.ngaylap,
-                    mapl = VattuDieuchuyenModel.noiden,
+                    mapl = VattuDieuchuyenModel.noidi,
+                    donvi = khoden != null ? khoden.tenkho : "",
                     makh = VattuDieuchuyenModel.noiden,
                     mach = VattuDieuchuyenModel.created_by,
                     tennguoigd = VattuDieuchuyenModel.ghichu,
@@ -523,6 +577,8 @@ namespace it_template.Areas.V1.Controllers
                         mach = DTA_HOADON_XUAT_NEW.mach,
                         mahh = item.mahh,
                         tenhh = hh.tenhh,
+                        malo = item.malo,
+                        handung = item.malo,
                         dvt = hh.dvt,
                         soluong = item.soluong,
                         stt = stt++,
@@ -589,6 +645,7 @@ namespace it_template.Areas.V1.Controllers
             var tenncc = Request.Form["filters[tenncc]"].FirstOrDefault();
             var mancc = Request.Form["filters[mancc]"].FirstOrDefault();
             var makho = Request.Form["filters[makho]"].FirstOrDefault();
+            var malo = Request.Form["filters[malo]"].FirstOrDefault();
             var ngay = Request.Form["filters[ngay]"].FirstOrDefault();
             int skip = start != null ? Convert.ToInt32(start) : 0;
             DateTime start_date = ngay != null ? DateTime.Parse(ngay).AddDays(1).AddTicks(-1) : DateTime.Now.Date.AddDays(1).AddTicks(-1);
@@ -600,6 +657,8 @@ namespace it_template.Areas.V1.Controllers
                 mahh = d.mahh,
                 //tenhh = hanghoa.Where(e => e.mahh == d.mahh).FirstOrDefault()?.tenhh,
                 //dvt = hanghoa.Where(e => e.mahh == d.mahh).FirstOrDefault()?.dvt,
+                malo = d.malo,
+                handung = d.handung,
                 mancc = d.mancc,
                 makho = d.hoadon.makho,
                 soluong = d.soluong,
@@ -609,22 +668,47 @@ namespace it_template.Areas.V1.Controllers
                 mahh = d.mahh,
                 //tenhh = d.package.tenhh,
                 //dvt = d.package.dvt,
+                malo = d.malo,
+                handung = d.handung,
                 mancc = d.mancc,
                 makho = d.hoadon.noidi,
                 soluong = -d.soluong,
             }).ToList()).ToList();
             var list_hh = _context.MaterialModel.Where(d => d.deleted_at == null).ToList();
             var list_ncc = _context.NhacungcapModel.ToList();
-            var datalist = customerData.GroupBy(d => new { d.mahh, d.mancc, d.makho }).Select(d => new VattuInventory()
+            var list_nsx = _context.NsxModel.ToList();
+            var datalist = customerData.GroupBy(d => new { d.mahh, d.mancc, d.makho, d.malo, d.handung }).Select(d => new VattuInventory()
             {
                 mahh = d.Key.mahh,
                 makho = d.Key.makho,
                 mancc = d.Key.mancc,
-                tenhh = list_hh.Where(e => e.mahh == d.Key.mahh).FirstOrDefault()?.tenhh,
-                dvt = list_hh.Where(e => e.mahh == d.Key.mahh).FirstOrDefault()?.dvt,
-                tenncc = list_ncc.Where(e => e.mancc == d.Key.mancc).FirstOrDefault()?.tenncc,
+                malo = d.Key.malo,
+                handung = d.Key.handung,
+                //tenhh = list_hh.Where(e => e.mahh == d.Key.mahh).FirstOrDefault()?.tenhh,
+                //dvt = list_hh.Where(e => e.mahh == d.Key.mahh).FirstOrDefault()?.dvt,
+                //tenncc = list_ncc.Where(e => e.mancc == d.Key.mancc).FirstOrDefault()?.tenncc,
+                //mansx = list_hh.Where(e => e.mahh == d.Key.mahh).FirstOrDefault()?.mansx,
+                //tennsx = list_nsx.Where(f => f.mansx == list_hh.Where(e => e.mahh == d.Key.mahh).FirstOrDefault()?.mansx).FirstOrDefault()?.tennsx,
                 soluong = d.Sum(e => e.soluong),
             }).Where(d => d.soluong != 0 && warehouse.Contains(d.makho)).ToList();
+            foreach (var d in datalist)
+            {
+                var ncc = list_ncc.Where(e => e.mancc == d.mancc).FirstOrDefault();
+                if (ncc != null)
+                {
+                    d.tenncc = ncc.tenncc;
+                }
+
+                var hh = list_hh.Where(e => e.mahh == d.mahh).FirstOrDefault();
+                if (hh != null)
+                {
+                    d.mansx = hh.mansx;
+                    d.tenhh = hh.tenhh;
+                    d.dvt = hh.dvt;
+                    var nsx = list_nsx.Where(f => f.mansx == hh.mansx).FirstOrDefault();
+                    d.tennsx = nsx != null ? nsx.tennsx : null;
+                }
+            }
 
             int recordsTotal = datalist.Count();
             if (mahh != null && mahh != "")
@@ -643,6 +727,10 @@ namespace it_template.Areas.V1.Controllers
             if (tenncc != null && tenncc != "")
             {
                 datalist = datalist.Where(d => d.tenncc.Contains(tenncc)).ToList();
+            }
+            if (malo != null && malo != "")
+            {
+                datalist = datalist.Where(d => d.malo == malo).ToList();
             }
             if (makho != null && makho != "")
             {
@@ -668,6 +756,8 @@ namespace it_template.Areas.V1.Controllers
             dt.Columns.Add("tenhh", typeof(string));
             dt.Columns.Add("mancc", typeof(string));
             dt.Columns.Add("tenncc", typeof(string));
+            dt.Columns.Add("malo", typeof(string));
+            dt.Columns.Add("handung", typeof(string));
             dt.Columns.Add("soluong", typeof(decimal));
             dt.Columns.Add("makho", typeof(string));
 
@@ -685,6 +775,8 @@ namespace it_template.Areas.V1.Controllers
                 dr1["tenhh"] = record.tenhh;
                 dr1["mancc"] = record.mancc;
                 dr1["tenncc"] = record.tenncc;
+                dr1["malo"] = record.malo;
+                dr1["handung"] = record.handung != null ? record.handung.Value.ToString("dd/MM/yyyy") : "";
                 dr1["soluong"] = record.soluong;
                 dr1["makho"] = record.makho;
 
@@ -719,36 +811,59 @@ namespace it_template.Areas.V1.Controllers
                 mahh = d.mahh,
                 //tenhh = hanghoa.Where(e => e.mahh == d.mahh).FirstOrDefault()?.tenhh,
                 //dvt = hanghoa.Where(e => e.mahh == d.mahh).FirstOrDefault()?.dvt,
+                malo = d.malo,
+                handung = d.handung,
                 mancc = d.mancc,
                 makho = d.hoadon.makho,
                 soluong = d.soluong,
             }).ToList();
-
-
-            customerData = customerData.Concat(dieuchuyen.Where(d => d.hoadon.noidi == makho && d.kt_xuat == true).Select(d => new VattuInventory()
+            customerData = customerData.Concat(dieuchuyen.Where(d => d.kt_xuat == true).Select(d => new VattuInventory() /// Xuất
             {
                 mahh = d.mahh,
                 //tenhh = d.package.tenhh,
                 //dvt = d.package.dvt,
+                malo = d.malo,
+                handung = d.handung,
                 mancc = d.mancc,
                 makho = d.hoadon.noidi,
                 soluong = -d.soluong,
             }).ToList()).ToList();
             var list_hh = _context.MaterialModel.Where(d => d.deleted_at == null).ToList();
-            var list_cc = _context.NhacungcapModel.ToList();
-            var datalist = customerData.GroupBy(d => new { d.mahh, d.makho, d.mancc }).Select(d => new VattuInventory()
+            var list_ncc = _context.NhacungcapModel.ToList();
+            var list_nsx = _context.NsxModel.ToList();
+            var datalist = customerData.GroupBy(d => new { d.mahh, d.mancc, d.makho, d.malo, d.handung }).Select(d => new VattuInventory()
             {
                 mahh = d.Key.mahh,
                 makho = d.Key.makho,
                 mancc = d.Key.mancc,
-                tenhh = list_hh.Where(e => e.mahh == d.Key.mahh).FirstOrDefault()?.tenhh,
-                dvt = list_hh.Where(e => e.mahh == d.Key.mahh).FirstOrDefault()?.dvt,
-                tenncc = list_cc.Where(e => e.mancc == d.Key.mancc).FirstOrDefault()?.tenncc,
+                malo = d.Key.malo,
+                handung = d.Key.handung,
+                //tenhh = list_hh.Where(e => e.mahh == d.Key.mahh).FirstOrDefault()?.tenhh,
+                //dvt = list_hh.Where(e => e.mahh == d.Key.mahh).FirstOrDefault()?.dvt,
+                //tenncc = list_ncc.Where(e => e.mancc == d.Key.mancc).FirstOrDefault()?.tenncc,
+                //mansx = list_hh.Where(e => e.mahh == d.Key.mahh).FirstOrDefault()?.mansx,
+                //tennsx = list_nsx.Where(f => f.mansx == list_hh.Where(e => e.mahh == d.Key.mahh).FirstOrDefault()?.mansx).FirstOrDefault()?.tennsx,
                 soluong = d.Sum(e => e.soluong),
-            }).FirstOrDefault();
-
-
-            return Json(datalist);
+            }).Where(d => d.soluong != 0).ToList();
+            foreach (var d in datalist)
+            {
+                var ncc = list_ncc.Where(e => e.mancc == d.mancc).FirstOrDefault();
+                if (ncc != null)
+                {
+                    d.tenncc = ncc.tenncc;
+                }
+                var hh = list_hh.Where(e => e.mahh == d.mahh).FirstOrDefault();
+                if (hh != null)
+                {
+                    d.mansx = hh.mansx;
+                    d.tenhh = hh.tenhh;
+                    d.dvt = hh.dvt;
+                    var nsx = list_nsx.Where(f => f.mansx == hh.mansx).FirstOrDefault();
+                    d.tennsx = nsx != null ? nsx.tennsx : null;
+                }
+            }
+            var end = datalist.FirstOrDefault();
+            return Json(end);
         }
         public void CopyValues<T>(T target, T source)
         {
@@ -771,91 +886,120 @@ namespace it_template.Areas.V1.Controllers
         //[HttpPost]
         public async Task<JsonResult> importbandau()
         {
+            return Json(new { });
             System.Security.Claims.ClaimsPrincipal currentUser = this.User;
             var user_id = UserManager.GetUserId(currentUser);
             var user = await UserManager.GetUserAsync(currentUser);
-
-            //var hanghoa = _context.MaterialModel.Where(d => d.deleted_at == null).ToList();
-            var nhap = _QLSXcontext.DTA_CT_HOADON_NHAP.Include(d => d.hoadon).Where(d => d.hoadon != null && d.hoadon.deleted_at == null).AsNoTracking().ToList();
-            var dieuchuyen = _QLSXcontext.DTA_CT_HOADON_XUAT.Include(d => d.hoadon).Where(d => d.hoadon != null && d.hoadon.deleted_at == null).AsNoTracking().ToList();
-            var customerData = nhap.Select(d => new VattuInventory()
+            var list_excel = new List<dynamic>()
             {
-                mahh = d.mahh,
-                //tenhh = hanghoa.Where(e => e.mahh == d.mahh).FirstOrDefault()?.tenhh,
-                //dvt = hanghoa.Where(e => e.mahh == d.mahh).FirstOrDefault()?.dvt,
-                mancc = d.mancc,
-                makho = d.hoadon.makho,
-                soluong = d.soluong,
-            }).ToList();
-            customerData = customerData.Concat(dieuchuyen.Select(d => new VattuInventory() /// Xuất
+                //new
+                //{
+                //    file = "TỒN KHO RD 31.05.2025.xlsx",
+                //    makho = "13",
+
+                //},new
+                //{
+                //    file = "TỒN KHO QC 31.05.2025.xlsx",
+                //    makho = "02",
+
+                //},
+                new
+                {
+                    file = "mã 0706.xlsx",
+                    makho = "12",
+
+                }
+            };
+            var list_hh = _context.MaterialModel.ToList();
+            var error = new List<string>();
+            foreach (var excel in list_excel)
             {
-                mahh = d.mahh,
-                //tenhh = d.package.tenhh,
-                //dvt = d.package.dvt,
-                mancc = d.mancc,
-                makho = d.hoadon.noixuat,
-                soluong = -d.soluong,
-            }).ToList()).ToList();
-            var list_hh = _context.MaterialModel.Where(d => d.deleted_at == null).ToList();
-            var list_ncc = _context.NhacungcapModel.ToList();
-            var datalist = customerData.GroupBy(d => new { d.mahh, d.mancc, d.makho }).Select(d => new VattuInventory()
-            {
-                mahh = d.Key.mahh,
-                makho = d.Key.makho,
-                mancc = d.Key.mancc,
-                tenhh = list_hh.Where(e => e.mahh == d.Key.mahh).FirstOrDefault()?.tenhh,
-                dvt = list_hh.Where(e => e.mahh == d.Key.mahh).FirstOrDefault()?.dvt,
-                tenncc = list_ncc.Where(e => e.mancc == d.Key.mancc).FirstOrDefault()?.tenncc,
-                soluong = d.Sum(e => e.soluong),
-            }).Where(d => d.soluong > 0).ToList();
+                //// Add tồn kho đầu kì
+                string sohd = "NHAP_BANDAU_" + excel.makho;
+                var DTA_NHAPXUAT_old = _QLSXcontext.VattuNhapModel.Where(d => d.sohd == sohd).FirstOrDefault();
+                //if (DTA_NHAPXUAT_old != null)
+                //{
+                //    ///Xóa phiếu cũ
+                //    var list = _QLSXcontext.VattuNhapChiTietModel.Where(d => d.sohd == sohd).ToList();
+                //    _QLSXcontext.RemoveRange(list);
+                //    _QLSXcontext.Remove(DTA_NHAPXUAT_old);
+                //    _QLSXcontext.SaveChanges();
 
-            int recordsFiltered = datalist.Count();
-            int recordsTotal = recordsFiltered;
-            var datapost = datalist.OrderBy(d => d.mahh).ToList();
+                //}
+                if (DTA_NHAPXUAT_old == null)
+                {
+                    var VattuNhapModel = new VattuNhapModel();
+                    VattuNhapModel.ngaylap = DateTime.Now.Date;
+                    VattuNhapModel.sohd = sohd;
+                    VattuNhapModel.makho = excel.makho;
+                    VattuNhapModel.created_by = user.Email;
+                    VattuNhapModel.created_at = DateTime.Now;
+                    _QLSXcontext.Add(VattuNhapModel);
+                    _QLSXcontext.SaveChanges();
+                }
 
 
+                Spire.Xls.Workbook book = new Spire.Xls.Workbook();
+                book.LoadFromFile("./wwwroot/report/excel/" + excel.file, ExcelVersion.Version2013);
 
-            //// Add tồn kho đầu kì
-            var sohd = "NHAP_BANDAU";
-            var DTA_NHAPXUAT_old = _QLSXcontext.VattuNhapModel.Where(d => d.sohd == sohd).FirstOrDefault();
-            if (DTA_NHAPXUAT_old != null)
-            {
-                ///Xóa phiếu cũ
-                var list = _QLSXcontext.VattuNhapChiTietModel.Where(d => d.sohd == sohd).ToList();
-                _QLSXcontext.RemoveRange(list);
-                _QLSXcontext.Remove(DTA_NHAPXUAT_old);
+                Spire.Xls.Worksheet sheet = book.Worksheets[0];
+                var lastrow = sheet.LastDataRow;
+                var lastcol = sheet.LastDataColumn;
+                // nếu vẫn chưa gặp end thì vẫn lấy data
+                Console.WriteLine(lastrow);
+                //var list_Result = new List<ResultModel>();
+                var newlist = new List<string>();
+                var list_add = new List<MaterialModel>();
+                for (int rowIndex = 1; rowIndex < lastrow; rowIndex++)
+                {
+                    var nowRow = sheet.Rows[rowIndex];
+                    if (nowRow == null)
+                        continue;
+                    // vì ta dùng 3 cột A, B, C => data của ta sẽ như sau
+                    //int numcount = nowRow.Cells.Count;
+                    //for(int y = 0;y<numcount - 1 ;y++)
+                    //var nowRowVitri = sheet.Rows[8];
+
+                    //var code_vitri = nowRow.Cells[15] != null ? nowRow.Cells[15].Value : null;
+                    //if (code_vitri == null || code_vitri == "")
+                    //    continue;
+                    var mahh = nowRow.Cells[1] != null ? nowRow.Cells[1].DisplayedText : null;
+                    if (mahh == null || mahh == "")
+                        continue;
+                    var hh = list_hh.Where(d => d.mahh == mahh).FirstOrDefault();
+                    if (hh == null)
+                    {
+                        error.Add(mahh);
+                        continue;///Lỗi
+                    }
+
+                    decimal? soluong = nowRow.Cells[4] != null ? (decimal)nowRow.Cells[4].NumberValue : null;
+
+
+                    var VattuNhapChiTietModel = new VattuNhapChiTietModel();
+                    VattuNhapChiTietModel.sohd = sohd;
+                    VattuNhapChiTietModel.mahh = mahh;
+                    //VattuNhapChiTietModel.mancc = item.mancc;
+                    VattuNhapChiTietModel.soluong = soluong;
+
+                    _QLSXcontext.Add(VattuNhapChiTietModel);
+                }
+
                 _QLSXcontext.SaveChanges();
-
             }
-            var VattuNhapModel = new VattuNhapModel();
-            VattuNhapModel.ngaylap = DateTime.Now.Date;
-            VattuNhapModel.sohd = sohd;
-            VattuNhapModel.makho = "KHO";
-            VattuNhapModel.created_by = user.Email;
-            VattuNhapModel.created_at = DateTime.Now;
-            _QLSXcontext.Add(VattuNhapModel);
-            _QLSXcontext.SaveChanges();
 
 
-            foreach (var item in datapost)
+            return Json(new
             {
-                var VattuNhapChiTietModel = new VattuNhapChiTietModel();
-                VattuNhapChiTietModel.sohd = VattuNhapModel.sohd;
-                VattuNhapChiTietModel.mahh = item.mahh;
-                VattuNhapChiTietModel.mancc = item.mancc;
-                VattuNhapChiTietModel.soluong = item.soluong;
-                _QLSXcontext.Add(VattuNhapChiTietModel);
-                _QLSXcontext.SaveChanges();
-            }
-
-            var jsonData = new { draw = 0, recordsFiltered = recordsFiltered, recordsTotal = recordsTotal, data = datapost };
-            return Json(jsonData, new System.Text.Json.JsonSerializerOptions()
+                error
+            }, new System.Text.Json.JsonSerializerOptions()
             {
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                 ReferenceHandler = ReferenceHandler.IgnoreCycles,
             });
 
         }
+
     }
     public class VattuInventory
     {
@@ -866,5 +1010,9 @@ namespace it_template.Areas.V1.Controllers
         public string makho { get; set; }
         public string mancc { get; set; }
         public string tenncc { get; set; }
+        public string mansx { get; set; }
+        public string tennsx { get; set; }
+        public string malo { get; set; }
+        public DateTime? handung { get; set; }
     }
 }

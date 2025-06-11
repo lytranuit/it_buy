@@ -110,6 +110,22 @@ namespace Vue.Controllers
                         await _context.SaveChangesAsync();
                     }
                 }
+                else if (type == "create_esign_muahang_return")
+                {
+                    var muahang_tmp = queue.valueQ.muahang;
+                    var model = _context.MuahangModel.Where(d => d.id == muahang_tmp.id).FirstOrDefault();
+                    if (model != null)
+                    {
+                        model.status_id = (int)Status.MuahangEsign;
+                        model.activeStep = 1;
+                        model.esign_id = muahang_tmp.esign_id;
+                        model.code = muahang_tmp.code;
+                        _context.Update(model);
+                        queue.status_id = 2;
+                        _context.Update(queue);
+                        await _context.SaveChangesAsync();
+                    }
+                }
                 else if (type == "esign_dutru_failed")
                 {
                     var dutru_tmp = queue.valueQ.dutru;
@@ -138,22 +154,6 @@ namespace Vue.Controllers
                         //    item.status_id = 2;
                         //}
                         //_context.UpdateRange(chitiet);
-                        queue.status_id = 2;
-                        _context.Update(queue);
-                        await _context.SaveChangesAsync();
-                    }
-                }
-                else if (type == "create_esign_muahang_return")
-                {
-                    var muahang_tmp = queue.valueQ.muahang;
-                    var model = _context.MuahangModel.Where(d => d.id == muahang_tmp.id).FirstOrDefault();
-                    if (model != null)
-                    {
-                        model.status_id = (int)Status.MuahangEsign;
-                        model.activeStep = 1;
-                        model.esign_id = muahang_tmp.esign_id;
-                        model.code = muahang_tmp.code;
-                        _context.Update(model);
                         queue.status_id = 2;
                         _context.Update(queue);
                         await _context.SaveChangesAsync();
@@ -207,7 +207,9 @@ namespace Vue.Controllers
                                     pdf = model.pdf,
                                     esign_id = model.esign_id,
                                     date = model.date,
-                                    parent_id = model.id
+                                    parent_id = model.id,
+                                    pay_at = model.pay_at,
+
                                 };
                                 _context.Add(muahang_data);
                                 await _context.SaveChangesAsync();
@@ -269,6 +271,8 @@ namespace Vue.Controllers
                                 var chitiet = ncc.chitiet;
                                 foreach (var item in chitiet)
                                 {
+                                    if (item.thanhtien_vat == 0)
+                                        continue;
                                     var dutru_chitiet_id = list_chitiet[item.muahang_chitiet_id];
                                     var user_nhanhang_id = list_chitiet_user_nhanhang[item.muahang_chitiet_id];
                                     var muahang_chitiet_data1 = new MuahangChitietModel()
@@ -335,6 +339,79 @@ namespace Vue.Controllers
                         }
                     }
                 }
+                else if (type == "esign_xuatvattu_failed")
+                {
+                    var dutru_tmp = queue.valueQ.dutru;
+                    var model = _QLSXcontext.XuatVattuModel.Where(d => d.id == dutru_tmp.id).FirstOrDefault();
+                    if (model != null)
+                    {
+                        model.status_id = (int)Status.EsignError;
+                        _QLSXcontext.Update(model);
+                        queue.status_id = 2;
+                        _context.Update(queue);
+                        await _context.SaveChangesAsync();
+                        await _QLSXcontext.SaveChangesAsync();
+                    }
+                }
+                else if (type == "esign_xuatvattu_success")
+                {
+                    var dutru_tmp = queue.valueQ.dutru;
+                    var model = _QLSXcontext.XuatVattuModel.Where(d => d.id == dutru_tmp.id).FirstOrDefault();
+                    if (model != null)
+                    {
+                        model.status_id = (int)Status.EsignSuccess;
+                        model.pdf = dutru_tmp.pdf;
+                        model.date_finish = DateTime.Now;
+                        _QLSXcontext.Update(model);
+                        //var chitiet = model.chitiet;
+                        //foreach (var item in chitiet)
+                        //{
+                        //    item.status_id = 2;
+                        //}
+                        //_context.UpdateRange(chitiet);
+                        queue.status_id = 2;
+                        _context.Update(queue);
+                        await _context.SaveChangesAsync();
+                        await _QLSXcontext.SaveChangesAsync();
+                    }
+                }
+                else if (type == "esign_xuatnguyenlieu_failed")
+                {
+                    var dutru_tmp = queue.valueQ.dutru;
+                    var model = _QLSXcontext.XuatNVLModel.Where(d => d.id == dutru_tmp.id).FirstOrDefault();
+                    if (model != null)
+                    {
+                        model.status_id = (int)Status.EsignError;
+                        _QLSXcontext.Update(model);
+                        queue.status_id = 2;
+                        _context.Update(queue);
+                        await _context.SaveChangesAsync();
+                        await _QLSXcontext.SaveChangesAsync();
+                    }
+                }
+                else if (type == "esign_xuatnguyenlieu_success")
+                {
+                    var dutru_tmp = queue.valueQ.dutru;
+                    var model = _QLSXcontext.XuatNVLModel.Where(d => d.id == dutru_tmp.id).FirstOrDefault();
+                    if (model != null)
+                    {
+                        model.status_id = (int)Status.EsignSuccess;
+                        model.pdf = dutru_tmp.pdf;
+                        model.date_finish = DateTime.Now;
+                        _QLSXcontext.Update(model);
+                        //var chitiet = model.chitiet;
+                        //foreach (var item in chitiet)
+                        //{
+                        //    item.status_id = 2;
+                        //}
+                        //_context.UpdateRange(chitiet);
+                        queue.status_id = 2;
+                        _context.Update(queue);
+                        await _context.SaveChangesAsync();
+                        await _QLSXcontext.SaveChangesAsync();
+                    }
+                }
+
             }
             ////finish mua hàng
             var muahang_list = _context.MuahangModel.Where(d => d.deleted_at == null && d.date_finish == null && d.is_nhanhang == true && d.is_thanhtoan == true)
@@ -346,48 +423,6 @@ namespace Vue.Controllers
                 item.date_finish = DateTime.Now;
                 _context.Update(item);
                 _context.SaveChanges();
-                /////
-                //var chitiet_no_mahh = item.chitiet.Where(d => d.mahh == null).ToList();
-                //foreach (var c in chitiet_no_mahh)
-                //{
-                //    //////tao ma
-                //    var hh = new MaterialModel()
-                //    {
-                //        nhom = "Khac",
-                //        mahh = "HH-" + new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds(),
-                //        tenhh = c.tenhh,
-                //        dvt = c.dvt,
-                //    };
-                //    _context.Add(hh);
-                //    _context.SaveChanges();
-                //    hh.mahh = "HH-" + hh.id;
-                //    _context.Update(hh);
-                //    _context.SaveChanges();
-                //    /////update chitiet muahang
-                //    c.hh_id = "m-" + hh.id;
-                //    c.mahh = hh.mahh;
-                //    _context.Update(c);
-                //    _context.SaveChanges();
-                //    ///Update chitiet ncc
-                //    foreach (var ncc_c in c.muahang_ncc_chitiet)
-                //    {
-                //        ncc_c.mahh = hh.mahh;
-                //        ncc_c.hh_id = "m-" + hh.id;
-
-                //        _context.Update(ncc_c);
-                //        _context.SaveChanges();
-                //    }
-
-                //    ///// update chitiet dutru
-                //    c.dutru_chitiet.mahh = hh.mahh;
-                //    c.dutru_chitiet.hh_id = "m-" + hh.id;
-
-                //    _context.Update(c.dutru_chitiet);
-                //    _context.SaveChanges();
-
-
-                //}
-
             }
 
 
@@ -631,7 +666,18 @@ namespace Vue.Controllers
 
         }
 
-
+        public async Task<JsonResult> Sync()
+        {
+            var muahang = _context.MuahangModel.Where(d => d.parent_id > 0).ToList();
+            foreach (var item in muahang)
+            {
+                var parent = _context.MuahangModel.Where(d => d.id == item.parent_id).FirstOrDefault();
+                item.pay_at = parent.pay_at;
+                _context.Update(item);
+                _context.SaveChanges();
+            }
+            return Json(new { success = true });
+        }
         class SuccesMail
         {
             public int success { get; set; }

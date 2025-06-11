@@ -1811,7 +1811,7 @@ namespace it_template.Areas.V1.Controllers
                 data.activeStep = 1;
                 data.esign_id = DocumentModel.id;
                 data.code = DocumentModel.code;
-
+                _context.Update(data);
                 _context.SaveChanges();
 
                 return Json(new { success = true });

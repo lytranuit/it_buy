@@ -412,6 +412,8 @@ namespace it_template.Areas.V1.Controllers
     public class PackageInventory
     {
         public string mahh { get; set; }
+        public string tenhh { get; set; }
+        public string dvt { get; set; }
         public decimal soluong { get; set; }
     }
 

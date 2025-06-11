@@ -60,8 +60,6 @@ import { formatDate } from "../../../utilities/util";
 import FormMuahangNhanhang from "../../../components/Datatable/FormMuahangNhanhang.vue";
 import { useToast } from "primevue/usetoast";
 import { useAuth } from "../../../stores/auth";
-const minDate = ref(new Date());
-const confirm = useConfirm();
 const toast = useToast();
 const route = useRoute();
 const storeMuahang = useMuahang();

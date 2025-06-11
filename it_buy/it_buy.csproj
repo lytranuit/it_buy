@@ -46,6 +46,9 @@
 		<None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
 	</ItemGroup>
 	<ItemGroup>
+	  <None Remove="Areas\V1\Models\XuatVattuChitietModel.cs~RF18bd07fb.TMP" />
+	</ItemGroup>
+	<ItemGroup>
 		<_WebToolingArtifacts Remove="Properties\PublishProfiles\web.pubxml" />
 	</ItemGroup>
 	<Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

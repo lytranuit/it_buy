@@ -77,11 +77,12 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-12 text-center">
-                                <Button label="Lưu lại" icon="pi pi-save" class="p-button-success p-button-sm mr-2"
-                                    @click="submit()" :disabled="buttonDisabled"></Button>
-                            </div>
+
                         </div>
+                    </div>
+                    <div class="card-footer text-center">
+                        <Button label="Lưu lại" icon="pi pi-save" class="p-button-success p-button-sm mr-2"
+                            @click="submit()" :disabled="buttonDisabled"></Button>
                     </div>
                 </section>
             </form>
@@ -117,6 +118,7 @@ const store_general = useGeneral();
 const buttonDisabled = ref();
 const { model, datatable, list_add, list_delete, list_update, start_event } = storeToRefs(storeVattu);
 const { user } = storeToRefs(store);
+
 onMounted(() => {
     store_general.fetchMaterials();
     if (!route.query.no_reset) {
@@ -171,11 +173,6 @@ const submit = () => {
                 return false;
             }
 
-            if (!product.dvt) {
-                alert("Chưa nhập đơn vị tính!");
-                buttonDisabled.value = false;
-                return false;
-            }
             if (!(product.soluong > 0)) {
                 alert("Chưa chọn nhập số lượng");
                 buttonDisabled.value = false;

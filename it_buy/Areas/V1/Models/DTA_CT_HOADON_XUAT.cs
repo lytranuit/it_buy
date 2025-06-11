@@ -27,6 +27,8 @@ namespace Vue.Models
         public string? tenhh { get; set; }
 
         public string? dvt { get; set; }
+        public string? malo { get; set; }
+        public string? handung { get; set; }
 
         public decimal? soluong { get; set; }
 

@@ -556,6 +556,7 @@ const nhaphanhoa = () => {
   for (var item of clonedSelected) {
     // console.log(item);
     for (var item1 of item.list_muahang) {
+      console.log(item1);
       if (!item1.pay_at) {
         continue;
       }

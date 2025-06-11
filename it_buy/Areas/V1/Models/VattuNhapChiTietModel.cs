@@ -19,6 +19,9 @@ namespace Vue.Models
 
         public decimal? soluong { get; set; } // Số lượng (kiểu money -> decimal)
 
+        public string? malo { get; set; }
+        public DateTime? handung { get; set; } 
+
         public string? ghichu { get; set; } // Ghi chú
         public int? muahang_id { get; set; } // Muahang_id
         //[Column("nguoidung")]

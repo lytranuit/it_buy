@@ -27,7 +27,7 @@
                 </template>
                 <template v-else-if="col.data == 'user_created'">
                     <span v-if="slotProps.data.user_created">{{ slotProps.data.user_created.FullName
-                    }}</span>
+                        }}</span>
                 </template>
                 <div v-else v-html="slotProps.data[col.data]"></div>
             </template>
@@ -156,7 +156,7 @@ onMounted(() => {
     let cache = localStorage.getItem(column_cache);
     if (!cache) {
         showing.value = columns.value.map((item) => {
-            return item.id;
+            return item.data;
         });
     } else {
         showing.value = JSON.parse(cache);

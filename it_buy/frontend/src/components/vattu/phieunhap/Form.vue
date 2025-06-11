@@ -35,6 +35,12 @@
             <NccTreeSelect v-model="slotProps.data[col.data]" :multiple="false" :useID="false" />
           </template>
 
+          <template v-else-if="col.data == 'malo'">
+            <input v-model="slotProps.data[col.data]" class="form-control" />
+          </template>
+          <template v-else-if="col.data == 'handung'">
+            <Calendar v-model="slotProps.data[col.data]" dateFormat="dd/mm/yy" class="date-custom" showIcon />
+          </template>
           <template v-else-if="col.data == 'soluong'">
             <input-number v-model="slotProps.data[col.data]" class="p-inputtext-sm" :maxFractionDigits="2"
               :suffix="' ' + slotProps.data.dvt" />
@@ -97,8 +103,18 @@ const columns = ref(
       className: "text-center",
     },
     {
-      label: "Nhà cung cấp(*)",
+      label: "Nhà cung cấp",
       data: "mancc",
+      className: "text-center",
+    },
+    {
+      label: "Số lô",
+      data: "malo",
+      className: "text-center",
+    },
+    {
+      label: "Hạn dùng",
+      data: "handung",
       className: "text-center",
     },
     {
@@ -179,6 +195,18 @@ defineExpose({
 <style>
 .mahh {
   min-width: 300px;
+}
+
+.mancc {
+  min-width: 300px;
+}
+
+.malo {
+  min-width: 150px;
+}
+
+.handung {
+  min-width: 200px;
 }
 
 .ghichu {

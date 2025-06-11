@@ -18,6 +18,8 @@ namespace Vue.Models
         public string? mahh { get; set; }
         public string? mancc { get; set; } // Mã ncc
 
+        public string? malo { get; set; }
+        public DateTime? handung { get; set; }
         public decimal? soluong { get; set; }
         public decimal? tonkho { get; set; }
 

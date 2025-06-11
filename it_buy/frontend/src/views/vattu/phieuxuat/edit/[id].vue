@@ -65,13 +65,16 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-12 text-center" v-if="user.email == model.created_by">
-                                <Button label="Lưu lại" icon="pi pi-save" class="p-button-success p-button-sm mr-2"
-                                    @click="submit()" :disabled="buttonDisabled"></Button>
-                                <Button label="Link nhận hàng" icon="pi pi-link"
-                                    class="p-button-primary p-button-sm mr-2" @click="nhanhang()"></Button>
-                            </div>
+
                         </div>
+                    </div>
+                    <div class="card-footer text-center" v-if="user.email == model.created_by">
+                        <Button label="Lưu lại" icon="pi pi-save" class="p-button-success p-button-sm mr-2"
+                            @click="submit()" :disabled="buttonDisabled"></Button>
+                        <Button label="In phiếu" icon="pi pi-file" class="p-button-warning p-button-sm mr-2"
+                            @click="print()"></Button>
+                        <!-- <Button label="Link nhận hàng" icon="pi pi-link"
+                                    class="p-button-primary p-button-sm mr-2" @click="nhanhang()"></Button> -->
                     </div>
                 </section>
             </form>
@@ -112,7 +115,10 @@ onMounted(async () => {
     console.log(start_event.value)
     var params = route.params.id;
     var data = await VattuApi.getXuat({ id: params });
-    let chitiet = data.chitiet;
+    let chitiet = data.chitiet.map((item, index) => {
+        item.handung = item.handung != null ? new Date(item.handung) : null;
+        return item;
+    });
     delete data.chitiet;
     // store_general.fetchMaterialGroup();
     await store_general.fetchMaterials();
@@ -127,11 +133,11 @@ onMounted(async () => {
     }
     start_event.value = true;
 });
+
 const changeNoidi = () => {
     if (!start_event.value) {
         return;
     }
-    console.log(1)
     datatable.value = [];
 
     if (!list_delete.value) {
@@ -145,6 +151,21 @@ const changeNoidi = () => {
 };
 const nhanhang = () => {
     location.href = "/Vattu/phieuxuat/view/" + model.value.id;
+}
+const print = () => {
+
+    const resoure = import.meta.env.VITE_URL_REPORT;
+    var params = { sohd: model.value.sohd };
+    window.open(`${resoure}/printXUATVATTU${generateUrl(params)}`, "_blank");
+};
+function generateUrl(object) {
+    const params = new URLSearchParams();
+
+    for (const key in object) {
+        params.append(key, object[key]);
+    }
+
+    return `?${params.toString()}`;
 }
 const submit = () => {
     buttonDisabled.value = true;
@@ -172,11 +193,6 @@ const submit = () => {
                 return false;
             }
 
-            if (!product.dvt) {
-                alert("Chưa nhập đơn vị tính!");
-                buttonDisabled.value = false;
-                return false;
-            }
             if (!(product.soluong > 0)) {
                 alert("Chưa chọn nhập số lượng");
                 buttonDisabled.value = false;

@@ -134,6 +134,72 @@ namespace it_template.Areas.V1.Controllers
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
             });
         }
+        public async Task<JsonResult> tonkhoNVL()
+        {
+            var All = _context.PackageModel.Where(d => d.soluong > 0 && d.deleted_at == null).GroupBy(d => new { d.mahh }).Select(d => new PackageInventory()
+            {
+                mahh = d.Key.mahh,
+                tenhh = d.FirstOrDefault().tenhh,
+                dvt = d.FirstOrDefault().dvt,
+                soluong = d.Sum(e => e.soluong)
+            }).ToList();
+            //var jsonData = new { data = ProcessModel };
+            return Json(All, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            });
+        }
+        public async Task<JsonResult> tonkhoVattu()
+        {
+            var nhap = _QLSXContext.VattuNhapChiTietModel.Include(d => d.hoadon).Where(d => d.hoadon != null && d.hoadon.deleted_at == null).AsNoTracking().ToList();
+            var dieuchuyen = _QLSXContext.VattuDieuchuyenChiTietModel.Include(d => d.hoadon).Where(d => d.hoadon != null && d.hoadon.deleted_at == null).AsNoTracking().ToList();
+            
+            var customerData = nhap.Select(d => new VattuInventory()
+            {
+                mahh = d.mahh,
+                //tenhh = hanghoa.Where(e => e.mahh == d.mahh).FirstOrDefault()?.tenhh,
+                //dvt = hanghoa.Where(e => e.mahh == d.mahh).FirstOrDefault()?.dvt,
+                malo = d.malo,
+                handung = d.handung,
+                mancc = d.mancc,
+                makho = d.hoadon.makho,
+                soluong = d.soluong,
+            }).ToList();
+
+            customerData = customerData.Concat(dieuchuyen.Where(d => d.kt_xuat == true).Select(d => new VattuInventory() /// Xuất
+            {
+                mahh = d.mahh,
+                malo = d.malo,
+                handung = d.handung,
+                mancc = d.mancc,
+                makho = d.hoadon.noidi,
+                soluong = -d.soluong,
+            }).ToList()).ToList();
+
+            var list_hh = _context.MaterialModel.Where(d => d.deleted_at == null).ToList();
+            var datalist = customerData.GroupBy(d => new { d.mahh }).Select(d => new VattuInventory()
+            {
+                mahh = d.Key.mahh,
+                soluong = d.Sum(e => e.soluong),
+            }).Where(d => d.soluong != 0).ToList();
+
+            foreach (var d in datalist)
+            {
+                var hh = list_hh.Where(e => e.mahh == d.mahh).FirstOrDefault();
+                if (hh != null)
+                {
+                    d.mansx = hh.mansx;
+                    d.tenhh = hh.tenhh;
+                    d.dvt = hh.dvt;
+                }
+            }
+
+            return Json(datalist, new System.Text.Json.JsonSerializerOptions()
+            {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            });
+        }
+
         public async Task<JsonResult> departmentsofuser()
         {
             System.Security.Claims.ClaimsPrincipal currentUser = this.User;

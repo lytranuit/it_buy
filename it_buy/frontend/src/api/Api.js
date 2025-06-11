@@ -29,6 +29,12 @@ export default {
   nhom() {
     return repository.get(`/v1/${resoure}/nhom`).then((res) => res.data);
   },
+  tonkhoNVL() {
+    return repository.get(`/v1/${resoure}/tonkhoNVL`).then((res) => res.data);
+  },
+  tonkhoVattu() {
+    return repository.get(`/v1/${resoure}/tonkhoVattu`).then((res) => res.data);
+  },
   group_materials() {
     return repository
       .get(`/v1/${resoure}/group_materials`)
