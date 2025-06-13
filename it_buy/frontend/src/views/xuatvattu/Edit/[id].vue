@@ -31,7 +31,7 @@
 
           <div class="row">
             <div class="col-12">
-              <Panel header="Dự trù hàng hóa" :toggleable="true">
+              <Panel header="Đề nghị" :toggleable="true">
                 <div class="row">
                   <div class="col-md-3">
                     <div class="form-group row">
@@ -320,6 +320,7 @@ const submit = async () => {
     });
     load_data(model.value.id);
   }
+  return true;
 };
 const view = async () => {
   await submit();

@@ -1,11 +1,13 @@
 <template>
   <AutoComplete :modelValue="modelValue" @update:modelValue="emit('update:modelValue', $event)" optionLabel="label"
-    optionGroupLabel="label" optionGroupChildren="items" :disabled="disabled" :suggestions="filterItems"
-    @complete="search" class="w-100" :forceSelection="type_id != 3" :virtualScrollerOptions="{ itemSize: 38 }"
-    inputClass="form-control form-control-sm" @item-select="emit('item-select', $event)">
+    :disabled="disabled" :suggestions="filterItems" @complete="search" class="w-100" :forceSelection="true"
+    :virtualScrollerOptions="{ itemSize: 38 }" inputClass="form-control form-control-sm" :panelStyle="{ width: '50%' }"
+    @item-select="emit('item-select', $event)">
     <template #option="slotProps">
       <div class="flex align-options-center">
-        {{ slotProps.option.mahh }} - {{ slotProps.option.tenhh }}
+        {{ slotProps.option.mahh }} - {{ slotProps.option.tenhh }} (<i>Tồn kho</i>: <b>{{ slotProps.option.soluong
+        }} {{
+            slotProps.option.dvt }}</b>)
       </div>
     </template>
   </AutoComplete>
@@ -31,16 +33,13 @@ const props = defineProps({
 });
 const emit = defineEmits(["update:modelValue", "item-select"]);
 const store = useGeneral();
-const { materialGroup } = storeToRefs(store);
+const { NVLGroup } = storeToRefs(store);
 
 const items = computed(() => {
-  return materialGroup.value.map((item) => {
-    item.label = item.manhom + " - " + item.tennhom;
-    item.items = item.items.map((i) => {
-      i.label = i.mahh + "-" + i.tenhh;
-      i.id = i.mahh;
-      return i;
-    });
+  // console.log("VattuGroup.value", VattuGroup.value);
+  return NVLGroup.value.map((item) => {
+    item.label = item.mahh + "-" + item.tenhh;
+    item.id = item.mahh;
     return item;
   });
 });
@@ -50,52 +49,20 @@ const search = (event) => {
   let query = event.query;
   let newFiltered = [];
 
-  for (let item of items.value) {
-    // if (props.type_id == 1) {
-    //   if (
-    //     [
-    //       "0716",
-    //       "0706",
-    //       "0721",
-    //       "0722",
-    //       "0723",
-    //       "0724",
-    //       "0725",
-    //       "Khac",
-    //     ].indexOf(item.manhom) != -1
-    //   ) {
-    //     continue;
-    //   }
-    // } else if (props.type_id == 2 || props.type_id == 3) {
-    //   if (
-    //     [
-    //       "0716",
-    //       "0706",
-    //       "0721",
-    //       "0722",
-    //       "0723",
-    //       "0724",
-    //       "0725",
-    //       "Khac",
-    //     ].indexOf(item.manhom) == -1
-    //   ) {
-    //     continue;
-    //   }
-    // }
-    let filteredItems = FilterService.filter(
-      item.items,
-      ["label"],
-      query,
-      FilterMatchMode.CONTAINS
-    );
-    if (filteredItems && filteredItems.length) {
-      newFiltered.push({ ...item, ...{ items: filteredItems } });
-    }
+  let filteredItems = FilterService.filter(
+    items.value,
+    ["label"],
+    query,
+    FilterMatchMode.CONTAINS
+  );
+  if (filteredItems && filteredItems.length) {
+    newFiltered = filteredItems;
   }
 
+  // console.log(newFiltered);
   filterItems.value = newFiltered;
 };
 onMounted(() => {
-  store.fetchMaterialGroup();
+  // store.fetchMaterialGroup();
 });
 </script>

@@ -24,7 +24,7 @@
         <span class="ui-column-title">{{ col.label }}</span>
         <div class="ui-column-data">
           <template v-if="col.data == 'id'">
-            <router-link :to="'/xuatvattu/edit/' + slotProps.data[col.data]">
+            <router-link :to="'/xuatnguyenlieu/edit/' + slotProps.data[col.data]">
               <i class="fas fa-pencil-alt mr-2"></i>
               {{ slotProps.data[col.data] }}
             </router-link>
@@ -33,7 +33,8 @@
           <template v-else-if="col.data == 'code'">
             <div>
               <div style="text-wrap: pretty">
-                <router-link :to="'/xuatvattu/edit/' + slotProps.data.id" class="text-blue">{{ slotProps.data.code }}
+                <router-link :to="'/xuatnguyenlieu/edit/' + slotProps.data.id" class="text-blue">{{ slotProps.data.code
+                }}
                 </router-link>
               </div>
               <small>Tạo bởi
@@ -105,7 +106,7 @@
 </template>
 <script setup>
 import { onMounted, ref, computed, watch } from "vue";
-import xuatvattuApi from "../../api/xuatvattuApi";
+import xuatnguyenlieuApi from "../../api/xuatnguyenlieuApi";
 import Tag from "primevue/tag";
 import DataTable from "primevue/datatable";
 import { FilterMatchMode } from "primevue/api";
@@ -177,7 +178,7 @@ const departments = ref([]);
 const totalRecords = ref(0);
 const loading = ref(true);
 const showing = ref([]);
-const column_cache = "columns_xuatvattu"; ////
+const column_cache = "columns_xuatnguyenlieu"; ////
 const first = ref(0);
 const rows = ref(10);
 const draw = ref(0);
@@ -210,7 +211,7 @@ const normalizer = (node) => {
 ////Data table
 const loadLazyData = () => {
   loading.value = true;
-  xuatvattuApi.table(lazyParams.value).then((res) => {
+  xuatnguyenlieuApi.table(lazyParams.value).then((res) => {
     // console.log(res);
     datatable.value = res.data;
     totalRecords.value = res.recordsFiltered;
@@ -230,7 +231,7 @@ const confirmDelete = (id) => {
     header: "Xác nhận",
     icon: "pi pi-exclamation-triangle",
     accept: () => {
-      xuatvattuApi.delete(id).then((res) => {
+      xuatnguyenlieuApi.delete(id).then((res) => {
         loadLazyData();
       });
     },
@@ -243,7 +244,7 @@ const confirmCopy = (id) => {
     header: "Xác nhận",
     icon: "pi pi-exclamation-triangle",
     accept: () => {
-      router.push("/xuatvattu/copy/" + id);
+      router.push("/xuatnguyenlieu/copy/" + id);
     },
   });
 };

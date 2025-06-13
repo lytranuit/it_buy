@@ -25,7 +25,7 @@
           <span>Đề nghị xuất vật tư</span>
         </router-link>
       </li>
-      <li>
+      <li v-if="is_RD || is_KHSX || is_admin">
         <router-link class="nav-link" to="/xuatnguyenlieu">
           <i class="fas fa-hockey-puck"></i>
           <span>Đề nghị xuất nguyên vật liệu</span>

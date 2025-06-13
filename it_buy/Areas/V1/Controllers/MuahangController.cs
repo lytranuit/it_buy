@@ -327,7 +327,7 @@ namespace it_template.Areas.V1.Controllers
             var list_mahh = new List<string>() { mahh };
             if (is_sametype == true)
             {
-                list_mahh = _context.MaterialModel.Where(d => d.mahh == mahh || (d.group != null && d.group == hh.group)).Select(d => d.mahh).ToList();
+                list_mahh = _context.MaterialModel.Where(d => d.mahh.StartsWith(mahh) || (d.group != null && d.group == hh.group)).Select(d => d.mahh).ToList();
             }
             var muahang_chitiet = _context.MuahangChitietModel
                 .Include(d => d.muahang).ThenInclude(d => d.muahang_chonmua).ThenInclude(d => d.chitiet)
