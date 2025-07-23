@@ -235,9 +235,12 @@ onMounted(() => {
     min-width: 150px;
   }
 
+  .date_nhanhang {
+    min-width: 200px;
+  }
+
   .tenhh,
-  .nhasx,
-  .leadtime {
+  .nhasx {
     min-width: 300px;
   }
 }

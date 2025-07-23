@@ -386,7 +386,7 @@ namespace it_template.Areas.V1.Controllers
 
         public async Task<IActionResult> importmahh()
         {
-            //return Ok();
+            return Ok();
             // Khởi tạo workbook để đọc
             Spire.Xls.Workbook book = new Spire.Xls.Workbook();
             book.LoadFromFile("./wwwroot/report/excel/DS HH.xlsx", ExcelVersion.Version2013);

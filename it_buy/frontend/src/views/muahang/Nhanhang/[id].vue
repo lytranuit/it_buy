@@ -112,6 +112,7 @@ const load_data = async (id) => {
   var chitiet = res.chitiet;
   var muahang_chonmua = res.muahang_chonmua;
   res.date = res.date ? moment(res.date).format("YYYY-MM-DD") : null;
+  res.date_nhanhang = res.date_nhanhang ? moment(res.date_nhanhang).format("YYYY-MM-DD") : null;
   res.nhacungcap_id = muahang_chonmua ? muahang_chonmua.ncc_id : null;
   delete res.chitiet;
   delete res.nccs;

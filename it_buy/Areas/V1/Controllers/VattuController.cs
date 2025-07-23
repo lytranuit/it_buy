@@ -9,6 +9,7 @@ using System.Linq.Expressions;
 using System.Text.Json.Serialization;
 using Vue.Data;
 using Vue.Models;
+using static iText.Svg.SvgConstants;
 
 namespace it_template.Areas.V1.Controllers
 {
@@ -291,7 +292,7 @@ namespace it_template.Areas.V1.Controllers
             }
             else
             {
-                int count = _QLSXcontext.VattuNhapModel.Where(d => d.ngaylap.Value.Date == VattuNhapModel.ngaylap.Value.Date).Count();
+                int count = _QLSXcontext.VattuNhapModel.Where(d => d.created_at.Value.Date == DateTime.Now.Date).Count();
                 count = count + 1;
                 var sohd = "NHAP_" + DateTime.Now.Date.ToString("ddMMyy") + "_" + count.ToString("D3");
                 var DTA_NHAPXUAT_old = _QLSXcontext.VattuNhapModel.Where(d => d.sohd == sohd).FirstOrDefault();
@@ -319,6 +320,11 @@ namespace it_template.Areas.V1.Controllers
                     item.sohd = VattuNhapModel.sohd;
                     //item.ngaylaphd = VattuNhapModel.ngaylap;
                     //item.created_by = VattuNhapModel.created_by;
+                    if (item.handung != null && item.handung.Value.Kind == DateTimeKind.Utc)
+                    {
+                        item.handung = item.handung.Value.ToLocalTime();
+                    }
+
                     _QLSXcontext.Add(item);
                     //_QLSXcontext.SaveChanges();
                     list.Add(item);
@@ -328,6 +334,10 @@ namespace it_template.Areas.V1.Controllers
             {
                 foreach (var item in list_update)
                 {
+                    if (item.handung != null && item.handung.Value.Kind == DateTimeKind.Utc)
+                    {
+                        item.handung = item.handung.Value.ToLocalTime();
+                    }
                     _QLSXcontext.Update(item);
                     list.Add(item);
                 }
@@ -492,7 +502,7 @@ namespace it_template.Areas.V1.Controllers
             }
             else
             {
-                int count = _QLSXcontext.VattuDieuchuyenModel.Where(d => d.ngaylap.Value.Date == VattuDieuchuyenModel.ngaylap.Value.Date).Count();
+                int count = _QLSXcontext.VattuDieuchuyenModel.Where(d => d.created_at.Value.Date == DateTime.Now.Date).Count();
                 count = count + 1;
                 var sohd = "XUAT_" + DateTime.Now.Date.ToString("ddMMyy") + "_" + count.ToString("D3");
                 var DTA_XuatXUAT_old = _QLSXcontext.VattuDieuchuyenModel.Where(d => d.sohd == sohd).FirstOrDefault();
@@ -522,6 +532,10 @@ namespace it_template.Areas.V1.Controllers
                     //item.created_by = VattuDieuchuyenModel.created_by;
                     if (item.kt_xuat == true)
                         item.user_xuat = user.Email;
+                    if (item.handung != null && item.handung.Value.Kind == DateTimeKind.Utc)
+                    {
+                        item.handung = item.handung.Value.ToLocalTime();
+                    }
                     _QLSXcontext.Add(item);
                     //_QLSXcontext.SaveChanges();
                     list.Add(item);
@@ -531,6 +545,10 @@ namespace it_template.Areas.V1.Controllers
             {
                 foreach (var item in list_update)
                 {
+                    if (item.handung != null && item.handung.Value.Kind == DateTimeKind.Utc)
+                    {
+                        item.handung = item.handung.Value.ToLocalTime();
+                    }
                     _QLSXcontext.Update(item);
                     list.Add(item);
                 }
@@ -540,56 +558,56 @@ namespace it_template.Areas.V1.Controllers
             _QLSXcontext.SaveChanges();
 
             ///Xóa phiếu cũ
-            var DTA_HOADON_XUAT = _QLSXcontext.DTA_HOADON_XUAT.Where(d => d.sohd.StartsWith(VattuDieuchuyenModel.sohd)).ToList();
-            var DTA_CT_HOADON_XUAT = _QLSXcontext.DTA_CT_HOADON_XUAT.Where(d => d.sohd == VattuDieuchuyenModel.sohd).ToList();
-            var HOADON_KHOA = DTA_HOADON_XUAT.Where(d => d.khoa == true).Count();
-            if (HOADON_KHOA == 0)
-            {
-                _QLSXcontext.RemoveRange(DTA_CT_HOADON_XUAT);
-                _QLSXcontext.RemoveRange(DTA_HOADON_XUAT);
-                _QLSXcontext.SaveChanges();
+            //var DTA_HOADON_XUAT = _QLSXcontext.DTA_HOADON_XUAT.Where(d => d.sohd.StartsWith(VattuDieuchuyenModel.sohd)).ToList();
+            //var DTA_CT_HOADON_XUAT = _QLSXcontext.DTA_CT_HOADON_XUAT.Where(d => d.sohd == VattuDieuchuyenModel.sohd).ToList();
+            //var HOADON_KHOA = DTA_HOADON_XUAT.Where(d => d.khoa == true).Count();
+            //if (HOADON_KHOA == 0)
+            //{
+            //    _QLSXcontext.RemoveRange(DTA_CT_HOADON_XUAT);
+            //    _QLSXcontext.RemoveRange(DTA_HOADON_XUAT);
+            //    _QLSXcontext.SaveChanges();
 
-                ////Thêm phiếu mới
-                var khoden = _QLSXcontext.KhoModel.Where(d => d.makho == VattuDieuchuyenModel.noiden).FirstOrDefault();
-                var DTA_HOADON_XUAT_NEW = new DTA_HOADON_XUAT()
-                {
-                    sohd = VattuDieuchuyenModel.sohd,
-                    ngaylaphd = VattuDieuchuyenModel.ngaylap,
-                    mapl = VattuDieuchuyenModel.noidi,
-                    donvi = khoden != null ? khoden.tenkho : "",
-                    makh = VattuDieuchuyenModel.noiden,
-                    mach = VattuDieuchuyenModel.created_by,
-                    tennguoigd = VattuDieuchuyenModel.ghichu,
-                    pl = VattuDieuchuyenModel.pl,
-                    noixuat = VattuDieuchuyenModel.noidi,
-                };
-                _QLSXcontext.Add(DTA_HOADON_XUAT_NEW);
+            //    ////Thêm phiếu mới
+            //    var khoden = _QLSXcontext.KhoModel.Where(d => d.makho == VattuDieuchuyenModel.noiden).FirstOrDefault();
+            //    var DTA_HOADON_XUAT_NEW = new DTA_HOADON_XUAT()
+            //    {
+            //        sohd = VattuDieuchuyenModel.sohd,
+            //        ngaylaphd = VattuDieuchuyenModel.ngaylap,
+            //        mapl = VattuDieuchuyenModel.noidi,
+            //        donvi = khoden != null ? khoden.tenkho : "",
+            //        makh = VattuDieuchuyenModel.noiden,
+            //        mach = VattuDieuchuyenModel.created_by,
+            //        tennguoigd = VattuDieuchuyenModel.ghichu,
+            //        pl = VattuDieuchuyenModel.pl,
+            //        noixuat = VattuDieuchuyenModel.noidi,
+            //    };
+            //    _QLSXcontext.Add(DTA_HOADON_XUAT_NEW);
 
-                var stt = 1;
-                foreach (var item in list)
-                {
-                    var hh = _context.MaterialModel.Where(d => d.mahh == item.mahh).FirstOrDefault();
-                    var DTA_CT_HOADON_XUAT_NEW = new DTA_CT_HOADON_XUAT()
-                    {
-                        kt = true,
-                        sohd = DTA_HOADON_XUAT_NEW.sohd,
-                        ngaylaphd = DTA_HOADON_XUAT_NEW.ngaylaphd,
-                        mach = DTA_HOADON_XUAT_NEW.mach,
-                        mahh = item.mahh,
-                        tenhh = hh.tenhh,
-                        malo = item.malo,
-                        handung = item.malo,
-                        dvt = hh.dvt,
-                        soluong = item.soluong,
-                        stt = stt++,
-                        ghichu = item.ghichu,
+            //    var stt = 1;
+            //    foreach (var item in list)
+            //    {
+            //        var hh = _context.MaterialModel.Where(d => d.mahh == item.mahh).FirstOrDefault();
+            //        var DTA_CT_HOADON_XUAT_NEW = new DTA_CT_HOADON_XUAT()
+            //        {
+            //            kt = true,
+            //            sohd = DTA_HOADON_XUAT_NEW.sohd,
+            //            ngaylaphd = DTA_HOADON_XUAT_NEW.ngaylaphd,
+            //            mach = DTA_HOADON_XUAT_NEW.mach,
+            //            mahh = item.mahh,
+            //            tenhh = hh.tenhh,
+            //            malo = item.malo,
+            //            handung = item.malo,
+            //            dvt = hh.dvt,
+            //            soluong = item.soluong,
+            //            stt = stt++,
+            //            ghichu = item.ghichu,
 
-                    };
-                    _QLSXcontext.Add(DTA_CT_HOADON_XUAT_NEW);
-                }
+            //        };
+            //        _QLSXcontext.Add(DTA_CT_HOADON_XUAT_NEW);
+            //    }
 
-                _QLSXcontext.SaveChanges();
-            }
+            //    _QLSXcontext.SaveChanges();
+            //}
 
 
             return Json(new { success = true, id = VattuDieuchuyenModel.id });
@@ -603,11 +621,11 @@ namespace it_template.Areas.V1.Controllers
             _QLSXcontext.SaveChanges();
 
             ///Xóa phiếu cũ
-            var DTA_HOADON_XUAT = _QLSXcontext.DTA_HOADON_XUAT.Where(d => d.sohd.StartsWith(Xuat.sohd)).ToList();
-            var DTA_CT_HOADON_XUAT = _QLSXcontext.DTA_CT_HOADON_XUAT.Where(d => d.sohd == Xuat.sohd).ToList();
-            _QLSXcontext.RemoveRange(DTA_CT_HOADON_XUAT);
-            _QLSXcontext.RemoveRange(DTA_HOADON_XUAT);
-            _QLSXcontext.SaveChanges();
+            //var DTA_HOADON_XUAT = _QLSXcontext.DTA_HOADON_XUAT.Where(d => d.sohd.StartsWith(Xuat.sohd)).ToList();
+            //var DTA_CT_HOADON_XUAT = _QLSXcontext.DTA_CT_HOADON_XUAT.Where(d => d.sohd == Xuat.sohd).ToList();
+            //_QLSXcontext.RemoveRange(DTA_CT_HOADON_XUAT);
+            //_QLSXcontext.RemoveRange(DTA_HOADON_XUAT);
+            //_QLSXcontext.SaveChanges();
 
 
 
@@ -831,13 +849,13 @@ namespace it_template.Areas.V1.Controllers
             var list_hh = _context.MaterialModel.Where(d => d.deleted_at == null).ToList();
             var list_ncc = _context.NhacungcapModel.ToList();
             var list_nsx = _context.NsxModel.ToList();
-            var datalist = customerData.GroupBy(d => new { d.mahh, d.mancc, d.makho, d.malo, d.handung }).Select(d => new VattuInventory()
+            var datalist = customerData.GroupBy(d => new { d.mahh, d.mancc, d.makho, d.malo }).Select(d => new VattuInventory()
             {
                 mahh = d.Key.mahh,
                 makho = d.Key.makho,
                 mancc = d.Key.mancc,
                 malo = d.Key.malo,
-                handung = d.Key.handung,
+                handung = d.FirstOrDefault().handung,
                 //tenhh = list_hh.Where(e => e.mahh == d.Key.mahh).FirstOrDefault()?.tenhh,
                 //dvt = list_hh.Where(e => e.mahh == d.Key.mahh).FirstOrDefault()?.dvt,
                 //tenncc = list_ncc.Where(e => e.mancc == d.Key.mancc).FirstOrDefault()?.tenncc,
@@ -897,18 +915,19 @@ namespace it_template.Areas.V1.Controllers
                 //    file = "TỒN KHO RD 31.05.2025.xlsx",
                 //    makho = "13",
 
-                //},new
-                //{
-                //    file = "TỒN KHO QC 31.05.2025.xlsx",
-                //    makho = "02",
-
                 //},
                 new
                 {
-                    file = "mã 0706.xlsx",
-                    makho = "12",
+                    file = "TỒN KHO QC 30.06.2025.xlsx",
+                    makho = "02",
 
-                }
+                },
+                //new
+                //{
+                //    file = "mã 0706.xlsx",
+                //    makho = "12",
+
+                //}
             };
             var list_hh = _context.MaterialModel.ToList();
             var error = new List<string>();

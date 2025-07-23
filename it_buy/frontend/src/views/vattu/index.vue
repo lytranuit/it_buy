@@ -36,6 +36,9 @@
                     {{ slotProps.data[col.data] }}
                   </RouterLink>
                 </template>
+                <template v-else-if="col.data == 'handung'">
+                  {{ formatDate(slotProps.data[col.data]) }}
+                </template>
                 <template v-else-if="col.data == 'soluong'">
                   {{ formatPrice(slotProps.data[col.data]) }} {{ slotProps.data.dvt }}
                 </template>
@@ -65,7 +68,7 @@ import Column from "primevue/column"; ////datatable1
 import InputText from "primevue/inputtext";
 import { useConfirm } from "primevue/useconfirm";
 import Loading from "../../components/Loading.vue";
-import { formatPrice } from "../../utilities/util";
+import { formatPrice, formatDate } from "../../utilities/util";
 import { useVattu } from "../../stores/Vattu";
 import { storeToRefs } from "pinia";
 import { rand } from "../../utilities/rand";
@@ -87,6 +90,16 @@ const columns = ref([
     data: "tenhh",
     className: "text-center",
     filter: true,
+  },
+  {
+    label: "Số lô",
+    data: "malo",
+    className: "text-center",
+  },
+  {
+    label: "Hạn dùng",
+    data: "handung",
+    className: "text-center",
   },
   {
     label: "Mã nhà cung cấp",
